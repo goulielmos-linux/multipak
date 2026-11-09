@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=MultiPak Application Installer
+Name[pt_BR]=Instalador de Aplicativos — MultiPak
+Comment=Install RPM, DEB, Arch Linux and AppImage applications
+Comment[pt_BR]=Instale aplicativos RPM, DEB, Arch Linux e AppImage
+Exec=multipak-installer %f
+Icon=io.github.multipak.installer
+Terminal=false
+Categories=System;PackageManager;
+MimeType=application/x-rpm;application/vnd.debian.binary-package;application/x-deb;application/x-archlinux-package;application/vnd.appimage;application/x-iso9660-appimage;application/x-appimage;application/x-multipak-appimage;
+StartupNotify=true
+StartupWMClass=io.github.multipak.installer
+NoDisplay=true

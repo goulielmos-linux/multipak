@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.multipak.manager</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  <name>MultiPak</name>
+  <icon type="stock">io.github.multipak.manager.installer</icon>
+  <summary>Install different package formats and manage your applications</summary>
+  <summary xml:lang="pt_BR">Instale diferentes formatos de pacotes e gerencie seus aplicativos</summary>
+  <description>
+    <p>MultiPak was developed to make installing different Linux package formats on Bazzite easier and more consistent. It brings RPM, DEB, compiled Arch Linux packages and AppImages together in a single graphical workflow, reducing the need to learn a separate installation process for each format.</p>
+  </description>
+  <launchable type="desktop-id">io.github.multipak.manager.desktop</launchable>
+  <developer id="io.github.multipak"><name>Goulielmos</name></developer>
+  <categories><category>System</category><category>PackageManager</category></categories>
+  <provides><binary>multipak-manager</binary><binary>multipak-installer</binary></provides>
+  <releases><release version="1.0.0a1" date="2026-11-09" type="development"/></releases>
+  <content_rating type="oars-1.1"/>
+</component>

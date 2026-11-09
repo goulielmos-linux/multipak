@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=MultiPak Application Manager
+Name[pt_BR]=Gerenciador de Aplicativos — MultiPak
+Comment=Manage your applications and set your preferences.
+Comment[pt_BR]=Gerencie seus aplicativos e ajuste suas preferências.
+Exec=multipak-manager
+Icon=io.github.multipak.manager
+Terminal=false
+Categories=System;PackageManager;
+StartupNotify=true
+StartupWMClass=io.github.multipak.manager
+Keywords=MultiPak;applications;containers;uninstall;update;
+Keywords[pt_BR]=MultiPak;aplicativos;programas;contêineres;desinstalar;atualizar;
