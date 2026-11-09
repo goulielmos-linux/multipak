@@ -1,0 +1,51 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "multipak"
+dynamic = ["version"]
+description = "A graphical RPM, DEB, Arch and AppImage installer for Linux desktops"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "GPL-3.0-only"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{name = "Goulielmos"}]
+dependencies = [
+    "PySide6-Essentials>=6.7,<7",
+    "zstandard>=0.23,<1; python_version < '3.14'",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.9", "build>=1"]
+
+[project.scripts]
+multipak-installer = "multipak.launcher:main"
+multipak-manager = "multipak.launcher:manager_main"
+multipak-appimage = "multipak.appimage_launcher:main"
+
+[tool.hatch.version]
+path = "src/multipak/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/multipak"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"data/io.github.multipak.manager.desktop" = "share/applications/io.github.multipak.manager.desktop"
+"data/io.github.multipak.installer.desktop" = "share/applications/io.github.multipak.installer.desktop"
+"src/multipak/assets/multipak-packages.xml" = "share/mime/packages/io.github.multipak.packages.xml"
+"src/multipak/kirigami/assets/multipak-installer.svg" = "share/icons/hicolor/scalable/apps/io.github.multipak.installer.svg"
+"src/multipak/kirigami/assets/multipak-manager.svg" = "share/icons/hicolor/scalable/apps/io.github.multipak.manager.svg"
+"src/multipak/kirigami/assets/multipak-installer.png" = "share/icons/hicolor/256x256/apps/io.github.multipak.installer.png"
+"src/multipak/kirigami/assets/multipak-manager.png" = "share/icons/hicolor/256x256/apps/io.github.multipak.manager.png"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+

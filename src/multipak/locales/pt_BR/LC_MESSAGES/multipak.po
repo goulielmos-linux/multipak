@@ -1,0 +1,1190 @@
+msgid ""
+msgstr "Project-Id-Version: MultiPak 1.0.0a1\nLanguage: pt_BR\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "\n\nCheck the rpm-ostree status before trying again. No system deployment was automatically undone."
+msgstr "\n\nConfira o estado do rpm-ostree antes de repetir. Nenhuma implantação do sistema foi desfeita automaticamente."
+
+msgid " (Unavailable)"
+msgstr " (Não disponível)"
+
+msgid " Before installation, the container packages will be updated by Pacman."
+msgstr " Antes da instalação, os pacotes do contêiner serão atualizados pelo Pacman."
+
+msgid " The filename indicates Fedora {0}, unlike the internal metadata; the internal metadata took priority."
+msgstr " O nome do arquivo indica Fedora {0}, divergindo dos metadados internos; os metadados internos tiveram prioridade."
+
+msgid " The image version number has not been confirmed yet."
+msgstr " A versão numérica da imagem ainda não foi confirmada."
+
+msgid " — stable version"
+msgstr " — versão estável"
+
+msgid "<a href='dependencies'>View full list</a>"
+msgstr "<a href='dependencies'>Ver lista completa</a>"
+
+msgid "A container with that name already exists. Choose another name."
+msgstr "Já existe um contêiner com esse nome. Escolha outro nome."
+
+msgid "A copy of the AppImage will be saved and a shortcut added to your application launcher."
+msgstr "Uma cópia do AppImage será salva e um atalho será adicionado ao lançador de aplicativos."
+
+msgid "A new container will be created and named during setup."
+msgstr "Um novo contêiner será criado. O nome será definido ao preparar o ambiente."
+
+msgid "A system operation or change is pending. Complete it and restart before uninstalling."
+msgstr "Há uma operação ou alteração pendente no sistema. Conclua essa operação e reinicie antes de desinstalar."
+
+msgid "A system operation or deployment is pending. Complete it and restart before trying again."
+msgstr "Há uma operação ou implantação pendente no sistema. Conclua essa operação e reinicie antes de tentar novamente."
+
+msgid "About the Application Installer — MultiPak"
+msgstr "Sobre o Instalador de Aplicativos — MultiPak"
+
+msgid "About the Application Manager — MultiPak"
+msgstr "Sobre o Gerenciador de Aplicativos — MultiPak"
+
+msgid "About the author"
+msgstr "Sobre o autor"
+
+msgid "About the recommended environment"
+msgstr "Entender a sugestão do ambiente"
+
+msgid "Adding application shortcuts…"
+msgstr "Adicionando atalhos ao lançador de aplicativos…"
+
+msgid "Adding the application to the application launcher…"
+msgstr "Adicionando o aplicativo ao lançador de aplicativos…"
+
+msgid "Additional dependencies:"
+msgstr "Dependências extras:"
+
+msgid "Advanced settings"
+msgstr "Configurações avançadas"
+
+msgid "Also delete the container's home folder, including its data and settings."
+msgstr "Também excluir a pasta pessoal do contêiner, incluindo seus dados e configurações."
+
+msgid "Another application uses this container. It will be kept."
+msgstr "Outro aplicativo utiliza esse contêiner. Ele será mantido."
+
+msgid "Another container uses this home folder. It will be kept."
+msgstr "Outro contêiner utiliza essa pasta pessoal. Ela será mantida."
+
+msgid "Another installation is already in progress."
+msgstr "Outra instalação já está em andamento."
+
+msgid "AppImage managed by MultiPak"
+msgstr "AppImage gerenciado pelo MultiPak"
+
+msgid "AppImage uninstalled. Personal data was preserved."
+msgstr "AppImage desinstalado. Os dados pessoais foram preservados."
+
+msgid "Application"
+msgstr "Programa"
+
+msgid "Application Installer — MultiPak"
+msgstr "Instalador de Aplicativos — MultiPak"
+
+msgid "Application Manager — MultiPak"
+msgstr "Gerenciador de Aplicativos — MultiPak"
+
+msgid "Application uninstalled. The container and personal data were preserved."
+msgstr "Aplicativo desinstalado. O contêiner e os dados pessoais foram preservados."
+
+msgid "Application {0} — MultiPak"
+msgstr "{0} de Aplicativos — MultiPak"
+
+msgid "Application: <b>%1</b> (%2)"
+msgstr "Aplicativo: <b>%1</b> (%2)"
+
+msgid "Arch Linux packages (.pkg.tar, .pkg.tar.zst, .pkg.tar.xz, .pkg.tar.gz and .pkg.tar.bz2)"
+msgstr "Pacotes Arch Linux (.pkg.tar, .pkg.tar.zst, .pkg.tar.xz, .pkg.tar.gz e .pkg.tar.bz2)"
+
+msgid "Arch package metadata exceeds the read limit."
+msgstr "Metadados do pacote Arch excedem o limite de leitura."
+
+msgid "Architecture {0} is incompatible with {1}."
+msgstr "Arquitetura {0} incompatível com {1}."
+
+msgid "Authors"
+msgstr "Autores"
+
+msgid "Back"
+msgstr "Voltar"
+
+msgid "Backend"
+msgstr "Backend"
+
+msgid "Bazaar is not installed or could not be found on this computer."
+msgstr "O Bazaar não está instalado ou não foi encontrado neste computador."
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Cancel installation"
+msgstr "Desistir"
+
+msgid "Cancelling installation"
+msgstr "Cancelando a instalação"
+
+msgid "Changes operating system files. This can cause dependency conflicts or prevent applications from working after an update."
+msgstr "Modifica os arquivos do sistema operacional. Pode causar conflitos de dependências e perda de funcionalidade após atualizações."
+
+msgid "Checking…"
+msgstr "Verificando…"
+
+msgid "Choose a custom name. The MultiPak prefix is reserved for the application."
+msgstr "Use um nome próprio. O prefixo MultiPak é reservado ao aplicativo."
+
+msgid "Choose a custom name. This name and the MultiPak prefixes are reserved for containers managed by the application."
+msgstr "Use um nome próprio. Esse nome e os prefixos do MultiPak são reservados aos contêineres gerenciados pelo aplicativo."
+
+msgid "Choose a valid name for the new environment."
+msgstr "Escolha um nome válido para o novo ambiente."
+
+msgid "Choose an RPM, DEB, prebuilt Arch Linux package or AppImage."
+msgstr "Escolha um pacote RPM, DEB, Arch Linux compilado ou AppImage."
+
+msgid "Choose another distribution or version"
+msgstr "Escolher outra distribuição ou versão"
+
+msgid "Choose the language used by MultiPak."
+msgstr "Escolha o idioma usado pelo MultiPak."
+
+msgid "Choose which file extensions to open."
+msgstr "Escolha quais extensões abrir."
+
+msgid "Choose which file types should open in the MultiPak Installation Wizard."
+msgstr "Escolha quais tipos de arquivo devem abrir no Assistente de Instalação MultiPak."
+
+msgid "Cleaning up the installation…"
+msgstr "Removendo os componentes da instalação…"
+
+msgid "Close"
+msgstr "Fechar"
+
+msgid "Container"
+msgstr "Contêiner"
+
+msgid "Container %1 has no applications registered in the Application Manager. Would you like to remove it to free up disk space?"
+msgstr "O contêiner %1 não tem mais aplicativos registrados no Gerenciador de Aplicativos. Deseja excluí-lo para liberar espaço em disco?"
+
+msgid "Container %1 will be created for this installation."
+msgstr "O contêiner %1 será criado para a instalação."
+
+msgid "Container %1 will be reused for this installation."
+msgstr "O contêiner %1 será reutilizado para a instalação."
+
+msgid "Container and its home folder removed."
+msgstr "Contêiner e sua pasta pessoal excluídos."
+
+msgid "Container base"
+msgstr "Base do contêiner"
+
+msgid "Container based on %1"
+msgstr "Contêiner baseado em %1"
+
+msgid "Container cleanup cannot undo a system installation."
+msgstr "A limpeza de contêineres não pode desfazer uma instalação no sistema."
+
+msgid "Container distribution and version"
+msgstr "Distribuição e versão do contêiner"
+
+msgid "Container name"
+msgstr "Nome do contêiner"
+
+msgid "Container removed. Its home folder was preserved."
+msgstr "Contêiner excluído. Sua pasta pessoal foi preservada."
+
+msgid "Container {0} will be {1} for this installation."
+msgstr "O contêiner {0} será {1} para a instalação."
+
+msgid "Container: {0}"
+msgstr "Contêiner: {0}"
+
+msgid "Continue"
+msgstr "Continuar"
+
+msgid "Continue with direct installation"
+msgstr "Continuar com a instalação direta"
+
+msgid "Copying the AppImage…"
+msgstr "Copiando o AppImage…"
+
+msgid "Copying the package to the container…"
+msgstr "Copiando o pacote para o contêiner…"
+
+msgid "Copying the package to the existing container…"
+msgstr "Copiando o pacote para o ambiente existente…"
+
+msgid "Copyright"
+msgstr "Direitos autorais"
+
+msgid "Could not check whether the container can be removed: {0}"
+msgstr "Não foi possível verificar se o contêiner pode ser excluído: {0}"
+
+msgid "Could not complete the operation"
+msgstr "Não foi possível concluir a operação"
+
+msgid "Could not complete: "
+msgstr "Não foi possível concluir: "
+
+msgid "Could not find 7-Zip or bsdtar to read the type 1 AppImage."
+msgstr "Não foi encontrado 7-Zip ou bsdtar para ler o AppImage tipo 1."
+
+msgid "Could not find unsquashfs to read the type 2 AppImage."
+msgstr "Não foi encontrado unsquashfs para ler o AppImage tipo 2."
+
+msgid "Could not identify the active deployment."
+msgstr "Não foi possível identificar a implantação em execução."
+
+msgid "Could not identify the distribution and version this package was built for. "
+msgstr "Não foi possível identificar a distribuição e a versão para as quais este pacote foi preparado. "
+
+msgid "Could not identify the host's user directories."
+msgstr "Não foi possível identificar as pastas do usuário no sistema."
+
+msgid "Could not identify the image version."
+msgstr "Não foi possível identificar a versão da imagem."
+
+msgid "Could not load Kirigami. Use the compatible PySide6 and Kirigami supplied by the system."
+msgstr "Não foi possível carregar Kirigami. Use o PySide6 e o Kirigami compatíveis fornecidos pelo sistema."
+
+msgid "Could not load the Kirigami manager."
+msgstr "Não foi possível carregar o gerenciador Kirigami."
+
+msgid "Could not locate the AppImage contents."
+msgstr "Não foi possível localizar o conteúdo do AppImage."
+
+msgid "Could not open Bazaar."
+msgstr "Não foi possível abrir o Bazaar."
+
+msgid "Could not open Kontainer"
+msgstr "Não foi possível abrir o Kontainer"
+
+msgid "Could not open Kontainer."
+msgstr "Não foi possível abrir o Kontainer."
+
+msgid "Could not query direct installations: "
+msgstr "Não foi possível consultar as instalações diretas: "
+
+msgid "Could not query existing environments: {0}"
+msgstr "Não foi possível consultar ambientes existentes: {0}"
+
+msgid "Could not query file associations: xdg-utils is missing."
+msgstr "Não foi possível consultar as associações de arquivos: falta xdg-utils."
+
+msgid "Could not query the system status."
+msgstr "Não foi possível consultar o estado do sistema."
+
+msgid "Could not refresh the list: "
+msgstr "Não foi possível atualizar a lista: "
+
+msgid "Could not register the icon in Kontainer: {0}"
+msgstr "Não foi possível registrar o ícone no Kontainer: {0}"
+
+msgid "Could not remove the container: {0}"
+msgstr "Não foi possível excluir o contêiner: {0}"
+
+msgid "Could not retrieve the list of layered system packages."
+msgstr "Não foi possível consultar os pacotes em camadas do sistema."
+
+msgid "Could not save the image."
+msgstr "Não foi possível salvar a imagem."
+
+msgid "Could not save the language preference: {0}"
+msgstr "Não foi possível salvar a preferência de idioma: {0}"
+
+msgid "Could not update file types: shared-mime-info is missing."
+msgstr "Não foi possível atualizar os tipos de arquivo: falta shared-mime-info."
+
+msgid "Could not verify container ownership."
+msgstr "Não foi possível verificar se o contêiner pertence ao MultiPak."
+
+msgid "Could not verify the AppImage mount.\n"
+msgstr "Não foi possível verificar a montagem do AppImage.\n"
+
+msgid "Could not verify the package status in the environment."
+msgstr "Não foi possível verificar o estado do pacote no ambiente."
+
+msgid "Create and name a new container"
+msgstr "Criar um novo contêiner e nomeá-lo"
+
+msgid "Creating the Distrobox container…"
+msgstr "Criando o contêiner Distrobox…"
+
+msgid "Custom container name"
+msgstr "Nome personalizado do contêiner"
+
+msgid "Customize the settings or choose a different installation method."
+msgstr "Permite personalizar parâmetros ou escolher métodos alternativos."
+
+msgid "Default settings (recommended)"
+msgstr "Configurações padrões (recomendado)"
+
+msgid "Delete container"
+msgstr "Excluir contêiner"
+
+msgid "Dependencies"
+msgstr "Dependências"
+
+msgid "Direct installation ended without confirming the pending deployment."
+msgstr "A instalação direta terminou sem confirmar a implantação pendente."
+
+msgid "Direct installation is unavailable. It requires a system booted with rpm-ostree."
+msgstr "A instalação direta está indisponível. Ela requer um sistema iniciado com rpm-ostree."
+
+msgid "Direct installation only supports RPMs compatible with the system."
+msgstr "A instalação direta aceita somente RPMs compatíveis com o sistema."
+
+msgid "Direct installation request removed by rpm-ostree."
+msgstr "Solicitação de instalação direta removida pelo rpm-ostree."
+
+msgid "Direct installation request removed."
+msgstr "Solicitação de instalação direta removida."
+
+msgid "Direct installation requires a system booted with rpm-ostree."
+msgstr "A instalação direta requer um sistema iniciado com rpm-ostree."
+
+msgid "Distribution detection confidence:"
+msgstr "Confiança da identificação:"
+
+msgid "Distribution detection confidence: {0}.\n\n{1}"
+msgstr "Confiança na identificação: {0}.\n\n{1}"
+
+msgid "Distrobox was not found."
+msgstr "Distrobox não encontrado."
+
+msgid "Downloading components and installing the application…"
+msgstr "Baixando os componentes e instalando o aplicativo…"
+
+msgid "Enter a name for the new container."
+msgstr "Digite um nome para o novo contêiner."
+
+msgid "Executable: %1"
+msgstr "Executável: %1"
+
+msgid "Existing compatible container"
+msgstr "Contêiner compatível existente"
+
+msgid "Extracting the application so it can run…"
+msgstr "Extraindo o aplicativo para execução…"
+
+msgid "Fedora — latest stable"
+msgstr "Fedora — estável mais recente"
+
+msgid "Fetching the container image…"
+msgstr "Obtendo a imagem do ambiente…"
+
+msgid "File types"
+msgstr "Tipos de arquivo"
+
+msgid "Finalizing the installation record…"
+msgstr "Finalizando o registro da instalação…"
+
+msgid "Finish"
+msgstr "Concluir"
+
+msgid "For containers created outside MultiPak, use <a href='kontainer'>Kontainer</a>."
+msgstr "Para contêineres criados pelo usuário fora do MultiPak, utilize o <a href='kontainer'>Kontainer</a>."
+
+msgid "Hide alternative method"
+msgstr "Ocultar método alternativo"
+
+msgid "Hide details"
+msgstr "Ocultar detalhes"
+
+msgid "High"
+msgstr "Forte"
+
+msgid "How to use the container"
+msgstr "Como utilizar o contêiner"
+
+msgid "I understand the risks and want to continue."
+msgstr "Entendo os riscos e desejo continuar."
+
+msgid "I'm an IT technician turned historian. This app is an adventure made possible in large part by GPT-6.1 Sol."
+msgstr "Sou um técnico em informática que se tornou historiador. Este aplicativo é uma aventura viabilizada, em grande parte, pelo GPT-6.1 Sol."
+
+msgid "Initializing the container…"
+msgstr "Inicializando o ambiente…"
+
+msgid "Install"
+msgstr "Instalar"
+
+msgid "Install a variety of packages safely and easily."
+msgstr "Instale diferentes pacotes com segurança e facilidade."
+
+msgid "Install anyway"
+msgstr "Instalar mesmo assim"
+
+msgid "Install directly on the system"
+msgstr "Instalar diretamente no sistema"
+
+msgid "Install directly on your system"
+msgstr "Instalação direta no sistema"
+
+msgid "Install xdg-utils to associate RPM, DEB, Arch and AppImage packages."
+msgstr "Instale xdg-utils para associar os pacotes RPM, DEB, Arch e AppImage."
+
+msgid "Install {0} on the system to continue."
+msgstr "Instale {0} no sistema para continuar."
+
+msgid "Installation cancelled"
+msgstr "Instalação cancelada"
+
+msgid "Installation completed"
+msgstr "Instalação concluída"
+
+msgid "Installation completed."
+msgstr "Instalação concluída."
+
+msgid "Installation ended without confirming that the package was installed."
+msgstr "A instalação terminou sem confirmar que o pacote foi instalado."
+
+msgid "Installation in progress"
+msgstr "Instalação em andamento"
+
+msgid "Installation method and settings"
+msgstr "Método e configuração da instalação"
+
+msgid "Installation pending. Restart to apply."
+msgstr "Instalação pendente. Reinicie para aplicar."
+
+msgid "Installed directly on the system"
+msgstr "Instalado diretamente no sistema"
+
+msgid "Installer"
+msgstr "Instalador"
+
+msgid "Installing the application…"
+msgstr "Instalando o aplicativo…"
+
+msgid "Installs the application safely and automatically."
+msgstr "Instala o aplicativo de modo seguro e automático."
+
+msgid "Invalid .PKGINFO file."
+msgstr "Arquivo .PKGINFO inválido."
+
+msgid "Invalid .PKGINFO metadata."
+msgstr "Metadados .PKGINFO inválidos."
+
+msgid "Invalid AppImage launch method."
+msgstr "Método de execução do AppImage inválido."
+
+msgid "Invalid DEB header."
+msgstr "Cabeçalho DEB inválido."
+
+msgid "Invalid ELF header."
+msgstr "Cabeçalho ELF inválido."
+
+msgid "Invalid application name in the AppImage."
+msgstr "Nome de aplicativo inválido no AppImage."
+
+msgid "Invalid container name."
+msgstr "Nome de contêiner inválido."
+
+msgid "Invalid container record."
+msgstr "Registro de contêiner inválido."
+
+msgid "Invalid control file."
+msgstr "Arquivo control inválido."
+
+msgid "Invalid distribution or version for Kontainer."
+msgstr "Distribuição ou versão inválida para o Kontainer."
+
+msgid "Invalid file size."
+msgstr "Tamanho de arquivo inválido."
+
+msgid "Invalid file type selection."
+msgstr "Seleção de tipos de arquivo inválida."
+
+msgid "Invalid image metadata."
+msgstr "Metadados de imagem inválidos."
+
+msgid "Invalid installation ID."
+msgstr "Identificador de instalação inválido."
+
+msgid "Invalid internal AppImage path."
+msgstr "Caminho interno inválido no AppImage."
+
+msgid "Invalid managed environment name."
+msgstr "Nome de ambiente gerenciado inválido."
+
+msgid "Invalid package name."
+msgstr "Nome de pacote inválido."
+
+msgid "Invalid shortcut argument."
+msgstr "Argumento de atalho inválido."
+
+msgid "Keep container"
+msgstr "Manter contêiner"
+
+msgid "Kirigami preview"
+msgstr "Prévia de Kirigami"
+
+msgid "Kontainer was not found. Check that it is installed."
+msgstr "O Kontainer não foi encontrado. Confira se ele está instalado."
+
+msgid "LGPLv3 / GPLv3 / Commercial"
+msgstr "LGPLv3 / GPLv3 / Comercial"
+
+msgid "Language"
+msgstr "Idioma"
+
+msgid "Language preference saved."
+msgstr "Preferência de idioma salva."
+
+msgid "Libraries in use"
+msgstr "Bibliotecas em uso"
+
+msgid "License"
+msgstr "Licença"
+
+msgid "List of dependencies declared by the package"
+msgstr "Lista de dependências declaradas pelo pacote"
+
+msgid "Loading package information…"
+msgstr "Carregando informações do pacote…"
+
+msgid "Loading preferences…"
+msgstr "Carregando preferências…"
+
+msgid "Loading…"
+msgstr "Carregando…"
+
+msgid "Low"
+msgstr "Fraca"
+
+msgid "Manage your applications and set your preferences."
+msgstr "Gerencie seus aplicativos e ajuste suas preferências."
+
+msgid "Manager"
+msgstr "Gerenciador"
+
+msgid "Medium"
+msgstr "Média"
+
+msgid "Missing or duplicate Arch metadata: {0}."
+msgstr "Metadado Arch ausente ou duplicado: {0}."
+
+msgid "MultiPak Application Manager"
+msgstr "Gerenciador de Aplicativos MultiPak"
+
+msgid "MultiPak Installation Wizard"
+msgstr "Assistente de Instalação MultiPak"
+
+msgid "MultiPak could not determine which RPM-based distribution this package was built for, so it will use the latest Fedora version as the default environment: {0}.\n\nIf the application does not work after installation, it may have been built for a different Fedora version or another distribution, such as Nobara, Rocky Linux, AlmaLinux or openSUSE. Uninstall it through Application Manager — MultiPak and look for a package built for your chosen distribution."
+msgstr "Como não foi possível determinar se o pacote foi preparado para Fedora ou para outra distribuição que utiliza RPM, o MultiPak utilizará a versão mais recente do Fedora como ambiente padrão: {0}.\n\nSe o aplicativo não funcionar após a instalação, ele pode ter sido preparado para outra versão do Fedora ou para outra distribuição, como Nobara, Rocky Linux, AlmaLinux ou openSUSE. Desinstale-o pelo Gerenciador de Aplicativos — MultiPak e procure uma versão do pacote mais apropriada."
+
+msgid "MultiPak could not load its interface: {0}"
+msgstr "O MultiPak não conseguiu carregar sua interface: {0}"
+
+msgid "MultiPak language"
+msgstr "Idioma do MultiPak"
+
+msgid "MultiPak may not detect applications installed in this container by other means. Deleting the container will also remove those applications and all remaining packages."
+msgstr "O MultiPak pode não detectar aplicativos instalados neste contêiner por outros meios. Excluir o contêiner também removerá esses aplicativos e todos os pacotes restantes."
+
+msgid "No MultiPak containers are available to update."
+msgstr "Nenhum contêiner do MultiPak disponível para atualização."
+
+msgid "No applications are available to uninstall."
+msgstr "Nenhum aplicativo disponível para desinstalação."
+
+msgid "No compatible environment is available in the catalog."
+msgstr "Não há um ambiente compatível disponível no catálogo."
+
+msgid "No container base is available."
+msgstr "Nenhuma base de contêiner disponível."
+
+msgid "Not available for %1."
+msgstr "Não disponível para %1."
+
+msgid "Not checked"
+msgstr "Não verificado"
+
+msgid "Not found"
+msgstr "Não encontrado"
+
+msgid "Not installed"
+msgstr "Não instalado"
+
+msgid "Not provided"
+msgstr "Não informada"
+
+msgid "Open Kontainer"
+msgstr "Abrir o Kontainer"
+
+msgid "Open the package without --page or --screenshot; these options are for previews only."
+msgstr "Abra o pacote sem --page ou --screenshot; essas opções são apenas de prévia."
+
+msgid "Opening Kontainer…"
+msgstr "Abrindo o Kontainer…"
+
+msgid "Operation timed out: {0}"
+msgstr "Tempo limite excedido: {0}"
+
+msgid "Original environment"
+msgstr "Ambiente original"
+
+msgid "Package format: <b>%1</b>"
+msgstr "Empacotamento: <b>%1</b>"
+
+msgid "Package operations must use sudo only inside the environment."
+msgstr "A operação de pacote deve usar sudo apenas dentro do ambiente."
+
+msgid "Preferences saved."
+msgstr "Preferências salvas."
+
+msgid "Preparing a copy of the package…"
+msgstr "Preparando uma cópia do pacote…"
+
+msgid "Preparing a new system deployment…"
+msgstr "Preparando uma nova implantação do sistema…"
+
+msgid "Preparing installation…"
+msgstr "Preparando a instalação…"
+
+msgid "Preparing the AppImage…"
+msgstr "Preparando o AppImage…"
+
+msgid "Preparing the existing container {0}…"
+msgstr "Preparando o ambiente existente {0}…"
+
+msgid "Preparing to install directly on the system…"
+msgstr "Preparando a instalação direta…"
+
+msgid "Preparing to install directly on your system…"
+msgstr "Preparando a instalação direta no sistema…"
+
+msgid "Preparing to uninstall the system package…"
+msgstr "Preparando a desinstalação direta…"
+
+msgid "Preview: {0} × {1} px"
+msgstr "Prévia: {0} × {1} px"
+
+msgid "Ready to install"
+msgstr "Pronto para instalar"
+
+msgid "Reload list"
+msgstr "Recarregar lista"
+
+msgid "Remote Podman connections are not supported in this version."
+msgstr "Podman remoto não é suportado nesta versão."
+
+msgid "Removal pending"
+msgstr "Remoção pendente"
+
+msgid "Remove applications installed through MultiPak."
+msgstr "Remova aplicativos instalados pelo MultiPak."
+
+msgid "Remove container?"
+msgstr "Excluir contêiner?"
+
+msgid "Removing container {0}…"
+msgstr "Excluindo o contêiner {0}…"
+
+msgid "Removing the components created by this installation…"
+msgstr "Removendo os componentes desta instalação…"
+
+msgid "Resolving dependencies and downloading components…"
+msgstr "Resolvendo dependências e baixando os componentes…"
+
+msgid "Resolving dependencies and installing the application…"
+msgstr "Resolvendo dependências e instalando o aplicativo…"
+
+msgid "Restart required"
+msgstr "Instalação preparada"
+
+msgid "Restart to complete the installation."
+msgstr "Instalação preparada. Reinicie para aplicar a alteração."
+
+msgid "Restart to complete the uninstallation."
+msgstr "Desinstalação preparada. Reinicie para concluir."
+
+msgid "Restart your computer to complete the installation."
+msgstr "Reinicie o computador para concluir a instalação."
+
+msgid "Restart your computer to complete the uninstallation."
+msgstr "Desinstalação preparada. Reinicie o computador para concluir."
+
+msgid "Run MultiPak as a regular user."
+msgstr "Abra o aplicativo como usuário comum."
+
+msgid "Run as a regular user with rootless Podman."
+msgstr "Execute como usuário comum, usando Podman rootless."
+
+msgid "Save"
+msgstr "Salvar"
+
+msgid "Saving preferences…"
+msgstr "Salvando preferências…"
+
+msgid "Search the app store"
+msgstr "Buscar na Loja"
+
+msgid "Searching Bazaar for the application…"
+msgstr "Buscando o aplicativo no Bazaar…"
+
+msgid "Select"
+msgstr "Selecionar"
+
+msgid "Select a compatible container."
+msgstr "Selecione um contêiner compatível."
+
+msgid "Select a container to update"
+msgstr "Selecionar contêiner para atualizar"
+
+msgid "Select a container. All its applications and packages will be updated. The host system will not be updated."
+msgstr "Selecione um contêiner. A atualização inclui todos os seus aplicativos e pacotes. O sistema principal não será atualizado."
+
+msgid "Select a prebuilt Arch package, not a source package."
+msgstr "Selecione um pacote Arch já compilado, não um pacote fonte."
+
+msgid "Select a regular file."
+msgstr "Selecione um arquivo regular."
+
+msgid "Select an AppImage."
+msgstr "Selecione um AppImage."
+
+msgid "Select an RPM that MultiPak installed directly on your system."
+msgstr "Selecione uma instalação RPM direta registrada pelo MultiPak."
+
+msgid "Select an application to uninstall"
+msgstr "Selecionar aplicativo para desinstalar"
+
+msgid "Select an application. Other applications and personal data will be preserved."
+msgstr "Selecione um aplicativo. Os outros aplicativos e os dados pessoais serão preservados."
+
+msgid "Select file types"
+msgstr "Selecionar tipos de arquivo"
+
+msgid "Select the interface language"
+msgstr "Selecionar idioma da interface"
+
+msgid "Selected base image"
+msgstr "Base escolhida por você"
+
+msgid "Show alternative method"
+msgstr "Ver método alternativo"
+
+msgid "Show details"
+msgstr "Ver detalhes"
+
+msgid "Some temporary environment files could not be removed."
+msgstr "Alguns arquivos temporários do ambiente não puderam ser removidos."
+
+msgid "Suggested environment"
+msgstr "Sugestão do ambiente"
+
+msgid "System language"
+msgstr "Idioma do sistema"
+
+msgid "The .PKGINFO metadata identifies this as an Arch-based package, but does not distinguish Arch Linux from its derivatives. The recommended environment is Arch Linux, which uses a rolling release model rather than numbered versions."
+msgstr "Os metadados .PKGINFO identificam um pacote da família Arch Linux, mas não distinguem o Arch de distribuições derivadas. O ambiente sugerido é o Arch Linux, que utiliza atualização contínua (rolling release), sem versões numeradas."
+
+msgid "The AppImage copy has changed. Open the file again."
+msgstr "A cópia do AppImage foi alterada. Abra o arquivo novamente."
+
+msgid "The AppImage directory must not be a symbolic link."
+msgstr "A pasta do AppImage não pode ser um link simbólico."
+
+msgid "The AppImage does not contain application metadata."
+msgstr "O AppImage não contém os metadados de um aplicativo."
+
+msgid "The AppImage must contain one .desktop file at its root."
+msgstr "O AppImage precisa conter um arquivo .desktop na raiz."
+
+msgid "The AppImage was installed and added to the application launcher."
+msgstr "O AppImage foi instalado e adicionado ao lançador de aplicativos."
+
+msgid "The app store is open. Search for “{0}”. The search term has been copied to your clipboard."
+msgstr "A loja foi aberta. Busque por “{0}”; o nome foi copiado para a área de transferência."
+
+msgid "The application directory must not be a symbolic link."
+msgstr "A pasta do aplicativo não pode ser um link simbólico."
+
+msgid "The application entry point is unavailable."
+msgstr "O ponto de entrada do aplicativo não está disponível."
+
+msgid "You can now open it from the application launcher."
+msgstr "Você já pode abri-lo pelo lançador de aplicativos."
+
+msgid "The application shown above was built for a different Linux distribution. We recommend checking your system's app store for a compatible version before continuing."
+msgstr "O aplicativo acima foi preparado para outra distribuição Linux. Recomendamos procurar uma versão compatível na loja de aplicativos do sistema antes de continuar."
+
+msgid "The application was installed in the environment "
+msgstr "O aplicativo foi instalado no ambiente "
+
+msgid "The application was installed in the {0} environment."
+msgstr "O aplicativo foi instalado no ambiente {0}."
+
+msgid "The command finished, but no pending deployment was found. Check rpm-ostree status in the system details."
+msgstr "O comando terminou, mas não foi identificada uma implantação pendente. Confira rpm-ostree status nos detalhes do sistema."
+
+msgid "The command finished, but package removal was not confirmed. Reload the list to check the system status."
+msgstr "O comando terminou, mas a remoção do pacote não foi confirmada. Recarregue a lista para consultar o estado do sistema."
+
+msgid "The components owned by this installation were removed. Shared environments and personal files were preserved."
+msgstr "Os componentes próprios desta instalação foram removidos. Ambientes compartilhados e arquivos pessoais foram preservados."
+
+msgid "The container does not belong to this installation; cleanup was blocked."
+msgstr "O contêiner não pertence a esta instalação; limpeza bloqueada."
+
+msgid "The container identity or ownership has changed. It will be kept."
+msgstr "A identidade ou a propriedade do contêiner mudou. Ele será mantido."
+
+msgid "The container is no longer available. Reload the list before updating."
+msgstr "O contêiner não está mais disponível. Recarregue a lista antes de atualizar."
+
+msgid "The container record must not be a symbolic link."
+msgstr "O registro do contêiner não pode ser um link simbólico."
+
+msgid "The container still exists."
+msgstr "O contêiner ainda existe."
+
+msgid "The container was not created."
+msgstr "O contêiner não foi criado."
+
+msgid "The container was replaced; cleanup was blocked."
+msgstr "O contêiner foi substituído; limpeza bloqueada."
+
+msgid "The container's home folder could not be verified. It will be kept."
+msgstr "Não foi possível verificar a pasta pessoal do contêiner. Ela será mantida."
+
+msgid "The container's home folder will be kept unless you select the option below. Files in other folders inside the container will be deleted."
+msgstr "A pasta pessoal do contêiner será mantida, a menos que você selecione a opção abaixo. Arquivos em outras pastas internas do contêiner serão excluídos."
+
+msgid "The container's home folder will be kept. Files in other folders inside the container will be deleted."
+msgstr "A pasta pessoal do contêiner será mantida. Arquivos em outras pastas internas do contêiner serão excluídos."
+
+msgid "The container, other applications and personal data will be preserved."
+msgstr "O contêiner, os outros aplicativos e os dados pessoais serão preservados."
+
+msgid "The copy is incomplete or has changed. Cancel and reopen the package."
+msgstr "Cópia incompleta ou alterada. Desista e abra o pacote novamente."
+
+msgid "The default container already exists. Reopen the package to reuse it."
+msgstr "O contêiner padrão já existe. Reabra o pacote para reutilizá-lo."
+
+msgid "The environment directory must not be a symbolic link."
+msgstr "O diretório do ambiente não pode ser um link simbólico."
+
+msgid "The environment distribution or version has changed."
+msgstr "A distribuição ou versão do ambiente foi alterada."
+
+msgid "The environment does not contain a valid os-release file, or the file is not a regular file."
+msgstr "O ambiente não forneceu um os-release regular válido."
+
+msgid "The existing environment does not match the selected distribution and version."
+msgstr "O ambiente existente não corresponde à distribuição e versão escolhidas."
+
+msgid "The extracted AppImage does not contain a valid AppRun."
+msgstr "O AppImage extraído não contém um AppRun válido."
+
+msgid "The extraction directory already exists."
+msgstr "A pasta de extração já existe."
+
+msgid "The file contents do not match a valid RPM, DEB, Arch or AppImage package. {0}"
+msgstr "O conteúdo do arquivo não corresponde a um pacote RPM, DEB, Arch ou AppImage válido. {0}"
+
+msgid "The file does not contain Arch package .PKGINFO metadata."
+msgstr "O arquivo não possui os metadados .PKGINFO de um pacote Arch."
+
+msgid "The file has changed. Open the AppImage again."
+msgstr "O arquivo foi alterado. Abra o AppImage novamente."
+
+msgid "The file has changed. Open the package again."
+msgstr "O arquivo foi alterado. Abra o pacote novamente."
+
+msgid "The file is not a valid DEB package."
+msgstr "O arquivo não é um pacote DEB válido."
+
+msgid "The file is not a valid DEB version 2.0 package."
+msgstr "O arquivo não é um pacote DEB versão 2.0 válido."
+
+msgid "The file is not a valid type 1 or type 2 AppImage."
+msgstr "O arquivo não é um AppImage tipo 1 ou 2 válido."
+
+msgid "The filename suggests that this package was built for {0}, but its internal metadata does not confirm this. MultiPak used the filename to suggest this version."
+msgstr "O nome do arquivo indica que o pacote foi preparado para {0}, mas essa informação não foi confirmada nos metadados internos. O MultiPak utilizou a indicação presente no nome para sugerir essa versão."
+
+msgid "The installation directory must not be a symbolic link."
+msgstr "Diretório da instalação não pode ser um link simbólico."
+
+msgid "The internal file exceeds the read limit."
+msgstr "O arquivo interno excede o limite de leitura."
+
+msgid "The managed AppImage copy and its shortcuts will be removed. Personal data will be preserved."
+msgstr "A cópia gerenciada do AppImage e seus atalhos serão removidos. Os dados pessoais serão preservados."
+
+msgid "The managed AppImage file is unavailable."
+msgstr "O arquivo AppImage gerenciado não está disponível."
+
+msgid "The managed AppImage must not be a symbolic link."
+msgstr "O AppImage gerenciado não pode ser um link simbólico."
+
+msgid "The managed copy and shortcuts for this installation were removed. The original file and your personal data were preserved."
+msgstr "A cópia gerenciada e os atalhos desta instalação foram removidos. O arquivo original e seus dados pessoais foram preservados."
+
+msgid "The name cannot start with a dot (.), hyphen (-) or underscore (_)."
+msgstr "O nome não pode começar com ponto (.), hífen (-) ou sublinhado (_)."
+
+msgid "The name contains unsupported characters. Use unaccented letters, numbers, dots (.), hyphens (-) or underscores (_)."
+msgstr "O nome contém caracteres não permitidos. Use letras sem acento, números, ponto (.), hífen (-) ou sublinhado (_)."
+
+msgid "The name exceeds the 63-character limit."
+msgstr "O nome ultrapassa o limite de 63 caracteres."
+
+msgid "The name will be assigned during setup"
+msgstr "Nome definido ao preparar o ambiente"
+
+msgid "The new image still exists; cleanup is incomplete."
+msgstr "A imagem nova ainda existe; a limpeza não foi concluída."
+
+msgid "The operation ended without a result."
+msgstr "A operação terminou sem resultado."
+
+msgid "The operation in the environment is still running. Wait and try cleanup again."
+msgstr "A operação no ambiente ainda está em andamento. Aguarde e tente limpar novamente."
+
+msgid "The operation was cancelled."
+msgstr "A operação foi cancelada."
+
+msgid "The operation was not completed."
+msgstr "A operação não foi concluída."
+
+msgid "The package and its dependencies will be installed in a Distrobox container using %1, without changing the base system image.\n\nAny available shortcuts will appear in your application launcher."
+msgstr "O pacote e suas dependências serão instalados dentro de um contêiner Distrobox via %1, sem alterar a imagem-base do sistema.\n\nAtalhos disponíveis aparecerão no lançador de aplicativos."
+
+msgid "The package and its dependencies will be layered onto the base system image using rpm-ostree. This creates a new deployment that takes effect after you restart."
+msgstr "O pacote e suas dependências serão integrados diretamente à imagem-base do sistema via layering com o rpm-ostree. O processo cria uma nova implantação (deployment) e exige a reinicialização do computador para ter efeito."
+
+msgid "The package declares no dependencies."
+msgstr "Nenhuma dependência declarada pelo pacote."
+
+msgid "The package does not contain control metadata."
+msgstr "O pacote não possui metadados control."
+
+msgid "The package does not contain control.tar."
+msgstr "O pacote não possui control.tar."
+
+msgid "The package is no longer requested as a direct installation."
+msgstr "O pacote já não está solicitado como instalação direta."
+
+msgid "The package still exists in the shared environment."
+msgstr "O pacote ainda existe no ambiente compartilhado."
+
+msgid "The package's internal metadata includes .fc{0}, which means it was built for Fedora {1}."
+msgstr "Os metadados internos do pacote indicam .fc{0}, o que significa que ele foi preparado para Fedora {1}."
+
+msgid "The package's internal metadata indicates that it was built for {0}, so MultiPak recommends this version."
+msgstr "Os metadados internos do pacote indicam que ele foi preparado para {0}. Por isso, o MultiPak sugere essa versão."
+
+msgid "The selected environment does not match the package format."
+msgstr "O ambiente selecionado não corresponde ao formato do pacote."
+
+msgid "The selected environment is no longer a Distrobox; the operation was blocked."
+msgstr "O ambiente selecionado não é mais um Distrobox; operação bloqueada."
+
+msgid "The selected environment no longer exists."
+msgstr "O ambiente selecionado não existe mais."
+
+msgid "The system language follows your desktop session settings. English is used if no translation is available."
+msgstr "O idioma do sistema segue as configurações da sua sessão. O inglês será usado quando não houver uma tradução disponível."
+
+msgid "The target distribution could not be identified. Since the .deb format is used by both Ubuntu and Debian, the latest Ubuntu LTS version is used by default."
+msgstr "Não foi possível identificar a distribuição de origem deste pacote. Como os arquivos .deb não distinguem Ubuntu de Debian, a última versão LTS do Ubuntu é utilizada como padrão."
+
+msgid "The temporary local copy of the package could not be removed."
+msgstr "A cópia temporária local do pacote não pôde ser removida."
+
+msgid "The welcome component did not create a Qt Quick window."
+msgstr "O componente de boas-vindas não criou uma janela Qt Quick."
+
+msgid "There are pending system changes. Restart before uninstalling."
+msgstr "Há alterações pendentes no sistema. Reinicie antes de desinstalar."
+
+msgid "This AppImage does not contain a recognized type 2 SquashFS payload."
+msgstr "Este AppImage não contém um SquashFS tipo 2 reconhecido."
+
+msgid "This AppImage installation is unavailable."
+msgstr "A instalação deste AppImage não está disponível."
+
+msgid "This is a preview. Kontainer was not opened."
+msgstr "Esta é uma prévia. O Kontainer não foi aberto."
+
+msgid "This is a preview. No application was removed."
+msgstr "Esta é uma prévia. Nenhum aplicativo foi removido."
+
+msgid "This is a preview. No associations were changed."
+msgstr "Esta é uma prévia. Nenhuma associação foi alterada."
+
+msgid "This is a preview. No container was removed."
+msgstr "Esta é uma prévia. Nenhum contêiner foi excluído."
+
+msgid "This is a preview. No update was started."
+msgstr "Esta é uma prévia. Nenhuma atualização foi iniciada."
+
+msgid "This is a preview. The preference was not saved."
+msgstr "Esta é uma prévia. A preferência não foi salva."
+
+msgid "This operation requires a system booted with rpm-ostree."
+msgstr "Esta operação requer um sistema iniciado com rpm-ostree."
+
+msgid "This option changes the system and requires a restart."
+msgstr "Esta opção altera o sistema e exige reinicialização."
+
+msgid "This package does not include an application shortcut. You can run it from a terminal inside the container."
+msgstr "O pacote não forneceu um atalho gráfico. Ele está disponível no terminal do ambiente."
+
+msgid "This package is already installed in the selected environment. MultiPak will not overwrite the existing installation."
+msgstr "Este pacote já existe no ambiente selecionado. O assistente não vai sobrescrever uma instalação preexistente."
+
+msgid "This preview does not start an installation."
+msgstr "A instalação não é iniciada nesta prévia."
+
+msgid "This shortcut does not belong to this installation."
+msgstr "Atalho fora do escopo desta instalação."
+
+msgid "This system package cannot be uninstalled through MultiPak."
+msgstr "Esta instalação direta não está disponível para desinstalação."
+
+msgid "Try again"
+msgstr "Tentar novamente"
+
+msgid "Ubuntu — default catalog version"
+msgstr "Ubuntu — versão padrão do catálogo"
+
+msgid "Unavailable"
+msgstr "Indisponível"
+
+msgid "Uninstall"
+msgstr "Desinstalar"
+
+msgid "Uninstall %1?\n\n%2"
+msgstr "Desinstalar %1?\n\n%2"
+
+msgid "Uninstall application"
+msgstr "Desinstalar programa"
+
+msgid "Uninstall applications"
+msgstr "Desinstalar programas"
+
+msgid "Uninstallation pending. Restart to finish."
+msgstr "Desinstalação pendente. Reinicie para concluir."
+
+msgid "Uninstalling {0}… Please wait."
+msgstr "Desinstalando {0}… Aguarde a conclusão."
+
+msgid "Uninstall…"
+msgstr "Desinstalar…"
+
+msgid "Unrecognized local package ID: "
+msgstr "Identificação de pacote local não reconhecida: "
+
+msgid "Unsupported DEB metadata compression."
+msgstr "Compressão dos metadados DEB não suportada."
+
+msgid "Unsupported package type."
+msgstr "Tipo de pacote não suportado."
+
+msgid "Update"
+msgstr "Atualizar"
+
+msgid "Update applications"
+msgstr "Atualizar programas"
+
+msgid "Update complete. All applications and packages in the container are up to date."
+msgstr "Atualização concluída. Os aplicativos e pacotes do contêiner estão atualizados."
+
+msgid "Update the applications and packages in a container."
+msgstr "Atualize os aplicativos e pacotes de um contêiner."
+
+msgid "Updating the Arch Linux environment…"
+msgstr "Atualizando o ambiente Arch Linux…"
+
+msgid "Updating {0}… Please wait."
+msgstr "Atualizando {0}… Aguarde a conclusão."
+
+msgid "Use MultiPak's recommendation (%1)"
+msgstr "Usar a sugestão do MultiPak (%1)"
+
+msgid "Use an existing container"
+msgstr "Utilizar um contêiner existente"
+
+msgid "Use only as a last resort."
+msgstr "Use como último recurso."
+
+msgid "Use system management for rpm-ostree operations."
+msgstr "Use o gerenciamento do sistema para operações rpm-ostree."
+
+msgid "Use the default MultiPak container"
+msgstr "Utilizar o contêiner padrão MultiPak"
+
+msgid "Verifying the installation…"
+msgstr "Verificando a instalação…"
+
+msgid "Verifying the pending deployment…"
+msgstr "Verificando a implantação pendente…"
+
+msgid "Verifying uninstallation…"
+msgstr "Verificando a desinstalação…"
+
+msgid "Version not provided"
+msgstr "Versão não informada"
+
+msgid "Version: {0} · {1}"
+msgstr "Versão: {0} · {1}"
+
+msgid "View license"
+msgstr "Ver licença"
+
+msgid "View the %1 license"
+msgstr "Ver a licença de %1"
+
+msgid "View the full list of additional dependencies"
+msgstr "Ver lista completa de dependências extras"
+
+msgid "Visit the %1 website"
+msgstr "Visitar o site de %1"
+
+msgid "Visual completion preview; no application was installed."
+msgstr "Prévia visual da conclusão; nenhum aplicativo foi instalado."
+
+msgid "Wait for rpm-ostree to finish. The window will close when the operation ends."
+msgstr "Aguarde o rpm-ostree concluir. A janela será fechada ao terminar a operação."
+
+msgid "Wait for the operation to finish before closing the manager."
+msgstr "Aguarde a operação terminar antes de fechar o gerenciador."
+
+msgid "We recommend checking your system's app store for this application before continuing."
+msgstr "Recomendamos procurar este aplicativo na loja de aplicativos do sistema antes de continuar."
+
+msgid "Welcome to the MultiPak Installation Wizard"
+msgstr "Bem-vindo ao Assistente de Instalação MultiPak"
+
+msgid "You chose to search Bazaar."
+msgstr "Você escolheu buscar no Bazaar."
+
+msgid "You confirmed the installation."
+msgstr "Você confirmou a instalação."
+
+msgid "created"
+msgstr "criado"
+
+msgid "reused"
+msgstr "reutilizado"
+
+msgid "rpm-ostree did not confirm uninstallation."
+msgstr "O rpm-ostree não confirmou a desinstalação."
+
+msgid "rpm-ostree will remove the package and recalculate the required dependencies. A restart will be needed to finish. Your personal data will be preserved."
+msgstr "O rpm-ostree removerá o pacote e recalculará as dependências necessárias. Será preciso reiniciar para concluir. Seus dados pessoais serão preservados."
+
+msgid "{0} exited with code {1}.\n{2}"
+msgstr "{0} encerrou com código {1}.\n{2}"
+
+msgid "{0} will be installed the next time you start your computer."
+msgstr "{0} será aplicado na próxima inicialização."

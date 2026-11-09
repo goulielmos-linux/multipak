@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-multipak-appimage">
+    <comment>AppImage application package</comment>
+    <comment xml:lang="pt_BR">Pacote de aplicativo AppImage</comment>
+    <glob pattern="*.appimage" weight="80"/>
+    <magic priority="80">
+      <match type="string" offset="0" value="\177ELF">
+        <match type="string" offset="8" value="AI\001"/>
+        <match type="string" offset="8" value="AI\002"/>
+      </match>
+    </magic>
+    <icon name="package-x-generic"/>
+  </mime-type>
+</mime-info>

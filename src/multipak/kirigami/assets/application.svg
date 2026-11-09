@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
+  <title>Aplicativos</title>
+  <rect x="8" y="10" width="62" height="60" rx="9" fill="#ffffff" stroke="#292d32" stroke-width="2.5" />
+  <rect x="18" y="22" width="70" height="64" rx="9" fill="#ffffff" />
+  <path d="M27 22H79Q88 22 88 31V42H18V31Q18 22 27 22Z" fill="#292d32" />
+  <rect x="18" y="22" width="70" height="64" rx="9" fill="none" stroke="#292d32" stroke-width="2.5" />
+  <g fill="#ffffff">
+    <circle cx="28" cy="32" r="1.8" />
+    <circle cx="35" cy="32" r="1.8" />
+    <circle cx="42" cy="32" r="1.8" />
+  </g>
+  <rect x="28" y="50" width="16" height="24" rx="4" fill="#292d32" />
+  <path d="M54 54H76M54 64H76M54 74H66" fill="none" stroke="#292d32" stroke-width="4" stroke-linecap="round" />
+</svg>

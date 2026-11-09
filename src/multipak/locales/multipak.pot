@@ -1,0 +1,1192 @@
+# MultiPak translation template. English is the source language.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "\n\nCheck the rpm-ostree status before trying again. No system deployment was automatically undone."
+msgstr ""
+
+msgid " (Unavailable)"
+msgstr ""
+
+msgid " Before installation, the container packages will be updated by Pacman."
+msgstr ""
+
+msgid " The filename indicates Fedora {0}, unlike the internal metadata; the internal metadata took priority."
+msgstr ""
+
+msgid " The image version number has not been confirmed yet."
+msgstr ""
+
+msgid " — stable version"
+msgstr ""
+
+msgid "<a href='dependencies'>View full list</a>"
+msgstr ""
+
+msgid "A container with that name already exists. Choose another name."
+msgstr ""
+
+msgid "A copy of the AppImage will be saved and a shortcut added to your application launcher."
+msgstr ""
+
+msgid "A new container will be created and named during setup."
+msgstr ""
+
+msgid "A system operation or change is pending. Complete it and restart before uninstalling."
+msgstr ""
+
+msgid "A system operation or deployment is pending. Complete it and restart before trying again."
+msgstr ""
+
+msgid "About the Application Installer — MultiPak"
+msgstr ""
+
+msgid "About the Application Manager — MultiPak"
+msgstr ""
+
+msgid "About the author"
+msgstr ""
+
+msgid "About the recommended environment"
+msgstr ""
+
+msgid "Adding application shortcuts…"
+msgstr ""
+
+msgid "Adding the application to the application launcher…"
+msgstr ""
+
+msgid "Additional dependencies:"
+msgstr ""
+
+msgid "Advanced settings"
+msgstr ""
+
+msgid "Also delete the container's home folder, including its data and settings."
+msgstr ""
+
+msgid "Another application uses this container. It will be kept."
+msgstr ""
+
+msgid "Another container uses this home folder. It will be kept."
+msgstr ""
+
+msgid "Another installation is already in progress."
+msgstr ""
+
+msgid "AppImage managed by MultiPak"
+msgstr ""
+
+msgid "AppImage uninstalled. Personal data was preserved."
+msgstr ""
+
+msgid "Application"
+msgstr ""
+
+msgid "Application Installer — MultiPak"
+msgstr ""
+
+msgid "Application Manager — MultiPak"
+msgstr ""
+
+msgid "Application uninstalled. The container and personal data were preserved."
+msgstr ""
+
+msgid "Application {0} — MultiPak"
+msgstr ""
+
+msgid "Application: <b>%1</b> (%2)"
+msgstr ""
+
+msgid "Arch Linux packages (.pkg.tar, .pkg.tar.zst, .pkg.tar.xz, .pkg.tar.gz and .pkg.tar.bz2)"
+msgstr ""
+
+msgid "Arch package metadata exceeds the read limit."
+msgstr ""
+
+msgid "Architecture {0} is incompatible with {1}."
+msgstr ""
+
+msgid "Authors"
+msgstr ""
+
+msgid "Back"
+msgstr ""
+
+msgid "Backend"
+msgstr ""
+
+msgid "Bazaar is not installed or could not be found on this computer."
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Cancel installation"
+msgstr ""
+
+msgid "Cancelling installation"
+msgstr ""
+
+msgid "Changes operating system files. This can cause dependency conflicts or prevent applications from working after an update."
+msgstr ""
+
+msgid "Checking…"
+msgstr ""
+
+msgid "Choose a custom name. The MultiPak prefix is reserved for the application."
+msgstr ""
+
+msgid "Choose a custom name. This name and the MultiPak prefixes are reserved for containers managed by the application."
+msgstr ""
+
+msgid "Choose a valid name for the new environment."
+msgstr ""
+
+msgid "Choose an RPM, DEB, prebuilt Arch Linux package or AppImage."
+msgstr ""
+
+msgid "Choose another distribution or version"
+msgstr ""
+
+msgid "Choose the language used by MultiPak."
+msgstr ""
+
+msgid "Choose which file extensions to open."
+msgstr ""
+
+msgid "Choose which file types should open in the MultiPak Installation Wizard."
+msgstr ""
+
+msgid "Cleaning up the installation…"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+msgid "Container"
+msgstr ""
+
+msgid "Container %1 has no applications registered in the Application Manager. Would you like to remove it to free up disk space?"
+msgstr ""
+
+msgid "Container %1 will be created for this installation."
+msgstr ""
+
+msgid "Container %1 will be reused for this installation."
+msgstr ""
+
+msgid "Container and its home folder removed."
+msgstr ""
+
+msgid "Container base"
+msgstr ""
+
+msgid "Container based on %1"
+msgstr ""
+
+msgid "Container cleanup cannot undo a system installation."
+msgstr ""
+
+msgid "Container distribution and version"
+msgstr ""
+
+msgid "Container name"
+msgstr ""
+
+msgid "Container removed. Its home folder was preserved."
+msgstr ""
+
+msgid "Container {0} will be {1} for this installation."
+msgstr ""
+
+msgid "Container: {0}"
+msgstr ""
+
+msgid "Continue"
+msgstr ""
+
+msgid "Continue with direct installation"
+msgstr ""
+
+msgid "Copying the AppImage…"
+msgstr ""
+
+msgid "Copying the package to the container…"
+msgstr ""
+
+msgid "Copying the package to the existing container…"
+msgstr ""
+
+msgid "Copyright"
+msgstr ""
+
+msgid "Could not check whether the container can be removed: {0}"
+msgstr ""
+
+msgid "Could not complete the operation"
+msgstr ""
+
+msgid "Could not complete: "
+msgstr ""
+
+msgid "Could not find 7-Zip or bsdtar to read the type 1 AppImage."
+msgstr ""
+
+msgid "Could not find unsquashfs to read the type 2 AppImage."
+msgstr ""
+
+msgid "Could not identify the active deployment."
+msgstr ""
+
+msgid "Could not identify the distribution and version this package was built for. "
+msgstr ""
+
+msgid "Could not identify the host's user directories."
+msgstr ""
+
+msgid "Could not identify the image version."
+msgstr ""
+
+msgid "Could not load Kirigami. Use the compatible PySide6 and Kirigami supplied by the system."
+msgstr ""
+
+msgid "Could not load the Kirigami manager."
+msgstr ""
+
+msgid "Could not locate the AppImage contents."
+msgstr ""
+
+msgid "Could not open Bazaar."
+msgstr ""
+
+msgid "Could not open Kontainer"
+msgstr ""
+
+msgid "Could not open Kontainer."
+msgstr ""
+
+msgid "Could not query direct installations: "
+msgstr ""
+
+msgid "Could not query existing environments: {0}"
+msgstr ""
+
+msgid "Could not query file associations: xdg-utils is missing."
+msgstr ""
+
+msgid "Could not query the system status."
+msgstr ""
+
+msgid "Could not refresh the list: "
+msgstr ""
+
+msgid "Could not register the icon in Kontainer: {0}"
+msgstr ""
+
+msgid "Could not remove the container: {0}"
+msgstr ""
+
+msgid "Could not retrieve the list of layered system packages."
+msgstr ""
+
+msgid "Could not save the image."
+msgstr ""
+
+msgid "Could not save the language preference: {0}"
+msgstr ""
+
+msgid "Could not update file types: shared-mime-info is missing."
+msgstr ""
+
+msgid "Could not verify container ownership."
+msgstr ""
+
+msgid "Could not verify the AppImage mount.\n"
+msgstr ""
+
+msgid "Could not verify the package status in the environment."
+msgstr ""
+
+msgid "Create and name a new container"
+msgstr ""
+
+msgid "Creating the Distrobox container…"
+msgstr ""
+
+msgid "Custom container name"
+msgstr ""
+
+msgid "Customize the settings or choose a different installation method."
+msgstr ""
+
+msgid "Default settings (recommended)"
+msgstr ""
+
+msgid "Delete container"
+msgstr ""
+
+msgid "Dependencies"
+msgstr ""
+
+msgid "Direct installation ended without confirming the pending deployment."
+msgstr ""
+
+msgid "Direct installation is unavailable. It requires a system booted with rpm-ostree."
+msgstr ""
+
+msgid "Direct installation only supports RPMs compatible with the system."
+msgstr ""
+
+msgid "Direct installation request removed by rpm-ostree."
+msgstr ""
+
+msgid "Direct installation request removed."
+msgstr ""
+
+msgid "Direct installation requires a system booted with rpm-ostree."
+msgstr ""
+
+msgid "Distribution detection confidence:"
+msgstr ""
+
+msgid "Distribution detection confidence: {0}.\n\n{1}"
+msgstr ""
+
+msgid "Distrobox was not found."
+msgstr ""
+
+msgid "Downloading components and installing the application…"
+msgstr ""
+
+msgid "Enter a name for the new container."
+msgstr ""
+
+msgid "Executable: %1"
+msgstr ""
+
+msgid "Existing compatible container"
+msgstr ""
+
+msgid "Extracting the application so it can run…"
+msgstr ""
+
+msgid "Fedora — latest stable"
+msgstr ""
+
+msgid "Fetching the container image…"
+msgstr ""
+
+msgid "File types"
+msgstr ""
+
+msgid "Finalizing the installation record…"
+msgstr ""
+
+msgid "Finish"
+msgstr ""
+
+msgid "For containers created outside MultiPak, use <a href='kontainer'>Kontainer</a>."
+msgstr ""
+
+msgid "Hide alternative method"
+msgstr ""
+
+msgid "Hide details"
+msgstr ""
+
+msgid "High"
+msgstr ""
+
+msgid "How to use the container"
+msgstr ""
+
+msgid "I understand the risks and want to continue."
+msgstr ""
+
+msgid "I'm an IT technician turned historian. This app is an adventure made possible in large part by GPT-6.1 Sol."
+msgstr ""
+
+msgid "Initializing the container…"
+msgstr ""
+
+msgid "Install"
+msgstr ""
+
+msgid "Install a variety of packages safely and easily."
+msgstr ""
+
+msgid "Install anyway"
+msgstr ""
+
+msgid "Install directly on the system"
+msgstr ""
+
+msgid "Install directly on your system"
+msgstr ""
+
+msgid "Install xdg-utils to associate RPM, DEB, Arch and AppImage packages."
+msgstr ""
+
+msgid "Install {0} on the system to continue."
+msgstr ""
+
+msgid "Installation cancelled"
+msgstr ""
+
+msgid "Installation completed"
+msgstr ""
+
+msgid "Installation completed."
+msgstr ""
+
+msgid "Installation ended without confirming that the package was installed."
+msgstr ""
+
+msgid "Installation in progress"
+msgstr ""
+
+msgid "Installation method and settings"
+msgstr ""
+
+msgid "Installation pending. Restart to apply."
+msgstr ""
+
+msgid "Installed directly on the system"
+msgstr ""
+
+msgid "Installer"
+msgstr ""
+
+msgid "Installing the application…"
+msgstr ""
+
+msgid "Installs the application safely and automatically."
+msgstr ""
+
+msgid "Invalid .PKGINFO file."
+msgstr ""
+
+msgid "Invalid .PKGINFO metadata."
+msgstr ""
+
+msgid "Invalid AppImage launch method."
+msgstr ""
+
+msgid "Invalid DEB header."
+msgstr ""
+
+msgid "Invalid ELF header."
+msgstr ""
+
+msgid "Invalid application name in the AppImage."
+msgstr ""
+
+msgid "Invalid container name."
+msgstr ""
+
+msgid "Invalid container record."
+msgstr ""
+
+msgid "Invalid control file."
+msgstr ""
+
+msgid "Invalid distribution or version for Kontainer."
+msgstr ""
+
+msgid "Invalid file size."
+msgstr ""
+
+msgid "Invalid file type selection."
+msgstr ""
+
+msgid "Invalid image metadata."
+msgstr ""
+
+msgid "Invalid installation ID."
+msgstr ""
+
+msgid "Invalid internal AppImage path."
+msgstr ""
+
+msgid "Invalid managed environment name."
+msgstr ""
+
+msgid "Invalid package name."
+msgstr ""
+
+msgid "Invalid shortcut argument."
+msgstr ""
+
+msgid "Keep container"
+msgstr ""
+
+msgid "Kirigami preview"
+msgstr ""
+
+msgid "Kontainer was not found. Check that it is installed."
+msgstr ""
+
+msgid "LGPLv3 / GPLv3 / Commercial"
+msgstr ""
+
+msgid "Language"
+msgstr ""
+
+msgid "Language preference saved."
+msgstr ""
+
+msgid "Libraries in use"
+msgstr ""
+
+msgid "License"
+msgstr ""
+
+msgid "List of dependencies declared by the package"
+msgstr ""
+
+msgid "Loading package information…"
+msgstr ""
+
+msgid "Loading preferences…"
+msgstr ""
+
+msgid "Loading…"
+msgstr ""
+
+msgid "Low"
+msgstr ""
+
+msgid "Manage your applications and set your preferences."
+msgstr ""
+
+msgid "Manager"
+msgstr ""
+
+msgid "Medium"
+msgstr ""
+
+msgid "Missing or duplicate Arch metadata: {0}."
+msgstr ""
+
+msgid "MultiPak Application Manager"
+msgstr ""
+
+msgid "MultiPak Installation Wizard"
+msgstr ""
+
+msgid "MultiPak could not determine which RPM-based distribution this package was built for, so it will use the latest Fedora version as the default environment: {0}.\n\nIf the application does not work after installation, it may have been built for a different Fedora version or another distribution, such as Nobara, Rocky Linux, AlmaLinux or openSUSE. Uninstall it through Application Manager — MultiPak and look for a package built for your chosen distribution."
+msgstr ""
+
+msgid "MultiPak could not load its interface: {0}"
+msgstr ""
+
+msgid "MultiPak language"
+msgstr ""
+
+msgid "MultiPak may not detect applications installed in this container by other means. Deleting the container will also remove those applications and all remaining packages."
+msgstr ""
+
+msgid "No MultiPak containers are available to update."
+msgstr ""
+
+msgid "No applications are available to uninstall."
+msgstr ""
+
+msgid "No compatible environment is available in the catalog."
+msgstr ""
+
+msgid "No container base is available."
+msgstr ""
+
+msgid "Not available for %1."
+msgstr ""
+
+msgid "Not checked"
+msgstr ""
+
+msgid "Not found"
+msgstr ""
+
+msgid "Not installed"
+msgstr ""
+
+msgid "Not provided"
+msgstr ""
+
+msgid "Open Kontainer"
+msgstr ""
+
+msgid "Open the package without --page or --screenshot; these options are for previews only."
+msgstr ""
+
+msgid "Opening Kontainer…"
+msgstr ""
+
+msgid "Operation timed out: {0}"
+msgstr ""
+
+msgid "Original environment"
+msgstr ""
+
+msgid "Package format: <b>%1</b>"
+msgstr ""
+
+msgid "Package operations must use sudo only inside the environment."
+msgstr ""
+
+msgid "Preferences saved."
+msgstr ""
+
+msgid "Preparing a copy of the package…"
+msgstr ""
+
+msgid "Preparing a new system deployment…"
+msgstr ""
+
+msgid "Preparing installation…"
+msgstr ""
+
+msgid "Preparing the AppImage…"
+msgstr ""
+
+msgid "Preparing the existing container {0}…"
+msgstr ""
+
+msgid "Preparing to install directly on the system…"
+msgstr ""
+
+msgid "Preparing to install directly on your system…"
+msgstr ""
+
+msgid "Preparing to uninstall the system package…"
+msgstr ""
+
+msgid "Preview: {0} × {1} px"
+msgstr ""
+
+msgid "Ready to install"
+msgstr ""
+
+msgid "Reload list"
+msgstr ""
+
+msgid "Remote Podman connections are not supported in this version."
+msgstr ""
+
+msgid "Removal pending"
+msgstr ""
+
+msgid "Remove applications installed through MultiPak."
+msgstr ""
+
+msgid "Remove container?"
+msgstr ""
+
+msgid "Removing container {0}…"
+msgstr ""
+
+msgid "Removing the components created by this installation…"
+msgstr ""
+
+msgid "Resolving dependencies and downloading components…"
+msgstr ""
+
+msgid "Resolving dependencies and installing the application…"
+msgstr ""
+
+msgid "Restart required"
+msgstr ""
+
+msgid "Restart to complete the installation."
+msgstr ""
+
+msgid "Restart to complete the uninstallation."
+msgstr ""
+
+msgid "Restart your computer to complete the installation."
+msgstr ""
+
+msgid "Restart your computer to complete the uninstallation."
+msgstr ""
+
+msgid "Run MultiPak as a regular user."
+msgstr ""
+
+msgid "Run as a regular user with rootless Podman."
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Saving preferences…"
+msgstr ""
+
+msgid "Search the app store"
+msgstr ""
+
+msgid "Searching Bazaar for the application…"
+msgstr ""
+
+msgid "Select"
+msgstr ""
+
+msgid "Select a compatible container."
+msgstr ""
+
+msgid "Select a container to update"
+msgstr ""
+
+msgid "Select a container. All its applications and packages will be updated. The host system will not be updated."
+msgstr ""
+
+msgid "Select a prebuilt Arch package, not a source package."
+msgstr ""
+
+msgid "Select a regular file."
+msgstr ""
+
+msgid "Select an AppImage."
+msgstr ""
+
+msgid "Select an RPM that MultiPak installed directly on your system."
+msgstr ""
+
+msgid "Select an application to uninstall"
+msgstr ""
+
+msgid "Select an application. Other applications and personal data will be preserved."
+msgstr ""
+
+msgid "Select file types"
+msgstr ""
+
+msgid "Select the interface language"
+msgstr ""
+
+msgid "Selected base image"
+msgstr ""
+
+msgid "Show alternative method"
+msgstr ""
+
+msgid "Show details"
+msgstr ""
+
+msgid "Some temporary environment files could not be removed."
+msgstr ""
+
+msgid "Suggested environment"
+msgstr ""
+
+msgid "System language"
+msgstr ""
+
+msgid "The .PKGINFO metadata identifies this as an Arch-based package, but does not distinguish Arch Linux from its derivatives. The recommended environment is Arch Linux, which uses a rolling release model rather than numbered versions."
+msgstr ""
+
+msgid "The AppImage copy has changed. Open the file again."
+msgstr ""
+
+msgid "The AppImage directory must not be a symbolic link."
+msgstr ""
+
+msgid "The AppImage does not contain application metadata."
+msgstr ""
+
+msgid "The AppImage must contain one .desktop file at its root."
+msgstr ""
+
+msgid "The AppImage was installed and added to the application launcher."
+msgstr ""
+
+msgid "The app store is open. Search for “{0}”. The search term has been copied to your clipboard."
+msgstr ""
+
+msgid "The application directory must not be a symbolic link."
+msgstr ""
+
+msgid "The application entry point is unavailable."
+msgstr ""
+
+msgid "The application shown above was built for a different Linux distribution. We recommend checking your system's app store for a compatible version before continuing."
+msgstr ""
+
+msgid "The application was installed in the environment "
+msgstr ""
+
+msgid "The application was installed in the {0} environment."
+msgstr ""
+
+msgid "The command finished, but no pending deployment was found. Check rpm-ostree status in the system details."
+msgstr ""
+
+msgid "The command finished, but package removal was not confirmed. Reload the list to check the system status."
+msgstr ""
+
+msgid "The components owned by this installation were removed. Shared environments and personal files were preserved."
+msgstr ""
+
+msgid "The container does not belong to this installation; cleanup was blocked."
+msgstr ""
+
+msgid "The container identity or ownership has changed. It will be kept."
+msgstr ""
+
+msgid "The container is no longer available. Reload the list before updating."
+msgstr ""
+
+msgid "The container record must not be a symbolic link."
+msgstr ""
+
+msgid "The container still exists."
+msgstr ""
+
+msgid "The container was not created."
+msgstr ""
+
+msgid "The container was replaced; cleanup was blocked."
+msgstr ""
+
+msgid "The container's home folder could not be verified. It will be kept."
+msgstr ""
+
+msgid "The container's home folder will be kept unless you select the option below. Files in other folders inside the container will be deleted."
+msgstr ""
+
+msgid "The container's home folder will be kept. Files in other folders inside the container will be deleted."
+msgstr ""
+
+msgid "The container, other applications and personal data will be preserved."
+msgstr ""
+
+msgid "The copy is incomplete or has changed. Cancel and reopen the package."
+msgstr ""
+
+msgid "The default container already exists. Reopen the package to reuse it."
+msgstr ""
+
+msgid "The environment directory must not be a symbolic link."
+msgstr ""
+
+msgid "The environment distribution or version has changed."
+msgstr ""
+
+msgid "The environment does not contain a valid os-release file, or the file is not a regular file."
+msgstr ""
+
+msgid "The existing environment does not match the selected distribution and version."
+msgstr ""
+
+msgid "The extracted AppImage does not contain a valid AppRun."
+msgstr ""
+
+msgid "The extraction directory already exists."
+msgstr ""
+
+msgid "The file contents do not match a valid RPM, DEB, Arch or AppImage package. {0}"
+msgstr ""
+
+msgid "The file does not contain Arch package .PKGINFO metadata."
+msgstr ""
+
+msgid "The file has changed. Open the AppImage again."
+msgstr ""
+
+msgid "The file has changed. Open the package again."
+msgstr ""
+
+msgid "The file is not a valid DEB package."
+msgstr ""
+
+msgid "The file is not a valid DEB version 2.0 package."
+msgstr ""
+
+msgid "The file is not a valid type 1 or type 2 AppImage."
+msgstr ""
+
+msgid "The filename suggests that this package was built for {0}, but its internal metadata does not confirm this. MultiPak used the filename to suggest this version."
+msgstr ""
+
+msgid "The installation directory must not be a symbolic link."
+msgstr ""
+
+msgid "The internal file exceeds the read limit."
+msgstr ""
+
+msgid "The managed AppImage copy and its shortcuts will be removed. Personal data will be preserved."
+msgstr ""
+
+msgid "The managed AppImage file is unavailable."
+msgstr ""
+
+msgid "The managed AppImage must not be a symbolic link."
+msgstr ""
+
+msgid "The managed copy and shortcuts for this installation were removed. The original file and your personal data were preserved."
+msgstr ""
+
+msgid "The name cannot start with a dot (.), hyphen (-) or underscore (_)."
+msgstr ""
+
+msgid "The name contains unsupported characters. Use unaccented letters, numbers, dots (.), hyphens (-) or underscores (_)."
+msgstr ""
+
+msgid "The name exceeds the 63-character limit."
+msgstr ""
+
+msgid "The name will be assigned during setup"
+msgstr ""
+
+msgid "The new image still exists; cleanup is incomplete."
+msgstr ""
+
+msgid "The operation ended without a result."
+msgstr ""
+
+msgid "The operation in the environment is still running. Wait and try cleanup again."
+msgstr ""
+
+msgid "The operation was cancelled."
+msgstr ""
+
+msgid "The operation was not completed."
+msgstr ""
+
+msgid "The package and its dependencies will be installed in a Distrobox container using %1, without changing the base system image.\n\nAny available shortcuts will appear in your application launcher."
+msgstr ""
+
+msgid "The package and its dependencies will be layered onto the base system image using rpm-ostree. This creates a new deployment that takes effect after you restart."
+msgstr ""
+
+msgid "The package declares no dependencies."
+msgstr ""
+
+msgid "The package does not contain control metadata."
+msgstr ""
+
+msgid "The package does not contain control.tar."
+msgstr ""
+
+msgid "The package is no longer requested as a direct installation."
+msgstr ""
+
+msgid "The package still exists in the shared environment."
+msgstr ""
+
+msgid "The package's internal metadata includes .fc{0}, which means it was built for Fedora {1}."
+msgstr ""
+
+msgid "The package's internal metadata indicates that it was built for {0}, so MultiPak recommends this version."
+msgstr ""
+
+msgid "The selected environment does not match the package format."
+msgstr ""
+
+msgid "The selected environment is no longer a Distrobox; the operation was blocked."
+msgstr ""
+
+msgid "The selected environment no longer exists."
+msgstr ""
+
+msgid "The system language follows your desktop session settings. English is used if no translation is available."
+msgstr ""
+
+msgid "The target distribution could not be identified. Since the .deb format is used by both Ubuntu and Debian, the latest Ubuntu LTS version is used by default."
+msgstr ""
+
+msgid "The temporary local copy of the package could not be removed."
+msgstr ""
+
+msgid "The welcome component did not create a Qt Quick window."
+msgstr ""
+
+msgid "There are pending system changes. Restart before uninstalling."
+msgstr ""
+
+msgid "This AppImage does not contain a recognized type 2 SquashFS payload."
+msgstr ""
+
+msgid "This AppImage installation is unavailable."
+msgstr ""
+
+msgid "This is a preview. Kontainer was not opened."
+msgstr ""
+
+msgid "This is a preview. No application was removed."
+msgstr ""
+
+msgid "This is a preview. No associations were changed."
+msgstr ""
+
+msgid "This is a preview. No container was removed."
+msgstr ""
+
+msgid "This is a preview. No update was started."
+msgstr ""
+
+msgid "This is a preview. The preference was not saved."
+msgstr ""
+
+msgid "This operation requires a system booted with rpm-ostree."
+msgstr ""
+
+msgid "This option changes the system and requires a restart."
+msgstr ""
+
+msgid "This package does not include an application shortcut. You can run it from a terminal inside the container."
+msgstr ""
+
+msgid "This package is already installed in the selected environment. MultiPak will not overwrite the existing installation."
+msgstr ""
+
+msgid "This preview does not start an installation."
+msgstr ""
+
+msgid "This shortcut does not belong to this installation."
+msgstr ""
+
+msgid "This system package cannot be uninstalled through MultiPak."
+msgstr ""
+
+msgid "Try again"
+msgstr ""
+
+msgid "Ubuntu — default catalog version"
+msgstr ""
+
+msgid "Unavailable"
+msgstr ""
+
+msgid "Uninstall"
+msgstr ""
+
+msgid "Uninstall %1?\n\n%2"
+msgstr ""
+
+msgid "Uninstall application"
+msgstr ""
+
+msgid "Uninstall applications"
+msgstr ""
+
+msgid "Uninstallation pending. Restart to finish."
+msgstr ""
+
+msgid "Uninstalling {0}… Please wait."
+msgstr ""
+
+msgid "Uninstall…"
+msgstr ""
+
+msgid "Unrecognized local package ID: "
+msgstr ""
+
+msgid "Unsupported DEB metadata compression."
+msgstr ""
+
+msgid "Unsupported package type."
+msgstr ""
+
+msgid "Update"
+msgstr ""
+
+msgid "Update applications"
+msgstr ""
+
+msgid "Update complete. All applications and packages in the container are up to date."
+msgstr ""
+
+msgid "Update the applications and packages in a container."
+msgstr ""
+
+msgid "Updating the Arch Linux environment…"
+msgstr ""
+
+msgid "Updating {0}… Please wait."
+msgstr ""
+
+msgid "Use MultiPak's recommendation (%1)"
+msgstr ""
+
+msgid "Use an existing container"
+msgstr ""
+
+msgid "Use only as a last resort."
+msgstr ""
+
+msgid "Use system management for rpm-ostree operations."
+msgstr ""
+
+msgid "Use the default MultiPak container"
+msgstr ""
+
+msgid "Verifying the installation…"
+msgstr ""
+
+msgid "Verifying the pending deployment…"
+msgstr ""
+
+msgid "Verifying uninstallation…"
+msgstr ""
+
+msgid "Version not provided"
+msgstr ""
+
+msgid "Version: {0} · {1}"
+msgstr ""
+
+msgid "View license"
+msgstr ""
+
+msgid "View the %1 license"
+msgstr ""
+
+msgid "View the full list of additional dependencies"
+msgstr ""
+
+msgid "Visit the %1 website"
+msgstr ""
+
+msgid "Visual completion preview; no application was installed."
+msgstr ""
+
+msgid "Wait for rpm-ostree to finish. The window will close when the operation ends."
+msgstr ""
+
+msgid "Wait for the operation to finish before closing the manager."
+msgstr ""
+
+msgid "We recommend checking your system's app store for this application before continuing."
+msgstr ""
+
+msgid "Welcome to the MultiPak Installation Wizard"
+msgstr ""
+
+msgid "You can now open it from the application launcher."
+msgstr ""
+
+msgid "You chose to search Bazaar."
+msgstr ""
+
+msgid "You confirmed the installation."
+msgstr ""
+
+msgid "created"
+msgstr ""
+
+msgid "reused"
+msgstr ""
+
+msgid "rpm-ostree did not confirm uninstallation."
+msgstr ""
+
+msgid "rpm-ostree will remove the package and recalculate the required dependencies. A restart will be needed to finish. Your personal data will be preserved."
+msgstr ""
+
+msgid "{0} exited with code {1}.\n{2}"
+msgstr ""
+
+msgid "{0} will be installed the next time you start your computer."
+msgstr ""

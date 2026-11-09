@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
+  <title>Contêiner</title>
+
+  <defs>
+<filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#000000" flood-opacity="0.45" />
+    </filter>
+<filter id="glow">
+      <feGaussianBlur stdDeviation="1.2" result="coloredBlur" />
+      <feMerge>
+        <feMergeNode in="coloredBlur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+<linearGradient id="topFace" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#52b788" />
+      <stop offset="100%" stop-color="#2d6a4f" />
+    </linearGradient>
+
+    <linearGradient id="leftFace" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2d6a4f" />
+      <stop offset="100%" stop-color="#1b4332" />
+    </linearGradient>
+
+    <linearGradient id="rightFace" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#40916c" />
+      <stop offset="100%" stop-color="#1b4332" />
+    </linearGradient>
+  </defs>
+<g filter="url(#shadow)" stroke-linejoin="round">
+<path d="M12 28 L48 48 V88 L12 68 Z" fill="url(#leftFace)" stroke="#081c15" stroke-width="1.5" stroke-opacity="0.6" />
+<path d="M48 48 L84 28 V68 L48 88 Z" fill="url(#rightFace)" stroke="#081c15" stroke-width="1.5" stroke-opacity="0.6" />
+<path d="M48 8 L84 28 L48 48 L12 28 Z" fill="url(#topFace)" stroke="#74c69d" stroke-width="1.5" stroke-opacity="0.8" />
+  </g>
+<g stroke="#d8f3dc" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.75">
+    <path d="M30 18 L48 28 L66 18" />
+    <path d="M48 28 L48 42" />
+  </g>
+<g filter="url(#glow)">
+<path d="M22 42 L38 51 M22 52 L38 61" stroke="#b7e4c7" stroke-width="2" stroke-linecap="round" opacity="0.85" />
+<path d="M60 56 L72 50 M60 56 L66 66" stroke="#95d5b2" stroke-width="1.2" opacity="0.8" />
+
+    <circle cx="60" cy="56" r="2.5" fill="#d8f3dc" stroke="#1b4332" stroke-width="1" />
+    <circle cx="72" cy="50" r="2" fill="#d8f3dc" stroke="#1b4332" stroke-width="1" />
+    <circle cx="66" cy="66" r="2" fill="#d8f3dc" stroke="#1b4332" stroke-width="1" />
+  </g>
+</svg>

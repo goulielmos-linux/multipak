@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-archlinux-package">
+    <comment>Arch Linux package</comment>
+    <comment xml:lang="pt_BR">Pacote Arch Linux</comment>
+    <sub-class-of type="application/x-tar"/>
+    <sub-class-of type="application/x-zstd-compressed-tar"/>
+    <sub-class-of type="application/x-xz-compressed-tar"/>
+    <sub-class-of type="application/x-compressed-tar"/>
+    <sub-class-of type="application/x-bzip-compressed-tar"/>
+    <glob pattern="*.pkg.tar" weight="80"/>
+    <glob pattern="*.pkg.tar.zst" weight="80"/>
+    <glob pattern="*.pkg.tar.xz" weight="80"/>
+    <glob pattern="*.pkg.tar.gz" weight="80"/>
+    <glob pattern="*.pkg.tar.bz2" weight="80"/>
+    <icon name="package-x-generic"/>
+  </mime-type>
+</mime-info>
