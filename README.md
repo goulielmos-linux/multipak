@@ -32,6 +32,17 @@ system updates, and asks the user to confirm.
 
 Both applications use Python, Qt and Kirigami controls that follow the KDE theme.
 
+## Screenshots
+
+### Application Manager
+![Application Manager](docs/screenshots/application-manager.png)
+
+### Installation settings
+![Installation settings](docs/screenshots/installation-settings.png)
+
+### Installation summary
+![Installation summary](docs/screenshots/installation-summary.png)
+
 ## Features
 
 - Show package details before installation.
