@@ -57,18 +57,16 @@ Both applications use Python, Qt and Kirigami controls that follow the KDE theme
 Supported file types: `.rpm`, `.deb`, `.pkg.tar`, `.pkg.tar.zst`, `.pkg.tar.xz`,
 `.pkg.tar.gz`, `.pkg.tar.bz2`, and `.AppImage` (type 1: ISO9660; type 2: SquashFS).
 
-## Distribution
+## Installation
 
-MultiPak uses Flatpak as its distribution format, with both applications in the
-same package. Install a local bundle with:
+MultiPak is distributed as a Flatpak package containing both the Installation Wizard and the Application Manager.
 
-```bash
-flatpak install --user /path/to/multipak-1.0.0a1-x86_64.flatpak
-```
+1. Download the `.flatpak` file.
+2. Open the downloaded file with Bazaar.
+3. Click **Install** and wait for installation to finish.
+4. Open **MultiPak Application Manager** from your application launcher.
 
-Open the Application Manager from the launcher, or run
-`flatpak run io.github.multipak.manager`. See [Distribution](docs/distribution.md)
-for build instructions and host requirements.
+See [Distribution](docs/distribution.md) for build instructions and system requirements.
 
 ## FAQ
 
