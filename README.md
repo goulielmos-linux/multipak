@@ -64,7 +64,8 @@ MultiPak is distributed as a Flatpak package containing both the Installation Wi
 1. Download the `.flatpak` file.
 2. Open the downloaded file with Bazaar.
 3. Click **Install** and wait for installation to finish.
-4. Open **MultiPak Application Manager** from your application launcher.
+4. Open an RPM, DEB, prebuilt Arch Linux package or AppImage with MultiPak to start installing it.
+5. To uninstall applications or change preferences, open **MultiPak Application Manager** from the application launcher.
 
 See [Distribution](docs/distribution.md) for build instructions and system requirements.
 
