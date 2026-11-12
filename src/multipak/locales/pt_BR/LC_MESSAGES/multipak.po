@@ -1,3 +1,4 @@
+# MultiPak Brazilian Portuguese translations.
 msgid ""
 msgstr "Project-Id-Version: MultiPak 1.0.0a1\nLanguage: pt_BR\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\n"
 
@@ -43,9 +44,6 @@ msgstr "Sobre o Instalador de Aplicativos — MultiPak"
 msgid "About the Application Manager — MultiPak"
 msgstr "Sobre o Gerenciador de Aplicativos — MultiPak"
 
-msgid "About the author"
-msgstr "Sobre o autor"
-
 msgid "About the recommended environment"
 msgstr "Entender a sugestão do ambiente"
 
@@ -60,6 +58,9 @@ msgstr "Dependências extras:"
 
 msgid "Advanced settings"
 msgstr "Configurações avançadas"
+
+msgid "All files"
+msgstr "Todos os arquivos"
 
 msgid "Also delete the container's home folder, including its data and settings."
 msgstr "Também excluir a pasta pessoal do contêiner, incluindo seus dados e configurações."
@@ -80,13 +81,16 @@ msgid "AppImage uninstalled. Personal data was preserved."
 msgstr "AppImage desinstalado. Os dados pessoais foram preservados."
 
 msgid "Application"
-msgstr "Programa"
+msgstr "Aplicativo"
 
 msgid "Application Installer — MultiPak"
 msgstr "Instalador de Aplicativos — MultiPak"
 
 msgid "Application Manager — MultiPak"
 msgstr "Gerenciador de Aplicativos — MultiPak"
+
+msgid "Application packages"
+msgstr "Pacotes de aplicativos"
 
 msgid "Application uninstalled. The container and personal data were preserved."
 msgstr "Aplicativo desinstalado. O contêiner e os dados pessoais foram preservados."
@@ -139,6 +143,9 @@ msgstr "Use um nome próprio. O prefixo MultiPak é reservado ao aplicativo."
 msgid "Choose a custom name. This name and the MultiPak prefixes are reserved for containers managed by the application."
 msgstr "Use um nome próprio. Esse nome e os prefixos do MultiPak são reservados aos contêineres gerenciados pelo aplicativo."
 
+msgid "Choose a package to install."
+msgstr "Escolha um pacote para instalar."
+
 msgid "Choose a valid name for the new environment."
 msgstr "Escolha um nome válido para o novo ambiente."
 
@@ -151,9 +158,6 @@ msgstr "Escolher outra distribuição ou versão"
 msgid "Choose the language used by MultiPak."
 msgstr "Escolha o idioma usado pelo MultiPak."
 
-msgid "Choose which file extensions to open."
-msgstr "Escolha quais extensões abrir."
-
 msgid "Choose which file types should open in the MultiPak Installation Wizard."
 msgstr "Escolha quais tipos de arquivo devem abrir no Assistente de Instalação MultiPak."
 
@@ -162,6 +166,9 @@ msgstr "Removendo os componentes da instalação…"
 
 msgid "Close"
 msgstr "Fechar"
+
+msgid "Configure file types and the interface language."
+msgstr "Configure os tipos de arquivo e o idioma da interface."
 
 msgid "Container"
 msgstr "Contêiner"
@@ -208,6 +215,9 @@ msgstr "Continuar"
 msgid "Continue with direct installation"
 msgstr "Continuar com a instalação direta"
 
+msgid "Copy information"
+msgstr "Copiar informações"
+
 msgid "Copying the AppImage…"
 msgstr "Copiando o AppImage…"
 
@@ -216,9 +226,6 @@ msgstr "Copiando o pacote para o contêiner…"
 
 msgid "Copying the package to the existing container…"
 msgstr "Copiando o pacote para o ambiente existente…"
-
-msgid "Copyright"
-msgstr "Direitos autorais"
 
 msgid "Could not check whether the container can be removed: {0}"
 msgstr "Não foi possível verificar se o contêiner pode ser excluído: {0}"
@@ -259,11 +266,8 @@ msgstr "Não foi possível localizar o conteúdo do AppImage."
 msgid "Could not open Bazaar."
 msgstr "Não foi possível abrir o Bazaar."
 
-msgid "Could not open Kontainer"
-msgstr "Não foi possível abrir o Kontainer"
-
-msgid "Could not open Kontainer."
-msgstr "Não foi possível abrir o Kontainer."
+msgid "Could not open the application installer."
+msgstr "Não foi possível abrir o instalador de aplicativos."
 
 msgid "Could not query direct installations: "
 msgstr "Não foi possível consultar as instalações diretas: "
@@ -301,14 +305,11 @@ msgstr "Não foi possível atualizar os tipos de arquivo: falta shared-mime-info
 msgid "Could not verify container ownership."
 msgstr "Não foi possível verificar se o contêiner pertence ao MultiPak."
 
-msgid "Could not verify the AppImage mount.\n"
-msgstr "Não foi possível verificar a montagem do AppImage.\n"
-
 msgid "Could not verify the package status in the environment."
 msgstr "Não foi possível verificar o estado do pacote no ambiente."
 
-msgid "Create and name a new container"
-msgstr "Criar um novo contêiner e nomeá-lo"
+msgid "Create a custom container"
+msgstr "Criar um contêiner personalizado"
 
 msgid "Creating the Distrobox container…"
 msgstr "Criando o contêiner Distrobox…"
@@ -352,17 +353,23 @@ msgstr "Confiança da identificação:"
 msgid "Distribution detection confidence: {0}.\n\n{1}"
 msgstr "Confiança na identificação: {0}.\n\n{1}"
 
+msgid "Distribution format."
+msgstr "Formato de distribuição."
+
 msgid "Distrobox was not found."
 msgstr "Distrobox não encontrado."
 
 msgid "Downloading components and installing the application…"
 msgstr "Baixando os componentes e instalando o aplicativo…"
 
+msgid "English is used if no translation is available."
+msgstr "O inglês será usado quando não houver uma tradução disponível."
+
 msgid "Enter a name for the new container."
 msgstr "Digite um nome para o novo contêiner."
 
-msgid "Executable: %1"
-msgstr "Executável: %1"
+msgid "Execution environment and graphics system."
+msgstr "Ambiente de execução e sistema gráfico."
 
 msgid "Existing compatible container"
 msgstr "Contêiner compatível existente"
@@ -385,8 +392,11 @@ msgstr "Finalizando o registro da instalação…"
 msgid "Finish"
 msgstr "Concluir"
 
-msgid "For containers created outside MultiPak, use <a href='kontainer'>Kontainer</a>."
-msgstr "Para contêineres criados pelo usuário fora do MultiPak, utilize o <a href='kontainer'>Kontainer</a>."
+msgid "Flatpak runtime"
+msgstr "Ambiente de execução Flatpak"
+
+msgid "Foundation of the graphical interface."
+msgstr "Base da interface gráfica."
 
 msgid "Hide alternative method"
 msgstr "Ocultar método alternativo"
@@ -403,9 +413,6 @@ msgstr "Como utilizar o contêiner"
 msgid "I understand the risks and want to continue."
 msgstr "Entendo os riscos e desejo continuar."
 
-msgid "I'm an IT technician turned historian. This app is an adventure made possible in large part by GPT-6.1 Sol."
-msgstr "Sou um técnico em informática que se tornou historiador. Este aplicativo é uma aventura viabilizada, em grande parte, pelo GPT-6.1 Sol."
-
 msgid "Initializing the container…"
 msgstr "Inicializando o ambiente…"
 
@@ -417,6 +424,9 @@ msgstr "Instale diferentes pacotes com segurança e facilidade."
 
 msgid "Install anyway"
 msgstr "Instalar mesmo assim"
+
+msgid "Install applications"
+msgstr "Instalar aplicativos"
 
 msgid "Install directly on the system"
 msgstr "Instalar diretamente no sistema"
@@ -463,6 +473,9 @@ msgstr "Instalando o aplicativo…"
 msgid "Installs the application safely and automatically."
 msgstr "Instala o aplicativo de modo seguro e automático."
 
+msgid "Integration between Python and Qt."
+msgstr "Integração entre Python e Qt."
+
 msgid "Invalid .PKGINFO file."
 msgstr "Arquivo .PKGINFO inválido."
 
@@ -477,6 +490,9 @@ msgstr "Cabeçalho DEB inválido."
 
 msgid "Invalid ELF header."
 msgstr "Cabeçalho ELF inválido."
+
+msgid "Invalid RPM metadata record."
+msgstr "Os dados de identificação do pacote RPM são inválidos."
 
 msgid "Invalid application name in the AppImage."
 msgstr "Nome de aplicativo inválido no AppImage."
@@ -511,20 +527,23 @@ msgstr "Caminho interno inválido no AppImage."
 msgid "Invalid managed environment name."
 msgstr "Nome de ambiente gerenciado inválido."
 
+msgid "Invalid multiline desktop entry."
+msgstr "Atalho com conteúdo inválido em várias linhas."
+
 msgid "Invalid package name."
 msgstr "Nome de pacote inválido."
 
 msgid "Invalid shortcut argument."
 msgstr "Argumento de atalho inválido."
 
+msgid "KDE interface components."
+msgstr "Componentes de interface do KDE."
+
 msgid "Keep container"
 msgstr "Manter contêiner"
 
 msgid "Kirigami preview"
 msgstr "Prévia de Kirigami"
-
-msgid "Kontainer was not found. Check that it is installed."
-msgstr "O Kontainer não foi encontrado. Confira se ele está instalado."
 
 msgid "LGPLv3 / GPLv3 / Commercial"
 msgstr "LGPLv3 / GPLv3 / Comercial"
@@ -535,11 +554,11 @@ msgstr "Idioma"
 msgid "Language preference saved."
 msgstr "Preferência de idioma salva."
 
+msgid "Language used for MultiPak’s application logic."
+msgstr "Linguagem usada na lógica do MultiPak."
+
 msgid "Libraries in use"
 msgstr "Bibliotecas em uso"
-
-msgid "License"
-msgstr "Licença"
 
 msgid "List of dependencies declared by the package"
 msgstr "Lista de dependências declaradas pelo pacote"
@@ -586,6 +605,12 @@ msgstr "Idioma do MultiPak"
 msgid "MultiPak may not detect applications installed in this container by other means. Deleting the container will also remove those applications and all remaining packages."
 msgstr "O MultiPak pode não detectar aplicativos instalados neste contêiner por outros meios. Excluir o contêiner também removerá esses aplicativos e todos os pacotes restantes."
 
+msgid "MultiPak settings"
+msgstr "Configurações do MultiPak"
+
+msgid "Native installation"
+msgstr "Instalação nativa"
+
 msgid "No MultiPak containers are available to update."
 msgstr "Nenhum contêiner do MultiPak disponível para atualização."
 
@@ -613,14 +638,8 @@ msgstr "Não instalado"
 msgid "Not provided"
 msgstr "Não informada"
 
-msgid "Open Kontainer"
-msgstr "Abrir o Kontainer"
-
 msgid "Open the package without --page or --screenshot; these options are for previews only."
 msgstr "Abra o pacote sem --page ou --screenshot; essas opções são apenas de prévia."
-
-msgid "Opening Kontainer…"
-msgstr "Abrindo o Kontainer…"
 
 msgid "Operation timed out: {0}"
 msgstr "Tempo limite excedido: {0}"
@@ -754,15 +773,6 @@ msgstr "Selecione uma instalação RPM direta registrada pelo MultiPak."
 msgid "Select an application to uninstall"
 msgstr "Selecionar aplicativo para desinstalar"
 
-msgid "Select an application. Other applications and personal data will be preserved."
-msgstr "Selecione um aplicativo. Os outros aplicativos e os dados pessoais serão preservados."
-
-msgid "Select file types"
-msgstr "Selecionar tipos de arquivo"
-
-msgid "Select the interface language"
-msgstr "Selecionar idioma da interface"
-
 msgid "Selected base image"
 msgstr "Base escolhida por você"
 
@@ -781,8 +791,11 @@ msgstr "Sugestão do ambiente"
 msgid "System language"
 msgstr "Idioma do sistema"
 
-msgid "The .PKGINFO metadata identifies this as an Arch-based package, but does not distinguish Arch Linux from its derivatives. The recommended environment is Arch Linux, which uses a rolling release model rather than numbered versions."
-msgstr "Os metadados .PKGINFO identificam um pacote da família Arch Linux, mas não distinguem o Arch de distribuições derivadas. O ambiente sugerido é o Arch Linux, que utiliza atualização contínua (rolling release), sem versões numeradas."
+msgid "System package installation was not confirmed."
+msgstr "A instalação do pacote no sistema não foi confirmada."
+
+msgid "The .PKGINFO metadata identifies this as an Arch-based package, but does not distinguish Arch Linux from its derivatives. The recommended environment is Arch Linux (rolling release)."
+msgstr "Os metadados .PKGINFO identificam um pacote da família Arch Linux, mas não distinguem o Arch de distribuições derivadas. O ambiente sugerido é o Arch Linux (rolling release)."
 
 msgid "The AppImage copy has changed. Open the file again."
 msgstr "A cópia do AppImage foi alterada. Abra o arquivo novamente."
@@ -807,12 +820,6 @@ msgstr "A pasta do aplicativo não pode ser um link simbólico."
 
 msgid "The application entry point is unavailable."
 msgstr "O ponto de entrada do aplicativo não está disponível."
-
-msgid "You can now open it from the application launcher."
-msgstr "Você já pode abri-lo pelo lançador de aplicativos."
-
-msgid "The application shown above was built for a different Linux distribution. We recommend checking your system's app store for a compatible version before continuing."
-msgstr "O aplicativo acima foi preparado para outra distribuição Linux. Recomendamos procurar uma versão compatível na loja de aplicativos do sistema antes de continuar."
 
 msgid "The application was installed in the environment "
 msgstr "O aplicativo foi instalado no ambiente "
@@ -976,8 +983,8 @@ msgstr "O pacote já não está solicitado como instalação direta."
 msgid "The package still exists in the shared environment."
 msgstr "O pacote ainda existe no ambiente compartilhado."
 
-msgid "The package's internal metadata includes .fc{0}, which means it was built for Fedora {1}."
-msgstr "Os metadados internos do pacote indicam .fc{0}, o que significa que ele foi preparado para Fedora {1}."
+msgid "The Release field in the package metadata indicates that it was built for Fedora {0}."
+msgstr "O campo Release dos metadados do pacote indica que ele foi preparado para o Fedora {0}."
 
 msgid "The package's internal metadata indicates that it was built for {0}, so MultiPak recommends this version."
 msgstr "Os metadados internos do pacote indicam que ele foi preparado para {0}. Por isso, o MultiPak sugere essa versão."
@@ -990,9 +997,6 @@ msgstr "O ambiente selecionado não é mais um Distrobox; operação bloqueada."
 
 msgid "The selected environment no longer exists."
 msgstr "O ambiente selecionado não existe mais."
-
-msgid "The system language follows your desktop session settings. English is used if no translation is available."
-msgstr "O idioma do sistema segue as configurações da sua sessão. O inglês será usado quando não houver uma tradução disponível."
 
 msgid "The target distribution could not be identified. Since the .deb format is used by both Ubuntu and Debian, the latest Ubuntu LTS version is used by default."
 msgstr "Não foi possível identificar a distribuição de origem deste pacote. Como os arquivos .deb não distinguem Ubuntu de Debian, a última versão LTS do Ubuntu é utilizada como padrão."
@@ -1012,8 +1016,8 @@ msgstr "Este AppImage não contém um SquashFS tipo 2 reconhecido."
 msgid "This AppImage installation is unavailable."
 msgstr "A instalação deste AppImage não está disponível."
 
-msgid "This is a preview. Kontainer was not opened."
-msgstr "Esta é uma prévia. O Kontainer não foi aberto."
+msgid "This is a preview. No application was opened."
+msgstr "Esta é uma prévia. Nenhum aplicativo foi aberto."
 
 msgid "This is a preview. No application was removed."
 msgstr "Esta é uma prévia. Nenhum aplicativo foi removido."
@@ -1067,10 +1071,10 @@ msgid "Uninstall %1?\n\n%2"
 msgstr "Desinstalar %1?\n\n%2"
 
 msgid "Uninstall application"
-msgstr "Desinstalar programa"
+msgstr "Desinstalar aplicativo"
 
 msgid "Uninstall applications"
-msgstr "Desinstalar programas"
+msgstr "Desinstalar aplicativos"
 
 msgid "Uninstallation pending. Restart to finish."
 msgstr "Desinstalação pendente. Reinicie para concluir."
@@ -1094,13 +1098,13 @@ msgid "Update"
 msgstr "Atualizar"
 
 msgid "Update applications"
-msgstr "Atualizar programas"
+msgstr "Atualizar aplicativos"
+
+msgid "Update applications in a MultiPak Distrobox container."
+msgstr "Atualize os aplicativos de um contêiner Distrobox do MultiPak."
 
 msgid "Update complete. All applications and packages in the container are up to date."
 msgstr "Atualização concluída. Os aplicativos e pacotes do contêiner estão atualizados."
-
-msgid "Update the applications and packages in a container."
-msgstr "Atualize os aplicativos e pacotes de um contêiner."
 
 msgid "Updating the Arch Linux environment…"
 msgstr "Atualizando o ambiente Arch Linux…"
@@ -1141,14 +1145,8 @@ msgstr "Versão: {0} · {1}"
 msgid "View license"
 msgstr "Ver licença"
 
-msgid "View the %1 license"
-msgstr "Ver a licença de %1"
-
 msgid "View the full list of additional dependencies"
 msgstr "Ver lista completa de dependências extras"
-
-msgid "Visit the %1 website"
-msgstr "Visitar o site de %1"
 
 msgid "Visual completion preview; no application was installed."
 msgstr "Prévia visual da conclusão; nenhum aplicativo foi instalado."
@@ -1159,11 +1157,11 @@ msgstr "Aguarde o rpm-ostree concluir. A janela será fechada ao terminar a oper
 msgid "Wait for the operation to finish before closing the manager."
 msgstr "Aguarde a operação terminar antes de fechar o gerenciador."
 
-msgid "We recommend checking your system's app store for this application before continuing."
-msgstr "Recomendamos procurar este aplicativo na loja de aplicativos do sistema antes de continuar."
-
 msgid "Welcome to the MultiPak Installation Wizard"
 msgstr "Bem-vindo ao Assistente de Instalação MultiPak"
+
+msgid "You can now open it from the application launcher."
+msgstr "Você já pode abri-lo pelo lançador de aplicativos."
 
 msgid "You chose to search Bazaar."
 msgstr "Você escolheu buscar no Bazaar."
@@ -1188,3 +1186,199 @@ msgstr "{0} encerrou com código {1}.\n{2}"
 
 msgid "{0} will be installed the next time you start your computer."
 msgstr "{0} será aplicado na próxima inicialização."
+
+msgid "Could not save the update reminder."
+msgstr "Não foi possível salvar o lembrete de atualização."
+
+msgid "Could not open the software store."
+msgstr "Não foi possível abrir a loja de aplicativos."
+
+msgid "Security update required"
+msgstr "Atualização de segurança necessária"
+
+msgid "Update available"
+msgstr "Atualização disponível"
+
+msgid "This version of MultiPak has a security issue. Update to continue installing applications."
+msgstr "Esta versão do MultiPak possui uma falha de segurança. Atualize para continuar instalando aplicativos."
+
+msgid "A new version of MultiPak is available."
+msgstr "Uma nova versão do MultiPak está disponível."
+
+msgid "Installed version: %1 → New version: %2"
+msgstr "Versão instalada: %1 → Nova versão: %2"
+
+msgid "Remind me later"
+msgstr "Lembrar depois"
+
+msgid "Update MultiPak to continue installing applications."
+msgstr "Atualize o MultiPak para continuar instalando aplicativos."
+
+msgid "Opening the app store…"
+msgstr "Abrindo a loja de aplicativos…"
+
+msgid "You chose to search the app store."
+msgstr "Você escolheu pesquisar na loja de aplicativos."
+
+msgid "No supported app store was found. Install Bazaar, GNOME Software or KDE Discover to search for applications."
+msgstr "Nenhuma loja de aplicativos compatível foi encontrada. Instale o Bazaar, GNOME Software ou KDE Discover para pesquisar aplicativos."
+
+msgid "A system change is pending. Restart your computer before installing Distrobox."
+msgstr "Há uma alteração do sistema pendente. Reinicie o computador antes de instalar o Distrobox."
+
+msgid "A system operation is in progress. Wait for it to finish before installing Distrobox."
+msgstr "Há uma operação do sistema em andamento. Aguarde sua conclusão antes de instalar o Distrobox."
+
+msgid "A system operation is in progress. Wait for it to finish before restarting."
+msgstr "Há uma operação do sistema em andamento. Aguarde sua conclusão antes de reiniciar."
+
+msgid "Distrobox installation could not be confirmed."
+msgstr "Não foi possível confirmar a instalação do Distrobox."
+
+msgid "Distrobox installation could not be confirmed. Check the rpm-ostree status before trying again."
+msgstr "Não foi possível confirmar a instalação do Distrobox. Verifique o estado do rpm-ostree antes de tentar novamente."
+
+msgid "Distrobox is available. You can continue installing the application."
+msgstr "O Distrobox está disponível. Você pode continuar a instalação do aplicativo."
+
+msgid "Distrobox is scheduled for installation. Restart your computer, then reopen the package to continue."
+msgstr "A instalação do Distrobox está agendada. Reinicie o computador e abra o pacote novamente para continuar."
+
+msgid "Distrobox was installed using rpm-ostree. Restart your computer, then reopen the package to install your application."
+msgstr "O Distrobox foi instalado usando o rpm-ostree. Reinicie o computador e abra o pacote novamente para instalar seu aplicativo."
+
+msgid "Finish the current application operation before installing Distrobox."
+msgstr "Conclua a operação atual do aplicativo antes de instalar o Distrobox."
+
+msgid "Install Distrobox"
+msgstr "Instalar Distrobox"
+
+msgid "Install Distrobox on the system to continue."
+msgstr "Instale o Distrobox no sistema para continuar."
+
+msgid "Install Distrobox on your system to install applications in containers."
+msgstr "Instale o Distrobox no sistema para instalar aplicativos em contêineres."
+
+msgid "Installing Distrobox using rpm-ostree…"
+msgstr "Instalando o Distrobox usando o rpm-ostree…"
+
+msgid "MultiPak needs Distrobox to install applications in containers. It will be installed on your system using rpm-ostree. System authorization may be required, and you will need to restart your computer to complete the installation."
+msgstr "O MultiPak precisa do Distrobox para instalar aplicativos em contêineres. Ele será instalado no sistema usando o rpm-ostree. A operação poderá solicitar sua senha e será necessário reiniciar o computador para concluir a instalação."
+
+msgid "No pending Distrobox installation was found. Check the system status before restarting."
+msgstr "Não foi encontrada uma instalação pendente do Distrobox. Verifique o estado do sistema antes de reiniciar."
+
+msgid "Preparing Distrobox"
+msgstr "Preparando o Distrobox"
+
+msgid "Requesting a system restart…"
+msgstr "Solicitando a reinicialização do sistema…"
+
+msgid "Restart later"
+msgstr "Reiniciar depois"
+
+msgid "Restart now"
+msgstr "Reiniciar agora"
+
+msgid "Verifying the Distrobox installation…"
+msgstr "Verificando a instalação do Distrobox…"
+
+
+msgid "Checking package repositories — {0}%"
+msgstr "Verificando os repositórios de pacotes — {0}%"
+
+msgid "Checking package repositories…"
+msgstr "Verificando os repositórios de pacotes…"
+
+msgid "Checking the container image…"
+msgstr "Verificando a imagem do contêiner…"
+
+msgid "Configuring the container…"
+msgstr "Configurando o contêiner…"
+
+msgid "Connecting to the container image download…"
+msgstr "Conectando ao download da imagem do contêiner…"
+
+msgid "Downloading container image — part {0}: {1}%\n{2} of {3}"
+msgstr "Baixando a imagem do contêiner — parte {0}: {1}%\n{2} de {3}"
+
+msgid "Downloading container packages — {0}%"
+msgstr "Baixando os pacotes do contêiner — {0}%"
+
+msgid "Downloading container packages…"
+msgstr "Baixando os pacotes do contêiner…"
+
+msgid "Downloading {0} — {1}%"
+msgstr "Baixando {0} — {1}%"
+
+msgid "Installing package updates…"
+msgstr "Instalando as atualizações dos pacotes…"
+
+msgid "Installing packages — {0}%"
+msgstr "Instalando pacotes — {0}%"
+
+msgid "Installing the container's basic components…"
+msgstr "Instalando os componentes básicos do contêiner…"
+
+msgid "Preparing the container's basic components…"
+msgstr "Preparando os componentes básicos do contêiner…"
+
+msgid "Reusing downloaded image layers…"
+msgstr "Reutilizando partes da imagem já baixadas…"
+
+msgid "Saving the container image…"
+msgstr "Salvando a imagem do contêiner…"
+
+msgid "This application is packaged in DEB format, used by distributions such as Debian and Ubuntu."
+msgstr "Este aplicativo está no formato DEB, usado por distribuições como Debian e Ubuntu."
+
+msgid "This application is packaged in RPM format, used by distributions such as Fedora and Red Hat Enterprise Linux."
+msgstr "Este aplicativo está no formato RPM, usado por distribuições como Fedora e Red Hat Enterprise Linux."
+
+msgid "This application is in the package format used by Arch Linux and its derivatives."
+msgstr "Este aplicativo está no formato de pacote usado pelo Arch Linux e por distribuições derivadas."
+
+msgid "Before continuing with the installation, check whether it is already available in your system's app store."
+msgstr "Antes de continuar com a instalação, verifique se o aplicativo já não está disponível na loja de aplicativos do seu sistema."
+
+msgid "Shortcuts created: {0}"
+msgstr "Atalhos criados: {0}"
+
+msgid "The container's home folder was kept: {0}"
+msgstr "A pasta pessoal do contêiner foi mantida: {0}"
+
+msgid "The shortcut {0} was skipped because its desktop file is invalid."
+msgstr "O atalho {0} foi ignorado porque o arquivo .desktop é inválido."
+
+msgid "There is not enough free space to copy the package."
+msgstr "Não há espaço livre suficiente para copiar o pacote."
+
+msgid "The disk is full. Free up disk space, then try again."
+msgstr "O disco está cheio. Libere espaço e tente novamente."
+
+msgid "Could not update file associations: {0}"
+msgstr "Não foi possível atualizar as associações de arquivos: {0}"
+
+msgid "DEB metadata exceeds the permitted limit."
+msgstr "Os metadados do DEB excedem o limite permitido."
+
+msgid "Decompressed metadata exceeds the limit."
+msgstr "Os metadados descompactados excedem o limite."
+
+msgid "The DEB control file is missing the {0} field."
+msgstr "O arquivo de controle do DEB não tem o campo {0}."
+
+msgid "The DEB file is truncated."
+msgstr "O arquivo DEB está incompleto."
+
+msgid "Waiting for the current step to finish before cleaning up…"
+msgstr "Aguardando a etapa terminar e preparando a limpeza…"
+
+msgid "Could not prepare a private temporary folder in the environment."
+msgstr "Não foi possível preparar uma pasta temporária privada no ambiente."
+
+msgid "Could not remove the folder {0}."
+msgstr "Não foi possível remover a pasta {0}."
+
+msgid "The operation in the environment is still running. Wait and try again."
+msgstr "A operação no ambiente ainda está em andamento. Aguarde e tente novamente."

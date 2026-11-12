@@ -17,9 +17,8 @@ def suggestion_details(package: Package, environment: Environment, title: str) -
         strength = tr("Medium")
         text = tr(
             "The .PKGINFO metadata identifies this as an Arch-based package, "
-            "but does not distinguish Arch Linux from its derivatives. The "
-            "recommended environment is Arch Linux, which uses a rolling "
-            "release model rather than numbered versions."
+            "but does not distinguish Arch Linux from its derivatives. "
+            "The recommended environment is Arch Linux (rolling release)."
         )
     elif matched and package.distro_hint_source == "filename":
         strength = tr("Medium")
@@ -36,9 +35,9 @@ def suggestion_details(package: Package, environment: Environment, title: str) -
         ).format(title)
         if package.kind == "rpm" and hint_family == "fedora":
             text = tr(
-                "The package's internal metadata includes .fc{0}, which means it "
-                "was built for Fedora {1}."
-            ).format(hint_version, hint_version)
+                "The Release field in the package metadata indicates that it was built "
+                "for Fedora {0}."
+            ).format(hint_version)
         if package.filename_distro_hint and package.filename_distro_hint != package.distro_hint:
             other = package.filename_distro_hint.partition("-")[2]
             text += tr(

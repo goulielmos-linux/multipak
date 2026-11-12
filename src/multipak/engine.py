@@ -2,18 +2,21 @@
 
 import hashlib
 import json
+import os
 import re
-import shutil
 import threading
 import uuid
 from collections.abc import Callable
 from pathlib import Path
+from types import SimpleNamespace
 
 from multipak.localization import tr
 
 from . import guest, host
+from .container_progress import ImageProgress, PackageProgress
 from .desktop import export_desktops, register_container_icon, remove_container_icon
-from .environment_choices import default_environment, next_container_name
+from .distrobox_setup import DistroboxMissing
+from .environment_choices import container_base, default_environment, next_container_name
 from .environments import (
     CUSTOM_LABEL,
     OWNER_LABEL,
@@ -32,6 +35,7 @@ from .models import (
     valid_environment_name,
 )
 from .process import Cancelled, CommandError, Runner
+from .storage import record_install_failure, require_copy_space
 from .store import Store
 
 
@@ -91,6 +95,8 @@ class Engine:
         )
         for executable in executables:
             if not host.which(executable):
+                if executable == "distrobox":
+                    raise DistroboxMissing(tr("Install Distrobox on the system to continue."))
                 raise RuntimeError(tr("Install {0} on the system to continue.").format(executable))
         # Require the session user's local rootless Podman store.
         info = self.runner.run(["podman", "info", "--format", "json"], timeout=30)
@@ -151,9 +157,9 @@ class Engine:
                 force_new_environment=force_new_environment,
             )
             self.runner.defer_cancellation = existing is not None
-            self.store.save(self.tx)
             directory = self.store.directory(token)
             try:
+                self.store.save(self.tx)
                 self._stage(2, tr("Preparing a copy of the package…"))
                 staged = directory / f"package.{package.kind}"
                 self._copy_package(package.path, staged)
@@ -175,16 +181,19 @@ class Engine:
                 self.store.save(self.tx)
                 raise
             except Exception as exc:
-                self.tx.status, self.tx.error = "failed", str(exc)
-                self.store.save(self.tx)
+                reported = record_install_failure(self.store, self.tx, exc)
+                if reported is not exc:
+                    raise reported from exc
                 raise
 
     def _copy_package(self, source: Path, target: Path) -> None:
-        with source.open("rb") as incoming, target.open("xb") as outgoing:
-            while chunk := incoming.read(1024 * 1024):
-                if self.cancelled.is_set():
-                    raise Cancelled
-                outgoing.write(chunk)
+        with source.open("rb") as incoming:
+            require_copy_space(target.parent, os.fstat(incoming.fileno()).st_size)
+            with target.open("xb") as outgoing:
+                while chunk := incoming.read(1024 * 1024):
+                    if self.cancelled.is_set():
+                        raise Cancelled
+                    outgoing.write(chunk)
 
     def _create(self, environment: Environment, directory: Path) -> None:
         assert self.tx is not None
@@ -205,14 +214,21 @@ class Engine:
             self._stage(25, tr("Preparing the existing container {0}…").format(self.tx.container))
             self.runner.run(self._enter("python3", "--version"))
             self._stage(35, tr("Copying the package to the existing container…"))
-            self._copy_into_guest(directory / f"package.{self.tx.package_kind}", self.guest_package)
+            self._prepare_guest_directory(self.runner)
             self._copy_into_guest(Path(guest.__file__), self.guest_helper)
+            self._copy_into_guest(directory / f"package.{self.tx.package_kind}", self.guest_package)
             return
-        self._stage(5, tr("Fetching the container image…"))
+        self._stage(-1, tr("Fetching the container image…"))
         if not self.tx.images_scanned:
             self.tx.images_before = [self._image_id(row) for row in self._images(self.runner)]
             self.tx.images_scanned = True
             self.store.save(self.tx)
+        # Fetch once, with Podman's transfer output enabled, before creating the container.
+        ImageProgress(self.progress).run(
+            self.runner,
+            ["podman", "pull", "--policy=missing", environment.image],
+            terminal_output=True,
+        )
         # Resolve floating image versions before choosing a stable, readable name.
         # Keep a persisted canonical name on retries, including partially created containers.
         if (
@@ -245,7 +261,7 @@ class Engine:
                 or not re.fullmatch(r"[0-9]+(?:\.[0-9]+)*", version)
             ):
                 raise ValueError(tr("Invalid distribution or version for Kontainer."))
-            base = f"MultiPak-{family.title()}-{version}"
+            base = container_base(environment, resolved_version=version)
             rows = json.loads(self.runner.run(["podman", "ps", "--all", "--format", "json"]))
             names = {name for row in rows for name in row.get("Names", [])}
             if base in names and not self.tx.force_new_environment:
@@ -266,9 +282,19 @@ class Engine:
                         tr("A container with that name already exists. Choose another name.")
                     )
         # Podman uses a cached image if available. No forced pull on every installation.
-        self._stage(8, tr("Creating the Distrobox container…"))
+        self._stage(-1, tr("Creating the Distrobox container…"))
         home = self.environment_home
-        home.mkdir(mode=0o700, parents=True, exist_ok=True)
+        home.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+        try:
+            home.mkdir(mode=0o700)
+        except FileExistsError:
+            if home.is_symlink() or not home.is_dir():
+                raise ValueError(
+                    tr("The container's home folder could not be verified. It will be kept.")
+                ) from None
+        else:
+            self.tx.home_created = True
+            self.store.save(self.tx)
         self.tx.status = "creating"
         self.store.save(self.tx)
         if self._owned_container(self.runner) is None:
@@ -308,28 +334,84 @@ class Engine:
             register_container_icon(self.store, self.tx)
         except OSError as exc:
             self._log(tr("Could not register the icon in Kontainer: {0}").format(exc))
-        self._stage(25, tr("Initializing the container…"))
-        self.runner.run(self._enter("true"))
+        self._stage(-1, tr("Initializing the container…"))
+        PackageProgress(self.progress).run(self.runner, self._enter("true"))
         self._stage(35, tr("Copying the package to the container…"))
-        self._copy_into_guest(directory / f"package.{self.tx.package_kind}", self.guest_package)
+        self._prepare_guest_directory(self.runner)
         self._copy_into_guest(Path(guest.__file__), self.guest_helper)
+        self._copy_into_guest(directory / f"package.{self.tx.package_kind}", self.guest_package)
         self.tx.status = "installing"
         self.store.save(self.tx)
 
+    # Distrobox shares /tmp with the host. Keep every temporary file in a private
+    # per-installation folder (mode 700) instead of directly in the shared /tmp.
+    @property
+    def guest_directory(self) -> str:
+        assert self.tx is not None
+        return f"/tmp/multipak-{self.tx.id}"
+
     @property
     def guest_package(self) -> str:
-        assert self.tx is not None
-        return f"/tmp/multipak-{self.tx.id}.{self.tx.package_kind}"
+        return f"{self.guest_directory}/package.{self.tx.package_kind}"
 
     @property
     def guest_helper(self) -> str:
-        assert self.tx is not None
-        return f"/tmp/multipak-{self.tx.id}-guest.py"
+        return f"{self.guest_directory}/guest.py"
 
     @property
     def guest_marker(self) -> str:
+        return f"{self.guest_directory}/running.json"
+
+    def _legacy_guest_paths(self) -> list[str]:
+        # Paths used by 1.0.0 Alpha 1; removed too when an old operation is cleaned up.
         assert self.tx is not None
-        return f"/tmp/multipak-{self.tx.id}-running.json"
+        prefix = f"/tmp/multipak-{self.tx.id}"
+        return [f"{prefix}.{self.tx.package_kind}", f"{prefix}-guest.py", f"{prefix}-running.json"]
+
+    def _remove_host_guest_files(self, runner: Runner) -> None:
+        """Distrobox shares /tmp with the host, so the private folder can outlive a
+        deleted container. Its files belong to the container's user namespace, so remove
+        them from inside that namespace. Best effort: /tmp is also cleared at reboot."""
+        try:
+            runner.run(
+                [
+                    "podman",
+                    "unshare",
+                    "rm",
+                    "-rf",
+                    "--",
+                    self.guest_directory,
+                    *self._legacy_guest_paths(),
+                ],
+                check=False,
+                timeout=60,
+            )
+        except (OSError, TimeoutError) as exc:
+            self._log(tr("Some temporary environment files could not be removed.") + f" {exc}")
+
+    def _prepare_guest_directory(self, runner: Runner) -> None:
+        """Create the private folder, or accept it on retry only if it is still a real
+        directory owned by the user with mode 700. Only plain arguments are passed through
+        distrobox enter: no shell script whose quoting it could change."""
+        directory = self.guest_directory
+        error = RuntimeError(tr("Could not prepare a private temporary folder in the environment."))
+        try:
+            # Fails harmlessly when the folder already exists; verified below.
+            runner.run(self._enter("mkdir", "-m", "700", "--", directory), check=False)
+            # %f is the raw mode in hexadecimal: independent of the container's language.
+            state = runner.run(self._enter("stat", "-c", "%u:%f", "--", directory))
+            uid = runner.run(self._enter("id", "-u"))
+        except CommandError as exc:
+            raise error from exc
+
+        def last_line(text):
+            lines = [line.strip() for line in str(text).splitlines() if line.strip()]
+            return lines[-1] if lines else ""
+
+        user = last_line(uid)
+        # 41c0 = a real directory (not a symbolic link) with mode 700.
+        if not user.isdigit() or last_line(state) != f"{user}:41c0":
+            raise error
 
     @property
     def environment_home(self) -> Path:
@@ -359,8 +441,8 @@ class Engine:
             self.preflight()
             tx.error = ""
             tx.status = "installing"
-            self.store.save(tx)
             try:
+                self.store.save(tx)
                 staged = self.store.directory(tx.id) / f"package.{tx.package_kind}"
                 with staged.open("rb") as stream:
                     digest = hashlib.file_digest(stream, "sha256").hexdigest()
@@ -374,11 +456,14 @@ class Engine:
                     tx.package_kind,
                     tx.image,
                 )
+                if tx.package_install_started and self._owned_container(self.runner):
+                    self._ensure_guest_idle(self.runner)
                 self._create(environment, self.store.directory(tx.id))
                 return self._finish_install(staged)
             except Exception as exc:
-                tx.status, tx.error = "failed", str(exc)
-                self.store.save(tx)
+                reported = record_install_failure(self.store, tx, exc)
+                if reported is not exc:
+                    raise reported from exc
                 raise
 
     def _finish_install(self, staged: Path) -> Transaction:
@@ -424,8 +509,8 @@ class Engine:
         )
         payload = self._guest_result(result)
         self._stage(96, tr("Adding application shortcuts…"))
-        count = export_desktops(self.store, self.tx, payload["desktops"])
-        self._log(f"Atalhos criados: {count}")
+        count = export_desktops(self.store, self.tx, payload["desktops"], log=self._log)
+        self._log(tr("Shortcuts created: {0}").format(count))
         try:
             self._remove_guest_temporary(self.runner)
         except (CommandError, TimeoutError) as exc:
@@ -453,18 +538,41 @@ class Engine:
 
     def _remove_guest_temporary(self, runner: Runner) -> None:
         assert self.tx is not None
-        paths = [self.guest_package, self.guest_helper, self.guest_marker]
-        runner.run(self._enter("sudo", "-n", "rm", "-f", "--", *paths))
+        paths = [self.guest_directory, *self._legacy_guest_paths()]
+        runner.run(self._enter("sudo", "-n", "rm", "-f", "-r", "--", *paths))
+
+    def _ensure_guest_idle(self, runner: Runner) -> None:
+        self._prepare_guest_directory(runner)
+        self._copy_with_runner(runner, Path(guest.__file__), self.guest_helper)
+        busy = self._guest_result(
+            runner.run(
+                self._enter(
+                    "sudo",
+                    "-n",
+                    "python3",
+                    self.guest_helper,
+                    "--busy",
+                    self.guest_marker,
+                    self._legacy_guest_paths()[-1],
+                )
+            )
+        )
+        if busy["busy"]:
+            raise RuntimeError(
+                tr("The operation in the environment is still running. Wait and try again.")
+            )
 
     def _package_command(self, arguments: list[str], *, check: bool = True) -> str:
         assert self.tx is not None
+        progress = PackageProgress(self.progress, install_label=tr("Installing the application…"))
         if not self.shared_environment:
-            return self.runner.run(self._enter(*arguments), check=check)
+            return progress.run(self.runner, self._enter(*arguments), check=check)
         # Keep the shared environment's package transaction running until it finishes.
         # Its PID marker also prevents cleanup after an exceptional client disconnect.
         if arguments[:2] != ["sudo", "-n"]:
             raise ValueError(tr("Package operations must use sudo only inside the environment."))
-        return self.runner.run(
+        return progress.run(
+            self.runner,
             self._enter(
                 "sudo",
                 "-n",
@@ -479,7 +587,7 @@ class Engine:
         )
 
     def _install_deb(self) -> None:
-        self._stage(40, tr("Downloading components and installing the application…"))
+        self._stage(-1, tr("Downloading components and installing the application…"))
         # Clear an interrupted dpkg configuration before asking apt to resume.
         # Unresolved dependencies may make configure return 1; apt --fix-broken then resolves them.
         if not self.shared_environment:
@@ -533,7 +641,7 @@ class Engine:
             self._package_command([*apt, "install", self.guest_package])
 
     def _install_rpm(self) -> None:
-        self._stage(40, tr("Resolving dependencies and downloading components…"))
+        self._stage(-1, tr("Resolving dependencies and downloading components…"))
         self._package_command(
             [
                 "sudo",
@@ -545,14 +653,14 @@ class Engine:
                 self.guest_package,
             ]
         )
-        self._stage(75, tr("Installing the application\u2026"))
+        self._stage(-1, tr("Installing the application\u2026"))
         self._package_command(["sudo", "-n", "dnf", "-y", "install", self.guest_package])
 
     def _install_arch(self) -> None:
-        self._stage(40, tr("Updating the Arch Linux environment\u2026"))
+        self._stage(-1, tr("Updating the Arch Linux environment\u2026"))
         # Refreshing indexes without upgrading would create an unsupported partial upgrade.
         self._package_command(["sudo", "-n", "pacman", "-Syu", "--noconfirm"])
-        self._stage(75, tr("Resolving dependencies and installing the application…"))
+        self._stage(-1, tr("Resolving dependencies and installing the application…"))
         self._package_command(["sudo", "-n", "pacman", "-U", "--noconfirm", self.guest_package])
 
     def _owned_container(self, runner: Runner) -> dict | None:
@@ -622,29 +730,10 @@ class Engine:
             try:
                 owned = self._owned_container(runner)
                 preserve = tx.preserve_environment_on_cleanup or self.shared_environment
+                if owned and tx.package_install_started:
+                    self._ensure_guest_idle(runner)
                 if owned and preserve:
                     if tx.package_install_started:
-                        self._copy_with_runner(runner, Path(guest.__file__), self.guest_helper)
-                        busy = self._guest_result(
-                            runner.run(
-                                self._enter(
-                                    "sudo",
-                                    "-n",
-                                    "python3",
-                                    self.guest_helper,
-                                    "--busy",
-                                    self.guest_marker,
-                                )
-                            )
-                        )
-                        if busy["busy"]:
-                            raise RuntimeError(
-                                tr(
-                                    "The operation in the environment is still running. "
-                                    "Wait and try cleanup "
-                                    "again."
-                                )
-                            )
                         state = self._guest_result(
                             runner.run(
                                 self._enter(
@@ -668,6 +757,7 @@ class Engine:
                         tx.image_id = owned.get("Image", "")
                         self.store.save(tx)
                     runner.run(["podman", "rm", "--force", "--time", "2", owned["Id"]])
+                    self._remove_host_guest_files(runner)
                 if not preserve and self._owned_container(runner) is not None:
                     raise RuntimeError(tr("The container still exists."))
                 for name in tx.launchers:
@@ -678,15 +768,44 @@ class Engine:
                     remove_container_icon(self.store, tx)
                     self._remove_new_image(runner)
                     if tx.managed_home:
-                        directory = self.store.environment_directory(tx.container)
-                        if directory.exists():
-                            shutil.rmtree(directory)
+                        self._remove_created_environment_files(runner, tx)
                 self.store.remove_directory(tx)
                 self.tx = None
             except Exception as exc:
                 tx.status, tx.error = "cleanup_failed", str(exc)
                 self.store.save(tx)
                 raise
+
+    def _remove_created_environment_files(self, runner: Runner, tx: Transaction) -> None:
+        from .containers import (
+            _check_home_references,
+            _home_path,
+            _read_record,
+            _record_path,
+            remove_tree,
+        )
+
+        directory = self.store.environment_directory(tx.container)
+        if tx.home_created is True:
+            try:
+                home = _home_path(self.store, SimpleNamespace(name=tx.container))
+                if home.exists():
+                    _check_home_references(runner, tx, home)
+            except (RuntimeError, ValueError) as exc:
+                self._log(tr("The container's home folder was kept: {0}").format(exc))
+            else:
+                if home.exists():
+                    remove_tree(runner, home)
+        try:
+            record = _read_record(self.store, tx.container)
+        except (OSError, TypeError, ValueError):
+            record = None
+        if record is not None and record.owner_id == tx.id:
+            _record_path(self.store, tx.container).unlink(missing_ok=True)
+        try:
+            directory.rmdir()
+        except OSError:
+            pass
 
     def _copy_with_runner(self, runner: Runner, source: Path, destination: str) -> None:
         assert self.tx is not None

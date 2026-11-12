@@ -14,4 +14,14 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with MultiPak. If not, see <https://www.gnu.org/licenses/>.
 
-Third-party assets retain their respective licenses and notices.
+Third-party components and assets retain their respective licenses and notices.
+
+The Flatpak bundles RPM, Lua and popt. Their license notices are installed under
+share/licenses/io.github.goulielmos_linux.multipak/ in the Flatpak.
+Source archives and checksums are listed in the Flatpak manifest:
+- RPM: https://rpm.org/
+- Lua: https://www.lua.org/
+- popt: https://github.com/rpm-software-management/popt
+
+Interface icons from the KDE Breeze icon theme are distributed under the
+LGPL-3.0-or-later. See src/multipak/kirigami/assets/breeze/COPYING-ICONS.

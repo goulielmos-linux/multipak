@@ -1,27 +1,23 @@
 """MultiPak's own AppImage reader and desktop integration, based on the format specification."""
 
-import configparser
 import hashlib
 import io
 import os
 import platform
 import re
-import selectors
 import shlex
 import shutil
-import signal
 import struct
-import subprocess
-import time
 import uuid
 from pathlib import Path, PurePosixPath
 
 from multipak.localization import current_language, tr
 
 from . import host
-from .desktop import quote_exec
+from .desktop import parse_desktop, quote_exec
 from .models import Package, Transaction
-from .process import Cancelled, CommandError
+from .process import CommandError
+from .storage import record_install_failure
 
 MAX_METADATA = 1024 * 1024
 MAX_ICON = 4 * 1024 * 1024
@@ -29,7 +25,13 @@ MAX_ICON = 4 * 1024 * 1024
 
 def _member(name):
     value = PurePosixPath(name)
-    if value.is_absolute() or ".." in value.parts or "\\" in name or any(ord(c) < 32 for c in name):
+    if (
+        value.is_absolute()
+        or (value.parts and value.parts[0].startswith("-"))
+        or ".." in value.parts
+        or "\\" in name
+        or any(ord(c) < 32 for c in name)
+    ):
         raise ValueError(tr("Invalid internal AppImage path."))
     return str(value)
 
@@ -169,9 +171,7 @@ def inspect_appimage(path, runner):
     if len(desktops) != 1:
         raise ValueError(tr("The AppImage must contain one .desktop file at its root."))
     text = archive.read(desktops[0]).decode("utf-8")
-    parser = configparser.ConfigParser(interpolation=None, strict=False)
-    parser.optionxform = str
-    parser.read_string(text)
+    parser = parse_desktop(text)
     entry = parser["Desktop Entry"]
     if entry.get("Type") != "Application":
         raise ValueError(tr("The AppImage does not contain application metadata."))
@@ -221,69 +221,6 @@ def inspect_appimage(path, runner):
     )
 
 
-def fuse_works(path, cancelled):
-    """Probe the standard type-2 runtime after installation was requested, without AppRun."""
-    if not os.access("/dev/fuse", os.R_OK | os.W_OK):
-        return False
-    with (
-        subprocess.Popen(
-            [str(path), "--appimage-mount"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            start_new_session=True,
-        ) as process,
-        selectors.DefaultSelector() as selector,
-    ):
-        try:
-            output = b""
-            deadline = time.monotonic() + 5
-            os.set_blocking(process.stdout.fileno(), False)
-            selector.register(process.stdout, selectors.EVENT_READ)
-            while selector.get_map() and time.monotonic() < deadline:
-                if cancelled.is_set():
-                    raise Cancelled
-                for key, _ in selector.select(timeout=0.1):
-                    chunk = os.read(key.fd, 65536)
-                    if not chunk:
-                        selector.unregister(key.fileobj)
-                    output = (output + chunk)[-65536:]
-                for line in output.decode("utf-8", errors="replace").splitlines():
-                    mount = Path(line.strip())
-                    if mount.is_absolute() and mount.is_mount() and (mount / "AppRun").exists():
-                        return True
-            message = output.decode("utf-8", errors="replace").lower()
-            if any(
-                hint in message
-                for hint in (
-                    "appimages require fuse",
-                    "libfuse.so",
-                    "fuse: device not found",
-                    "failed to open /dev/fuse",
-                    "cannot open /dev/fuse",
-                    "fusermount: mount failed",
-                    "fusermount3: mount failed",
-                )
-            ):
-                return False
-            raise RuntimeError(tr("Could not verify the AppImage mount.\n") + message)
-        finally:
-            try:
-                os.killpg(process.pid, signal.SIGTERM)
-            except ProcessLookupError:
-                pass
-            try:
-                process.wait(timeout=3)
-            except subprocess.TimeoutExpired:
-                os.killpg(process.pid, signal.SIGKILL)
-                process.wait()
-            try:
-                os.killpg(process.pid, signal.SIGKILL)
-            except ProcessLookupError:
-                pass
-            if cancelled.is_set():
-                raise Cancelled
-
-
 def _desktop(store, tx, package):
     directory = store.appimage_directory(tx.id)
     icon = "application-x-executable"
@@ -291,9 +228,7 @@ def _desktop(store, tx, package):
         path = directory / ("icon" + package.icon_extension)
         path.write_bytes(package.icon_data)
         icon = str(path)
-    parser = configparser.ConfigParser(interpolation=None, strict=False)
-    parser.optionxform = str
-    parser.read_string(package.desktop_entry)
+    parser = parse_desktop(package.desktop_entry)
     entry = parser["Desktop Entry"]
     launcher = Path(__file__).with_name("appimage_launcher.py")
     invocation = (
@@ -359,20 +294,16 @@ def _complete(engine, package):
     application = directory / "application.AppImage"
     application.chmod(0o755)
     engine._stage(45, tr("Preparing the AppImage…"))
-    direct = (
-        not host.is_flatpak()
-        and package.appimage_type == 2
-        and fuse_works(application, engine.cancelled)
-    )
-    if not direct:
-        engine._stage(60, tr("Extracting the application so it can run…"))
-        destination = directory / "AppDir"
-        if destination.is_symlink():
-            raise ValueError(tr("The application directory must not be a symbolic link."))
-        if destination.exists():
-            shutil.rmtree(destination)
-        Archive(application, engine.runner).extract(destination)
-    tx.appimage_mode = "direct" if direct else "extracted"
+    # Integration never executes code supplied by the application. Extraction
+    # also avoids depending on a particular runtime's FUSE implementation.
+    engine._stage(60, tr("Extracting the application so it can run…"))
+    destination = directory / "AppDir"
+    if destination.is_symlink():
+        raise ValueError(tr("The application directory must not be a symbolic link."))
+    if destination.exists():
+        shutil.rmtree(destination)
+    Archive(application, engine.runner).extract(destination)
+    tx.appimage_mode = "extracted"
     engine._stage(90, tr("Adding the application to the application launcher…"))
     _desktop(engine.store, tx, package)
     tx.status, tx.error = "installed", ""
@@ -395,8 +326,8 @@ def install(engine, package):
             container_created=False,
         )
         engine.tx = tx
-        engine.store.save(tx)
         try:
+            engine.store.save(tx)
             engine._stage(5, tr("Copying the AppImage…"))
             directory = engine.store.appimage_directory(tx.id)
             directory.mkdir(parents=True, mode=0o700)
@@ -414,8 +345,9 @@ def install(engine, package):
                 raise ValueError(tr("The file has changed. Open the AppImage again."))
             return _complete(engine, copied)
         except Exception as error:
-            tx.status, tx.error = "failed", str(error)
-            engine.store.save(tx)
+            reported = record_install_failure(engine.store, tx, error)
+            if reported is not error:
+                raise reported from error
             raise
 
 
@@ -432,8 +364,9 @@ def retry(engine, tx):
                 raise ValueError(tr("The AppImage copy has changed. Open the file again."))
             return _complete(engine, inspect_appimage(target, engine.runner))
         except Exception as error:
-            tx.status, tx.error = "failed", str(error)
-            engine.store.save(tx)
+            reported = record_install_failure(engine.store, tx, error)
+            if reported is not error:
+                raise reported from error
             raise
 
 

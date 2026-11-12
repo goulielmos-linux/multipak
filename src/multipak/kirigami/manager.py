@@ -2,12 +2,15 @@
 
 import argparse
 import os
+import sys
 from pathlib import Path
+from threading import Lock
 
 from PySide6.QtCore import (
     Property,
     QEvent,
     QObject,
+    Qt,
     QTimer,
     QUrl,
     Signal,
@@ -20,7 +23,6 @@ from PySide6.QtWidgets import QApplication, QStyleFactory
 from multipak import DISPLAY_VERSION, host
 from multipak.containers import ManagedContainer, remove_container, uninstall_application
 from multipak.environments import discover
-from multipak.external_apps import open_kontainer
 from multipak.file_associations import FORMATS, FileAssociations
 from multipak.localization import tr
 from multipak.models import ExistingEnvironment, Transaction
@@ -36,6 +38,8 @@ from multipak.worker import Worker
 from .about import bind_about, license_text
 from .identity import configure_application
 from .languages import bind_languages
+from .manager_icons import GENERIC_ICON, application_icon
+from .update_notice import bind_update_notice, installation_allowed
 
 
 class Manager(QObject):
@@ -44,6 +48,7 @@ class Manager(QObject):
     confirmationRequested = Signal()
     containerRemovalRequested = Signal()
     associationSettingsRequested = Signal()
+    associationsSaved = Signal()
     languageSettingsRequested = Signal()
     companionWarning = Signal(str)
 
@@ -82,6 +87,40 @@ class Manager(QObject):
         self._unused_container = None
         self._container_error = ""
         self._remove_container_home = False
+        # Long container updates print many lines. Batch them so each line does not
+        # trigger a full interface refresh, as the installer already does.
+        self._pending_logs = ""
+        self._log_lock = Lock()
+        self._log_timer = QTimer(self)
+        self._log_timer.setInterval(150)
+        self._log_timer.timeout.connect(self._flush_logs)
+
+    @Slot()
+    def openInstaller(self):
+        if self.busy or not installation_allowed(self):
+            return
+        from PySide6.QtCore import QProcess
+        from PySide6.QtWidgets import QFileDialog
+
+        path, _ = QFileDialog.getOpenFileName(
+            None,
+            tr("Install applications"),
+            str(Path.home()),
+            tr("Application packages") + " (*.rpm *.deb *.pkg.tar *.pkg.tar.zst "
+            "*.pkg.tar.xz *.pkg.tar.gz *.pkg.tar.bz2 *.AppImage *.appimage);;"
+            + tr("All files")
+            + " (*)",
+        )
+        if not path:
+            return
+        if self.preview:
+            self._status = tr("This is a preview. No application was opened.")
+            self.changed.emit()
+            return
+        bootstrap = str(Path(__file__).with_name("bootstrap.py"))
+        result = QProcess.startDetached(sys.executable, [bootstrap, path])
+        if not (result[0] if isinstance(result, tuple) else result):
+            self.companionWarning.emit(tr("Could not open the application installer."))
 
     @Property(str, notify=changed)
     def mode(self):
@@ -226,6 +265,7 @@ class Manager(QObject):
             return [
                 {
                     "title": tx.package_name,
+                    "icon": GENERIC_ICON if self.preview else application_icon(self.store, tx),
                     "subtitle": tr("Version: {0} · {1}").format(
                         (
                             tr("Not provided")
@@ -363,6 +403,7 @@ class Manager(QObject):
         if self.preview:
             self._status = tr("This is a preview. No associations were changed.")
             self.changed.emit()
+            self.associationsSaved.emit()
             return
         selected = dict(self._associations)
         self._status, self._logs, self._error = tr("Saving preferences…"), "", False
@@ -372,6 +413,7 @@ class Manager(QObject):
 
     def _saved_associations(self, selected):
         self._associations = selected
+        self.associationsSaved.emit()
         self._status = tr("Preferences saved.")
 
     @Slot()
@@ -414,28 +456,6 @@ class Manager(QObject):
     def _loaded_environments(self, items):
         self._items = items
         self._status = "" if items else tr("No MultiPak containers are available to update.")
-
-    @Slot()
-    def openKontainer(self):
-        if self.busy:
-            return
-        if self.preview:
-            self._status = tr("This is a preview. Kontainer was not opened.")
-            self.changed.emit()
-            return
-        self._status, self._logs, self._error = tr("Opening Kontainer…"), "", False
-        self._run(
-            lambda engine: open_kontainer(engine.runner),
-            self._kontainer_opened,
-            self._kontainer_failed,
-        )
-
-    def _kontainer_opened(self, _result):
-        self._status = ""
-
-    def _kontainer_failed(self, message):
-        self._status, self._logs, self._error = "", "", False
-        self.companionWarning.emit(message)
 
     @Slot()
     def goHome(self):
@@ -551,9 +571,10 @@ class Manager(QObject):
         self.worker.succeeded.connect(self._succeeded)
         self.worker.failed.connect(self._failed)
         self.worker.progress.connect(self._set_progress)
-        self.worker.log.connect(self._append_log)
+        self.worker.log.connect(self._queue_log, Qt.DirectConnection)
         self.worker.finished.connect(self._finished)
         self.changed.emit()
+        self._log_timer.start()
         self.worker.start()
 
     @Slot(object)
@@ -574,8 +595,23 @@ class Manager(QObject):
         self._logs = (self._logs + text + "\n")[-200_000:]
         self.changed.emit()
 
+    @Slot(str)
+    def _queue_log(self, text):
+        # Called on the worker thread: no QML or QObject mutations here.
+        with self._log_lock:
+            self._pending_logs = (self._pending_logs + text + "\n")[-200_000:]
+
+    @Slot()
+    def _flush_logs(self):
+        with self._log_lock:
+            pending, self._pending_logs = self._pending_logs, ""
+        if pending:
+            self._append_log(pending.removesuffix("\n"))
+
     @Slot()
     def _finished(self):
+        self._log_timer.stop()
+        self._flush_logs()
         worker, self.worker = self.worker, None
         worker.deleteLater()
         ok, value = self._outcome
@@ -597,6 +633,7 @@ def create_manager(app, controller):
     engine = QQmlApplicationEngine(app)
     languages = bind_languages(app, engine, controller, manager=True)
     bind_about(engine, languages)
+    bind_update_notice(engine, controller, preview=controller.preview)
     controller.setParent(engine)
     engine.rootContext().setContextProperty("manager", controller)
     engine.load(QUrl.fromLocalFile(str(Path(__file__).with_name("Manager.qml"))))

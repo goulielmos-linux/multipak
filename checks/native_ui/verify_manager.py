@@ -38,6 +38,15 @@ class ManagerTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix="multipak-manager-")
         directory = Path(self.temporary.name)
+        environment = patch.dict(
+            os.environ,
+            {
+                "XDG_DATA_HOME": str(directory / "xdg-data"),
+                "XDG_CONFIG_HOME": str(directory / "xdg-config"),
+            },
+        )
+        environment.start()
+        self.addCleanup(environment.stop)
         self.store = Store(directory / "data", directory / "applications")
         self.calls = []
         self.release = threading.Event()
@@ -47,6 +56,8 @@ class ManagerTests(unittest.TestCase):
         self.system_status = None
         self.system_calls = []
         self.association_values = {key: True for key in ("rpm", "deb", "arch", "appimage")}
+        self.association_release = threading.Event()
+        self.association_release.set()
         self.association_saved = []
         self.association_failure = False
         self.environments = (
@@ -125,6 +136,8 @@ class ManagerTests(unittest.TestCase):
 
             class Preferences:
                 def load(self):
+                    if not owner.association_release.wait(5):
+                        raise TimeoutError("Preferences test did not release the read")
                     return dict(owner.association_values)
 
                 def apply(self, selected):
@@ -158,7 +171,15 @@ class ManagerTests(unittest.TestCase):
         self.assertTrue(predicate())
 
     def find(self, name, parent=None):
-        item = (parent or self.page).findChild(QObject, name)
+        root = parent or self.page
+        item = root.findChild(QObject, name)
+        items = [root.contentItem() if hasattr(root, "contentItem") else root]
+        while item is None and items:
+            current = items.pop()
+            if current.objectName() == name:
+                item = current
+            else:
+                items.extend(current.childItems())
         self.assertIsNotNone(item, name)
         return item
 
@@ -210,13 +231,8 @@ class ManagerTests(unittest.TestCase):
             self.find("aboutDescription", dialog).property("text"),
             "Manage your applications and set your preferences.",
         )
-        self.click("aboutAuthorInfoButton", dialog)
-        author_dialog = self.find("aboutAuthorDialog", dialog)
-        self.assertTrue(author_dialog.property("opened"))
-        biography = self.find("aboutAuthorBiography", author_dialog).property("text")
-        self.assertIn("historian", biography)
-        self.assertIn("GPT-6.1 Sol", biography)
-        QMetaObject.invokeMethod(author_dialog, "close")
+        self.assertEqual(self.find("aboutAuthorInfoButton", dialog).property("text"), "Goulielmos")
+        self.assertIsNone(dialog.findChild(QObject, "aboutAuthorDialog"))
         self.click("managerLicenseButton", dialog)
         license_dialog = self.find("managerLicenseDialog", self.window)
         self.assertTrue(license_dialog.property("opened"))
@@ -238,11 +254,24 @@ class ManagerTests(unittest.TestCase):
         self.click("managerBackButton")
         self.assertEqual(self.controller.mode, "home")
 
+    def test_file_types_appear_only_after_preferences_load(self):
+        self.build()
+        self.association_release.clear()
+        try:
+            self.click("managerSettingsButton")
+            self.assertTrue(self.controller.busy)
+            self.assertEqual(self.find("associationChoices").property("count"), 0)
+        finally:
+            self.association_release.set()
+        self.wait(lambda: self.controller.associationsReady)
+        for kind in self.association_values:
+            self.assertTrue(self.find(f"association_{kind}").property("checked"))
+
     def test_format_selection_saves_and_can_restore_individual_formats(self):
         self.build()
-        self.click("managerAssociationsButton")
+        self.click("managerSettingsButton")
         self.wait(lambda: not self.controller.busy)
-        self.assertEqual(self.page.objectName(), "associationPage")
+        self.assertEqual(self.page.objectName(), "managerSettingsPage")
         self.assertTrue(self.find("association_appimage").property("checked"))
         self.click("association_appimage")
         self.click("association_deb")
@@ -251,10 +280,10 @@ class ManagerTests(unittest.TestCase):
         self.assertEqual(
             self.association_saved, [{"rpm": True, "deb": False, "arch": True, "appimage": False}]
         )
-        self.assertIn("salvas", self.controller.status)
+        self.assertEqual(self.controller.status, "Preferences saved.")
         self.click("associationBackButton")
         self.assertEqual(self.page.objectName(), "managerPage")
-        self.click("managerAssociationsButton")
+        self.click("managerSettingsButton")
         self.wait(lambda: not self.controller.busy)
         self.assertFalse(self.find("association_appimage").property("checked"))
         self.click("association_appimage")
@@ -265,7 +294,7 @@ class ManagerTests(unittest.TestCase):
 
     def test_format_selection_failure_reports_error_without_claiming_success(self):
         self.build()
-        self.click("managerAssociationsButton")
+        self.click("managerSettingsButton")
         self.wait(lambda: not self.controller.busy)
         self.association_failure = True
         self.click("associationSaveButton")
@@ -282,7 +311,9 @@ class ManagerTests(unittest.TestCase):
         self.build()
         self.open_list("remove")
         self.assertEqual(len(self.controller.rows), 2)
-        self.controller.select(0)
+        self.controller.select(
+            next(i for i, tx in enumerate(self.controller._items) if tx.id == target.id)
+        )
         self.assertTrue(self.find("managerActionButton").property("enabled"))
         self.click("managerActionButton")
         dialog = self.find("removalDialog", self.window)
@@ -315,7 +346,7 @@ class ManagerTests(unittest.TestCase):
         self.controller.select(0)
         self.click("managerActionButton")
         dialog = self.find("removalDialog", self.window)
-        self.assertIn("managed copy", self.controller.removalExplanation)
+        self.assertIn("managed AppImage copy", self.controller.removalExplanation)
         self.assertNotIn("container", self.controller.removalExplanation)
         self.click("confirmRemovalButton", dialog)
         self.wait(lambda: not self.controller.busy)
@@ -337,7 +368,7 @@ class ManagerTests(unittest.TestCase):
         self.assertFalse(self.controller.canAct)
         self.window.close()
         self.assertTrue(self.window.isVisible())
-        self.assertIn("Aguarde", self.controller.status)
+        self.assertIn("Wait", self.controller.status)
         self.assertFalse(worker.cancel_requested.is_set())
         self.controller.openList("update")
         self.assertEqual(self.controller.mode, "remove")
@@ -362,7 +393,7 @@ class ManagerTests(unittest.TestCase):
         )
         self.controller.select(1)
         self.release.clear()
-        self.assertEqual(self.find("managerActionButton").property("text"), "Atualizar")
+        self.assertEqual(self.find("managerActionButton").property("text"), "Update")
         self.click("managerActionButton")
         self.assertEqual(self.calls, [("update", "MultiPak-Fedora-45")])
         self.assertTrue(self.controller.busy)
@@ -406,54 +437,12 @@ class ManagerTests(unittest.TestCase):
         names = [row["detail"] for row in self.controller.rows]
         self.assertIn("My-Apps", names)
         self.assertNotIn("Personal", names)
-        guidance = self.find("userContainersGuidance")
-        self.assertTrue(guidance.property("visible"))
-        self.assertEqual(
-            guidance.property("text"),
-            "For containers created outside MultiPak, use <a href='kontainer'>Kontainer</a>.",
-        )
         self.controller.select(names.index("My-Apps"))
         self.click("managerActionButton")
         self.wait(lambda: not self.controller.busy)
         self.assertEqual(self.calls, [("update", "My-Apps")])
-        self.assertIn("completed", self.controller.status)
+        self.assertIn("complete", self.controller.status)
         self.click("managerBackButton")
-        self.assertFalse(guidance.property("visible"))
-
-    def test_kontainer_link_opens_companion_and_reports_missing_installation(self):
-        self.build()
-        self.open_list("update")
-        link = self.find("userContainersGuidance")
-        with patch("multipak.kirigami.manager.open_kontainer") as opener:
-            link.forceActiveFocus()
-            QTest.keyClick(self.window, Qt.Key_Return)
-            self.wait(lambda: not self.controller.busy)
-            opener.assert_called_once()
-        self.assertFalse(self.controller.hasError)
-        self.assertFalse(self.calls)
-        with patch(
-            "multipak.kirigami.manager.open_kontainer",
-            side_effect=RuntimeError("Kontainer was not found."),
-        ):
-            link.forceActiveFocus()
-            QTest.keyClick(self.window, Qt.Key_Space)
-            self.wait(lambda: not self.controller.busy)
-        dialog = self.find("kontainerWarningDialog", self.window)
-        self.assertTrue(dialog.isVisible())
-        self.assertEqual(dialog.modality(), Qt.WindowModal)
-        self.assertEqual(dialog.transientParent(), self.window)
-        self.assertIn(
-            "Kontainer was not found",
-            self.find("kontainerWarningText", dialog).property("text"),
-        )
-        self.assertEqual(self.controller.status, "")
-        self.assertEqual(self.controller.logs, "")
-        self.assertFalse(self.controller.hasError)
-        self.assertTrue(self.controller.canClose)
-        self.assertFalse(self.calls)
-        self.click("kontainerWarningOk", dialog)
-        self.assertFalse(dialog.isVisible())
-        self.assertTrue(self.window.isVisible())
 
     def prepare_system_removal(self):
         self.add_transaction(
@@ -487,7 +476,7 @@ class ManagerTests(unittest.TestCase):
             self.prepare_system_removal()
             self.click("managerActionButton")
             dialog = self.find("removalDialog", self.window)
-            self.assertIn("reiniciar", self.controller.removalExplanation)
+            self.assertIn("restart", self.controller.removalExplanation)
             self.click("cancelRemovalButton", dialog)
             self.assertTrue(all(call[1] == "status" for call in self.system_calls))
             self.release.clear()

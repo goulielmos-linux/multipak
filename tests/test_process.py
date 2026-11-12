@@ -64,3 +64,28 @@ def test_shared_environment_cancellation_finishes_current_command_only():
 def test_network_failure_is_a_hint_not_every_error():
     assert looks_like_network_failure("Temporary failure resolving example.org")
     assert not looks_like_network_failure("Package not found")
+
+
+def test_flatpak_rpm_command_stays_inside_sandbox(tmp_path, monkeypatch):
+    from multipak import host
+
+    executable = tmp_path / "rpm"
+    executable.write_text("#!/bin/sh\nprintf 'local RPM metadata\\n'\n")
+    executable.chmod(0o755)
+    monkeypatch.setattr(host, "is_flatpak", lambda: True)
+    monkeypatch.setattr(
+        host, "command", lambda *args, **kwargs: pytest.fail("RPM was routed to the host")
+    )
+    runner = Runner(threading.Event(), lambda _: None)
+    assert runner.run([str(executable), "-qp", "demo.rpm"]).strip() == "local RPM metadata"
+
+
+def test_log_filters_color_without_changing_command_output():
+    logs = []
+    runner = Runner(threading.Event(), logs.append)
+    output = runner.run(
+        [sys.executable, "-c", 'print("\\x1b[32m [ OK ]\\x1b[0mInstalling basic packages...")']
+    )
+    assert "\x1b[32m" in output and "\x1b[0m" in output
+    assert "\x1b" not in "".join(logs)
+    assert " [ OK ]Installing basic packages..." in "".join(logs)

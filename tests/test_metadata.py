@@ -48,7 +48,7 @@ def test_rpm_metadata_uses_query_and_never_executes_scripts(tmp_path):
     calls = []
 
     class Query:
-        def run(self, argv):
+        def run(self, argv, **options):
             calls.append(argv)
             return "demo\x1f1.0-1.fc44\x1fnoarch" if "--queryformat" in argv else "libc.so.6"
 
@@ -75,7 +75,7 @@ def test_rpm_destination_prefers_internal_metadata_then_unambiguous_filename(
     path.write_bytes(b"\xed\xab\xee\xdb\x03\x00\x00\x00")
 
     class Query:
-        def run(self, argv):
+        def run(self, argv, **options):
             return f"app\x1f1.0-{release}\x1fnoarch" if "--queryformat" in argv else ""
 
     package = inspect_package(path, Query())
@@ -96,7 +96,7 @@ def test_renamed_rpm_uses_rpm_parser(tmp_path):
     path.write_bytes(b"\xed\xab\xee\xdb\x03\x00\x00\x00")
 
     class Query:
-        def run(self, argv):
+        def run(self, argv, **options):
             assert argv[0] == "rpm"
             return "demo\x1f1.0-1.fc45\x1fnoarch" if "--queryformat" in argv else ""
 
@@ -110,3 +110,25 @@ def test_ar_archive_with_control_is_not_automatically_a_deb(tmp_path):
     path.write_bytes(b"!<arch>\n" + ar_member("control.tar", b"fake control"))
     with pytest.raises(ValueError, match="DEB"):
         inspect_package(path, Runner(threading.Event(), lambda _: None))
+
+
+def test_flatpak_rpm_inspection_uses_bundled_tool_and_sandbox_path(tmp_path, monkeypatch):
+    from multipak import host
+
+    path = tmp_path / "demo.rpm"
+    path.write_bytes(b"\xed\xab\xee\xdb\x03\x00\x00\x00")
+    monkeypatch.setattr(host, "is_flatpak", lambda: True)
+    monkeypatch.setattr(
+        host, "accessible_file", lambda _: pytest.fail("RPM inspection staged a host copy")
+    )
+    calls = []
+
+    class Query:
+        def run(self, argv, **options):
+            calls.append(argv)
+            return b"demo\x1f1.0-1.fc44\x1fnoarch" if options.get("binary") else "libc.so.6"
+
+    package = inspect_package(path, Query())
+    assert package.name == "demo"
+    assert len(calls) == 2
+    assert all(argv[0] == "/app/bin/rpm" and argv[-1] == str(path) for argv in calls)

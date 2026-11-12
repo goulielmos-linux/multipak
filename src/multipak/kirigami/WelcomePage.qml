@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
+import "BreezeIcons.js" as BreezeIcons
 
 Kirigami.Page {
     id: page
@@ -38,7 +39,7 @@ Kirigami.Page {
             Layout.fillWidth: true
 
             Kirigami.Icon {
-                source: welcome.isAppImage ? "dialog-information" : "dialog-warning"
+                source: BreezeIcons.source(welcome.isAppImage ? "dialog-information" : "dialog-warning", Kirigami.Theme.backgroundColor)
                 Layout.preferredWidth: Kirigami.Units.iconSizes.large
                 Layout.preferredHeight: Kirigami.Units.iconSizes.large
                 Layout.alignment: Qt.AlignTop
@@ -47,9 +48,22 @@ Kirigami.Page {
 
             Controls.Label {
                 objectName: "warningLabel"
-                text: welcome.isAppImage
-                    ? qsTr("We recommend checking your system's app store for this application before continuing.")
-                    : qsTr("The application shown above was built for a different Linux distribution. We recommend checking your system's app store for a compatible version before continuing.")
+                text: {
+                    let formatNote = ""
+                    switch (welcome.isAppImage ? "" : welcome.packaging) {
+                    case "DEB":
+                        formatNote = qsTr("This application is packaged in DEB format, used by distributions such as Debian and Ubuntu.")
+                        break
+                    case "RPM":
+                        formatNote = qsTr("This application is packaged in RPM format, used by distributions such as Fedora and Red Hat Enterprise Linux.")
+                        break
+                    case "Arch Linux":
+                        formatNote = qsTr("This application is in the package format used by Arch Linux and its derivatives.")
+                        break
+                    }
+                    const recommendation = qsTr("Before continuing with the installation, check whether it is already available in your system's app store.")
+                    return formatNote ? formatNote + " " + recommendation : recommendation
+                }
                 wrapMode: Text.WordWrap
                 horizontalAlignment: Text.AlignJustify
                 Layout.fillWidth: true

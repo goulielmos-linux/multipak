@@ -144,7 +144,7 @@ def test_arch_install_updates_then_installs_exports_and_uninstalls_without_delet
 ):
     engine = fake_engine
     tx = engine.install(metadata.inspect_package(arch, None), ARCH)
-    assert tx.container == "MultiPak-Arch-rolling"
+    assert tx.container == "MultiPak-Arch-Linux"
     assert tx.environment_id == "arch-rolling"
     assert tx.status == "installed"
     assert len(tx.launchers) == 1

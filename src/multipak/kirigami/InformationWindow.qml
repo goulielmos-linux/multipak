@@ -11,6 +11,7 @@ Controls.ApplicationWindow {
     color: palette.window
     property real preferredWidth: Kirigami.Units.gridUnit * 28
     property real contentPadding: Kirigami.Units.largeSpacing * 2
+    property real preferredMaximumHeight: Screen.desktopAvailableHeight
     property string closeText: "OK"
     property string closeObjectName: "informationCloseButton"
     readonly property bool opened: visible
@@ -22,6 +23,7 @@ Controls.ApplicationWindow {
     ))
     readonly property int fittedHeight: Math.ceil(Math.min(
         body.implicitHeight + contentPadding * 2 + actionBar.implicitHeight,
+        preferredMaximumHeight,
         Screen.desktopAvailableHeight - Kirigami.Units.gridUnit * 2
     ))
     width: fittedWidth
@@ -54,7 +56,7 @@ Controls.ApplicationWindow {
         anchors.fill: parent
         contentWidth: availableWidth
         leftPadding: dialog.contentPadding
-        rightPadding: dialog.contentPadding
+        rightPadding: dialog.contentPadding + effectiveScrollBarWidth
         topPadding: dialog.contentPadding
         bottomPadding: dialog.contentPadding
         background: null

@@ -10,7 +10,7 @@ from multipak.suggestions import suggestion_details
 @pytest.mark.parametrize(
     "hint,source,expected,evidence",
     [
-        ("fedora-45", "metadata", "High", "internal metadata"),
+        ("fedora-45", "metadata", "High", "Release field"),
         ("fedora-45", "filename", "Medium", "filename"),
         ("", "", "Low", "latest Fedora version"),
     ],
@@ -42,8 +42,8 @@ def test_strong_rpm_suggestion_explains_metadata_evidence(version):
     assert strength == "High"
     assert text == (
         "Distribution detection confidence: High.\n\n"
-        f"The package's internal metadata includes .fc{version}, "
-        f"which means it was built for Fedora {version}."
+        "The Release field in the package metadata indicates that "
+        f"it was built for Fedora {version}."
     )
 
 

@@ -128,7 +128,7 @@ def decompress_control(name: str, raw: bytes) -> bytes:
     with reader:
         unpacked = reader.read(MAX_CONTROL_ARCHIVE + 1)
     if len(unpacked) > MAX_CONTROL_ARCHIVE:
-        raise ValueError("Metadados descompactados excedem o limite.")
+        raise ValueError(tr("Decompressed metadata exceeds the limit."))
     return unpacked
 
 
@@ -151,10 +151,10 @@ def _deb_fields(path: Path) -> dict[str, str]:
                 continue
             if name.startswith("control.tar"):
                 if size > MAX_CONTROL_ARCHIVE:
-                    raise ValueError("Metadados do DEB excedem o limite permitido.")
+                    raise ValueError(tr("DEB metadata exceeds the permitted limit."))
                 raw = stream.read(size)
                 if len(raw) != size:
-                    raise ValueError("DEB truncado.")
+                    raise ValueError(tr("The DEB file is truncated."))
                 raw = decompress_control(name, raw)
                 with tarfile.open(fileobj=io.BytesIO(raw), mode="r|") as archive:
                     for member in archive:
@@ -197,6 +197,9 @@ def inspect_package(path: Path, runner: Runner) -> Package:
     filename_hint = ""
     if kind == "deb":
         fields = _deb_fields(path)
+        for key in ("Package", "Version", "Architecture"):
+            if not fields.get(key):
+                raise ValueError(tr("The DEB control file is missing the {0} field.").format(key))
         name, version, arch = (fields[k] for k in ("Package", "Version", "Architecture"))
         deps = ", ".join(filter(None, (fields.get("Pre-Depends"), fields.get("Depends"))))
     elif kind == "arch":
@@ -205,20 +208,30 @@ def inspect_package(path: Path, runner: Runner) -> Package:
         deps = "\n".join(fields.get("depend", ()))
         hint, hint_source = "arch-rolling", "metadata"
     elif kind == "rpm":
-        with host.accessible_file(path) as visible:
-            raw = runner.run(
-                [
-                    "rpm",
-                    "-qp",
-                    "--queryformat",
-                    "%{NAME}\x1f%{VERSION}-%{RELEASE}\x1f%{ARCH}",
-                    str(visible),
-                ]
-            )
-            deps = runner.run(["rpm", "-qp", "--requires", str(visible)])
-        # rpm can emit signature warnings before the query result.
-        name, version, arch = raw.strip().splitlines()[-1].split("\x1f")
-        match = re.search(r"\.fc(\d+)(?:\.|$)", version)
+        executable = "/app/bin/rpm" if host.is_flatpak() else "rpm"
+        raw = runner.run(
+            [
+                executable,
+                "-qp",
+                "--queryformat",
+                "%{NAME}\x1f%{VERSION}-%{RELEASE}\x1f%{ARCH}",
+                str(path),
+            ],
+            binary=True,
+            output_limit=MAX_CONTROL_FILE,
+        )
+        deps = runner.run([executable, "-qp", "--requires", str(path)])
+        # Binary reads keep diagnostics on stderr, separate from this record.
+        if isinstance(raw, bytes):
+            raw = raw.decode("utf-8", errors="strict")
+        fields = raw.split("\x1f")
+        if len(fields) != 3 or any(
+            not field or any(ord(c) < 32 or ord(c) == 127 for c in field) for field in fields
+        ):
+            raise ValueError(tr("Invalid RPM metadata record."))
+        name, version, arch = fields
+        release = version.partition("-")[2]
+        match = re.search(r"\.fc(\d+)(?:\.|$)", release)
         hint = f"fedora-{match[1]}" if match else ""
         versions = set(re.findall(r"\.fc(\d+)(?=[._-]|$)", path.name))
         if len(versions) == 1:

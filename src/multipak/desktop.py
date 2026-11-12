@@ -1,6 +1,7 @@
 """Namespaced desktop integration, without overwriting an existing application."""
 
 import base64
+import binascii
 import configparser
 import io
 
@@ -19,10 +20,22 @@ def quote_exec(value: str) -> str:
     return '"' + escaped.replace("\\", "\\\\").replace("%", "%%") + '"'
 
 
-def render_desktop(content: str, container: str, executable: str) -> str | None:
-    parser = configparser.ConfigParser(interpolation=None, strict=False)
+def parse_desktop(content: str) -> configparser.ConfigParser:
+    """Desktop entries have no INI continuation syntax or duplicate keys."""
+    parser = configparser.ConfigParser(interpolation=None, strict=True)
     parser.optionxform = str
     parser.read_string(content)
+    if parser.defaults() or any(
+        "\n" in value or "\r" in value or "\x00" in value
+        for section in parser.sections()
+        for value in parser[section].values()
+    ):
+        raise ValueError(tr("Invalid multiline desktop entry."))
+    return parser
+
+
+def render_desktop(content: str, container: str, executable: str) -> str | None:
+    parser = parse_desktop(content)
     if "Desktop Entry" not in parser:
         return None
     main = parser["Desktop Entry"]
@@ -61,14 +74,38 @@ def render_desktop(content: str, container: str, executable: str) -> str | None:
     return stream.getvalue()
 
 
-def export_desktops(store: Store, tx: Transaction, desktops: list[dict]) -> int:
+def _display_name(entry) -> str:
+    name = entry.get("name") if isinstance(entry, dict) else None
+    if not isinstance(name, str):
+        return "?"
+    return "".join(c for c in name if c.isprintable())[:120] or "?"
+
+
+def export_desktops(store: Store, tx: Transaction, desktops: list[dict], log=None) -> int:
+    """Export valid shortcuts. An invalid one is skipped with a warning; the package
+    is already installed at this point, so one bad file must not fail the installation."""
     executable = host.which("distrobox")
     if not executable:
         raise RuntimeError(tr("Distrobox was not found."))
     count = 0
     for index, entry in enumerate(desktops):
-        content = base64.b64decode(entry["content"], validate=True).decode("utf-8")
-        rendered = render_desktop(content, tx.container, executable)
+        try:
+            content = base64.b64decode(entry["content"], validate=True).decode("utf-8")
+            rendered = render_desktop(content, tx.container, executable)
+        except (
+            KeyError,
+            TypeError,
+            ValueError,
+            binascii.Error,
+            configparser.Error,
+        ) as error:
+            message = tr(
+                "The shortcut {0} was skipped because its desktop file is invalid."
+            ).format(_display_name(entry))
+            tx.warnings.append(message)
+            if log is not None:
+                log(f"{message} {error}")
+            continue
         if rendered is None:
             continue
         name = f"multipak-{tx.id}-{index}.desktop"

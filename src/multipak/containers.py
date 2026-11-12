@@ -4,7 +4,7 @@ import configparser
 import json
 import re
 import shutil
-from dataclasses import asdict, dataclass, replace
+from dataclasses import asdict, dataclass, fields, replace
 from pathlib import Path
 
 from .environments import OWNER_LABEL
@@ -42,7 +42,11 @@ def _read_record(store, name):
         return None
     if not path.is_file() or path.stat().st_size > 65536:
         raise ValueError(tr("Invalid container record."))
-    container = ManagedContainer(**json.loads(path.read_text(encoding="utf-8")))
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError(tr("Invalid container record."))
+    known = {field.name for field in fields(ManagedContainer)}
+    container = ManagedContainer(**{k: v for k, v in data.items() if k in known})
     if not container.valid() or container.name != name:
         raise ValueError(tr("Invalid container record."))
     return container
@@ -103,6 +107,26 @@ def _candidate(store, transaction):
     # An existing MultiPak shortcut pins ownership to the stored, immutable container ID.
     # A familiar container name alone never establishes ownership.
     return container if _registered_shortcut(store, container) else None
+
+
+def remove_tree(runner, path: Path) -> None:
+    """Remove an already verified home, including files owned by subordinate IDs."""
+    identity = path.lstat()
+    try:
+        shutil.rmtree(path)
+    except PermissionError:
+        current = path.lstat()
+        if path.is_symlink() or (identity.st_dev, identity.st_ino) != (
+            current.st_dev,
+            current.st_ino,
+        ):
+            raise
+        runner.run(
+            ["podman", "unshare", "rm", "-rf", "--one-file-system", "--", str(path)],
+            timeout=600,
+        )
+        if path.exists() or path.is_symlink():
+            raise PermissionError(tr("Could not remove the folder {0}.").format(path)) from None
 
 
 def _referenced(store, container):
@@ -239,7 +263,7 @@ def remove_container(engine, container, *, remove_home=False):
             if _exists(engine.runner, container.container_id):
                 raise RuntimeError(tr("The container still exists."))
         if home is not None and home.exists():
-            shutil.rmtree(_home_path(engine.store, container))
+            remove_tree(engine.runner, _home_path(engine.store, container))
         if _registered_shortcut(engine.store, container):
             (engine.store.applications / f"{container.name}.desktop").unlink()
         # Other files in the environment directory are outside this confirmation.

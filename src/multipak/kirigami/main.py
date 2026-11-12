@@ -24,6 +24,7 @@ from .about import bind_about
 from .configuration import Configuration
 from .identity import configure_application
 from .languages import bind_languages
+from .update_notice import bind_update_notice
 
 # Preview fixtures only; the live installer obtains these versions from its catalog.
 PREVIEW_ENVIRONMENTS = (
@@ -50,6 +51,7 @@ class Welcome(QObject):
     modeChosen = Signal()
     environmentChosen = Signal()
     installationRequested = Signal()
+    distroboxRequired = Signal()
 
     def __init__(
         self,
@@ -129,6 +131,22 @@ class Welcome(QObject):
     @Property(str, constant=True)
     def appVersion(self):
         return DISPLAY_VERSION
+
+    @Property(bool, notify=dataChanged)
+    def distroboxCanInstall(self):
+        return getattr(self, "_distrobox_can_install", False)
+
+    @Property(bool, notify=dataChanged)
+    def distroboxRestartRequired(self):
+        return getattr(self, "_distrobox_restart_required", False)
+
+    @Property(str, notify=dataChanged)
+    def distroboxMessage(self):
+        return getattr(self, "_distrobox_message", "")
+
+    @Property(bool, notify=dataChanged)
+    def distroboxSetupActive(self):
+        return getattr(self, "_mode", "") in ("distrobox", "reboot")
 
     @Property(str, notify=dataChanged)
     def applicationNameHtml(self):
@@ -333,6 +351,7 @@ def create_window(app, bridge):
     engine = QQmlApplicationEngine(app)
     languages = bind_languages(app, engine, bridge)
     bind_about(engine, languages)
+    bind_update_notice(engine, bridge, preview=not bridge.live)
     engine.warnings.connect(
         lambda warnings: print(
             "\n".join(warning.toString() for warning in warnings), file=sys.stderr

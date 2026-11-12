@@ -44,9 +44,13 @@ def _without_multipak(value):
 
 
 def _atomic_write(path, content):
+    _atomic_write_bytes(path, content.encode("utf-8"))
+
+
+def _atomic_write_bytes(path, content):
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(content, encoding="utf-8")
+    temporary.write_bytes(content)
     temporary.replace(path)
 
 
@@ -100,19 +104,24 @@ class FileAssociations:
         self.state_path.parent.mkdir(parents=True, exist_ok=True)
         with self.state_path.with_suffix(".lock").open("a") as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
-            saved = json.loads(self.state_path.read_text()) if self.state_path.exists() else {}
+            saved = self._read_state()
             if saved.get("desktop_id") == DESKTOP_ID:
                 return False
             self.apply({key: True for key in FORMATS})
         return True
 
+    def _read_state(self):
+        try:
+            value = json.loads(self.state_path.read_text(encoding="utf-8"))
+        except (FileNotFoundError, ValueError):
+            return {}
+        return value if isinstance(value, dict) else {}
+
     def load(self):
         selected = {}
-        saved = (
-            json.loads(self.state_path.read_text()).get("selected", {})
-            if self.state_path.exists()
-            else {}
-        )
+        saved = self._read_state().get("selected", {})
+        if not isinstance(saved, dict):
+            saved = {}
         config = configparser.ConfigParser(interpolation=None, strict=False)
         if self.path.exists():
             config.read(self.path, encoding="utf-8")
@@ -159,9 +168,10 @@ class FileAssociations:
         config.optionxform = str
         if self.path.exists():
             config.read_string(self.path.read_text(encoding="utf-8"))
+        before = self._read_state().get("before", {})
         before = (
-            json.loads(self.state_path.read_text()).get("before", {})
-            if self.state_path.exists()
+            {mime: value for mime, value in before.items() if isinstance(value, str)}
+            if isinstance(before, dict)
             else {}
         )
         for section in SECTIONS:
@@ -250,7 +260,7 @@ class FileAssociations:
                 if content is None:
                     path.unlink(missing_ok=True)
                 else:
-                    _atomic_write(path, content.decode("utf-8"))
+                    _atomic_write_bytes(path, content)
             try:
                 self.refresher()
             except Exception:

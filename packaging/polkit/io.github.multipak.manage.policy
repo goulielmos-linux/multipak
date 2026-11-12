@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN" "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+  <vendor>MultiPak</vendor>
+  <action id="io.github.multipak.system-install">
+    <description>Install system packages with MultiPak</description>
+    <description xml:lang="pt_BR">Instalar pacotes no sistema com o MultiPak</description>
+    <message>Authentication is required for this MultiPak system operation.</message>
+    <message xml:lang="pt_BR">É necessário autenticar para esta operação do MultiPak no sistema.</message>
+    <defaults><allow_any>no</allow_any><allow_inactive>no</allow_inactive><allow_active>auth_admin</allow_active></defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/local/libexec/multipak-system/manage</annotate>
+  </action>
+</policyconfig>

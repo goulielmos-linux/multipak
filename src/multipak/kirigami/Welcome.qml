@@ -152,6 +152,18 @@ Kirigami.ApplicationWindow {
         }
     }
 
+    pageStack.enabled: !appUpdates.checking
+    UpdateNotice {
+        transientParent: root
+        installer: true
+        onInstallerCloseRequested: root.close()
+    }
+
+    DistroboxDialog {
+        id: distroboxDialog
+        transientParent: root
+    }
+
     pageStack.globalToolBar.style: Kirigami.ApplicationHeaderStyle.None
     pageStack.initialPage: welcomeComponent
 
@@ -267,6 +279,9 @@ Kirigami.ApplicationWindow {
 
     Connections {
         target: welcome
+        function onDistroboxRequired() {
+            Qt.callLater(() => distroboxDialog.open());
+        }
         function onStateChanged() { root.syncOperation(); }
         function onCloseRequested() { root.close(); }
         function onNotice(message) {
@@ -277,9 +292,9 @@ Kirigami.ApplicationWindow {
             if (welcome.lastChoice === "continue") {
                 root.openMethod();
             } else if (welcome.live) {
-                welcome.searchBazaar();
+                welcome.searchStore();
             } else {
-                root.showPreview(qsTr("You chose to search Bazaar."));
+                root.showPreview(qsTr("You chose to search the app store."));
             }
         }
         function onMethodChosen() {

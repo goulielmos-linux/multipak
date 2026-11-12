@@ -2,12 +2,14 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
+import "BreezeIcons.js" as BreezeIcons
 
 Kirigami.ScrollablePage {
     id: page
     objectName: "managerPage"
     signal aboutRequested()
     signal closeRequested()
+    signal settingsRequested()
     readonly property real outerMargin: Kirigami.Units.largeSpacing * 2
     readonly property real preferredWindowWidth: Math.max(
         header.implicitWidth, Kirigami.Units.gridUnit * 29
@@ -31,6 +33,17 @@ Kirigami.ScrollablePage {
             onAboutRequested: page.aboutRequested()
         }
 
+        Kirigami.InlineMessage {
+            visible: appUpdates.required
+            text: qsTr("Update MultiPak to continue installing applications.")
+            type: Kirigami.MessageType.Warning
+            Layout.fillWidth: true
+            actions: Kirigami.Action {
+                text: qsTr("Update")
+                onTriggered: appUpdates.openStore()
+            }
+        }
+
         Controls.Label {
             visible: manager.mode === "home"
             text: qsTr("Manage your applications and set your preferences.")
@@ -43,12 +56,22 @@ Kirigami.ScrollablePage {
             spacing: Kirigami.Units.largeSpacing
             Layout.fillWidth: true
 
+            ManagerActionCard {
+                title: qsTr("Install applications")
+                description: qsTr("Choose a package to install.")
+                iconName: "list-add"
+                enabled: appUpdates.installAllowed
+                buttonName: "managerInstallButton"
+                onActivated: manager.openInstaller()
+                Layout.fillWidth: true
+            }
+
             Kirigami.AbstractCard {
                 Layout.fillWidth: true
                 contentItem: RowLayout {
                     spacing: Kirigami.Units.largeSpacing
                     Kirigami.Icon {
-                        source: "edit-delete"
+                        source: BreezeIcons.source("edit-delete", Kirigami.Theme.backgroundColor)
                         Layout.preferredWidth: Kirigami.Units.iconSizes.medium
                         Layout.preferredHeight: Kirigami.Units.iconSizes.medium
                         Accessible.ignored: true
@@ -81,7 +104,7 @@ Kirigami.ScrollablePage {
                 contentItem: RowLayout {
                     spacing: Kirigami.Units.largeSpacing
                     Kirigami.Icon {
-                        source: "system-software-update"
+                        source: BreezeIcons.source("system-software-update", Kirigami.Theme.backgroundColor)
                         Layout.preferredWidth: Kirigami.Units.iconSizes.medium
                         Layout.preferredHeight: Kirigami.Units.iconSizes.medium
                         Accessible.ignored: true
@@ -95,7 +118,7 @@ Kirigami.ScrollablePage {
                             Layout.fillWidth: true
                         }
                         Controls.Label {
-                            text: qsTr("Update the applications and packages in a container.")
+                            text: qsTr("Update applications in a MultiPak Distrobox container.")
                             wrapMode: Text.WordWrap
                             Layout.fillWidth: true
                         }
@@ -108,68 +131,13 @@ Kirigami.ScrollablePage {
                     }
                 }
             }
-            Kirigami.AbstractCard {
+            ManagerActionCard {
+                title: qsTr("MultiPak settings")
+                description: qsTr("Configure file types and the interface language.")
+                iconName: "configure"
+                buttonName: "managerSettingsButton"
+                onActivated: page.settingsRequested()
                 Layout.fillWidth: true
-                contentItem: RowLayout {
-                    spacing: Kirigami.Units.largeSpacing
-                    Kirigami.Icon {
-                        source: "configure"
-                        Layout.preferredWidth: Kirigami.Units.iconSizes.medium
-                        Layout.preferredHeight: Kirigami.Units.iconSizes.medium
-                        Accessible.ignored: true
-                    }
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        Controls.Label {
-                            text: qsTr("File types")
-                            font.bold: true
-                            wrapMode: Text.WordWrap
-                            Layout.fillWidth: true
-                        }
-                        Controls.Label {
-                            text: qsTr("Choose which file extensions to open.")
-                            wrapMode: Text.WordWrap
-                            Layout.fillWidth: true
-                        }
-                    }
-                    Controls.Button {
-                        objectName: "managerAssociationsButton"
-                        text: qsTr("Select")
-                        Accessible.name: qsTr("Select file types")
-                        onClicked: manager.openAssociations()
-                    }
-                }
-            }
-            Kirigami.AbstractCard {
-                Layout.fillWidth: true
-                contentItem: RowLayout {
-                    spacing: Kirigami.Units.largeSpacing
-                    Kirigami.Icon {
-                        source: "preferences-desktop-locale"
-                        Layout.preferredWidth: Kirigami.Units.iconSizes.medium
-                        Layout.preferredHeight: Kirigami.Units.iconSizes.medium
-                        Accessible.ignored: true
-                    }
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        Controls.Label {
-                            text: qsTr("Language")
-                            font.bold: true
-                            Layout.fillWidth: true
-                        }
-                        Controls.Label {
-                            text: qsTr("Choose the language used by MultiPak.")
-                            wrapMode: Text.WordWrap
-                            Layout.fillWidth: true
-                        }
-                    }
-                    Controls.Button {
-                        objectName: "managerLanguageButton"
-                        text: qsTr("Select")
-                        Accessible.name: qsTr("Select the interface language")
-                        onClicked: manager.openLanguages()
-                    }
-                }
             }
 
         }
@@ -183,30 +151,8 @@ Kirigami.ScrollablePage {
         }
 
         Controls.Label {
-            visible: manager.mode !== "home"
-            text: manager.mode === "remove"
-                ? qsTr("Select an application. Other applications and personal data will be preserved.")
-                : qsTr("Select a container. All its applications and packages will be updated. The host system will not be updated.")
-            wrapMode: Text.WordWrap
-            Layout.fillWidth: true
-        }
-
-        Controls.Label {
-            objectName: "userContainersGuidance"
             visible: manager.mode === "update"
-            text: qsTr("For containers created outside MultiPak, use <a href='kontainer'>Kontainer</a>.")
-            textFormat: Text.RichText
-            linkColor: Kirigami.Theme.linkColor
-            enabled: !manager.busy
-            activeFocusOnTab: true
-            Accessible.role: Accessible.Link
-            Accessible.name: qsTr("Open Kontainer")
-            onLinkActivated: link => { if (link === "kontainer") manager.openKontainer(); }
-            Keys.onReturnPressed: manager.openKontainer()
-            Keys.onSpacePressed: manager.openKontainer()
-            HoverHandler {
-                cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
-            }
+            text: qsTr("Select a container. All its applications and packages will be updated. The host system will not be updated.")
             wrapMode: Text.WordWrap
             Layout.fillWidth: true
         }
@@ -240,14 +186,12 @@ Kirigami.ScrollablePage {
                         onClicked: manager.select(index)
                         contentItem: RowLayout {
                             spacing: Kirigami.Units.largeSpacing
-                            Image {
+                            Kirigami.Icon {
+                                objectName: "managerApplicationIcon" + index
                                 source: manager.mode === "remove"
-                                    ? "assets/application.svg" : "assets/container.svg"
-                                sourceSize.width: Kirigami.Units.iconSizes.medium
-                                sourceSize.height: Kirigami.Units.iconSizes.medium
+                                    ? modelData.icon : Qt.resolvedUrl("assets/container.svg")
                                 Layout.preferredWidth: Kirigami.Units.iconSizes.medium
                                 Layout.preferredHeight: Kirigami.Units.iconSizes.medium
-                                fillMode: Image.PreserveAspectFit
                                 Accessible.ignored: true
                             }
                             ColumnLayout {
@@ -334,7 +278,7 @@ Kirigami.ScrollablePage {
                 objectName: "managerRefreshButton"
                 visible: manager.mode !== "home"
                 text: qsTr("Reload list")
-                icon.name: "view-refresh"
+                icon.source: BreezeIcons.source("view-refresh", Kirigami.Theme.backgroundColor)
                 enabled: !manager.busy
                 onClicked: manager.refresh()
             }

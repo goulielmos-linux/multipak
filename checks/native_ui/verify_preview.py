@@ -239,7 +239,7 @@ class PreviewTests(unittest.TestCase):
 
     def test_environment_confidence_uses_evidence_and_variable_version(self):
         cases = (
-            ("1.2.31-1.fc45", "fedora-45", "metadata", "High", "Fedora 45", ".fc45"),
+            ("1.2.31-1.fc45", "fedora-45", "metadata", "High", "Fedora 45", "Release"),
             ("1.2.31-1.fc44", "fedora-44", "metadata", "High", "Fedora 44", ".fc44"),
             ("1.2.31", "fedora-45", "filename", "Medium", "Fedora 45", "filename"),
             ("1.2.31", "", "", "Low", "Fedora 45", "could not"),

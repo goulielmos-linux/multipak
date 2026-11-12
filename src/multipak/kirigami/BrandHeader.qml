@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
+import "BreezeIcons.js" as BreezeIcons
 
 RowLayout {
     id: header
@@ -32,7 +33,7 @@ RowLayout {
         Controls.ToolButton {
             objectName: "aboutButton"
             visible: header.showAbout
-            icon.name: "help-about"
+            icon.source: BreezeIcons.source("help-about", Kirigami.Theme.backgroundColor)
             text: header.aboutText
             display: Controls.AbstractButton.IconOnly
             onClicked: header.aboutRequested()

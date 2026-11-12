@@ -303,3 +303,11 @@ def test_qt_recognizes_arch_packages_without_claiming_ordinary_archives(settings
         *(["application/x-archlinux-package"] * len(packages)),
         "application/x-zstd-compressed-tar",
     ]
+
+
+def test_first_start_recovers_from_invalid_saved_preferences(settings, monkeypatch):
+    monkeypatch.setattr("multipak.file_associations.host.is_flatpak", lambda: True)
+    settings.state_path.parent.mkdir(parents=True)
+    settings.state_path.write_text("{incomplete")
+    assert settings.initialize_defaults()
+    assert settings.load() == selection()

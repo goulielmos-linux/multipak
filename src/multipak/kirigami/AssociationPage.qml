@@ -5,7 +5,7 @@ import org.kde.kirigami as Kirigami
 
 Kirigami.ScrollablePage {
     id: page
-    objectName: "associationPage"
+    objectName: "managerSettingsPage"
     signal aboutRequested()
     signal returnRequested()
     readonly property real outerMargin: Kirigami.Units.largeSpacing * 2
@@ -15,6 +15,11 @@ Kirigami.ScrollablePage {
     readonly property real preferredWindowHeight: body.implicitHeight
         + topPadding + bottomPadding + actions.implicitHeight
     padding: outerMargin
+
+    Connections {
+        target: manager
+        function onAssociationsSaved() { languages.save(manager.previewMode); }
+    }
 
     component FormatChoice: Controls.CheckBox {
         id: choice
@@ -51,8 +56,13 @@ Kirigami.ScrollablePage {
             onAboutRequested: page.aboutRequested()
         }
         Kirigami.Heading {
-            text: qsTr("File types")
+            text: qsTr("MultiPak settings")
             level: 2
+            Layout.fillWidth: true
+        }
+        Kirigami.Heading {
+            text: qsTr("File types")
+            level: 3
             Layout.fillWidth: true
         }
         Controls.Label {
@@ -63,10 +73,48 @@ Kirigami.ScrollablePage {
         ColumnLayout {
             spacing: Kirigami.Units.smallSpacing
             Layout.fillWidth: true
-            FormatChoice { formatId: "rpm" }
-            FormatChoice { formatId: "deb" }
-            FormatChoice { formatId: "arch" }
-            FormatChoice { formatId: "appimage" }
+            Repeater {
+                objectName: "associationChoices"
+                model: manager.associationsReady ? manager.formatOptions : []
+                delegate: FormatChoice {
+                    required property var modelData
+                    formatId: modelData.id
+                }
+            }
+        }
+        Kirigami.Separator { Layout.fillWidth: true }
+        Kirigami.Heading {
+            objectName: "languageHeading"
+            text: qsTr("Language")
+            level: 3
+            Layout.fillWidth: true
+        }
+        Controls.ComboBox {
+            objectName: "languageCombo"
+            model: languages.options
+            textRole: "label"
+            currentIndex: languages.selectedIndex
+            onActivated: index => languages.choose(index)
+            enabled: !manager.busy
+            Accessible.name: qsTr("MultiPak language")
+            Layout.fillWidth: true
+        }
+        Controls.Label {
+            objectName: "languageFallbackNotice"
+            text: qsTr("English is used if no translation is available.")
+            visible: languages.selectedIndex === 0
+            color: Kirigami.Theme.negativeTextColor
+            wrapMode: Text.WordWrap
+            Layout.fillWidth: true
+        }
+        Controls.Label {
+            objectName: "languageStatus"
+            text: languages.status
+            visible: languages.hasError && text.length > 0
+            textFormat: Text.PlainText
+            color: languages.hasError ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.textColor
+            wrapMode: Text.WordWrap
+            Layout.fillWidth: true
         }
         Controls.ProgressBar {
             visible: manager.busy

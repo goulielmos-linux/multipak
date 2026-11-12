@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 import subprocess
 import sys
 import threading
@@ -9,7 +10,7 @@ import pytest
 
 from multipak.engine import OWNER_LABEL
 from multipak.metadata import inspect_package
-from multipak.models import ENVIRONMENTS
+from multipak.models import ENVIRONMENTS, Package
 from multipak.process import CommandError
 
 DEBIAN = next(e for e in ENVIRONMENTS if e.id == "debian-stable")
@@ -41,7 +42,7 @@ def test_deb_downloads_and_installs_local_file_in_one_apt_transaction(fake_engin
     tx = engine.install(package_for(deb, engine), DEBIAN)
     calls = [call for call in engine.runner.calls if "apt-get" in call]
     assert len(calls) == 1
-    assert calls[0][-2:] == ["install", f"/tmp/multipak-{tx.id}.deb"]
+    assert calls[0][-2:] == ["install", f"/tmp/multipak-{tx.id}/package.deb"]
     assert "--download-only" not in calls[0]
     assert "--no-download" not in calls[0]
 
@@ -125,8 +126,13 @@ def test_new_containers_override_multiline_image_description(fake_engine, deb, c
 
 def test_installed_distrobox_list_does_not_show_phantom_ubuntu(tmp_path, fake_engine, deb):
     # Feed simulated Podman output to the installed Distrobox list parser.
-    script = Path("/run/host/usr/bin/distrobox-list")
-    if not script.is_file():
+    candidates = (
+        shutil.which("distrobox-list"),
+        "/usr/bin/distrobox-list",
+        "/run/host/usr/bin/distrobox-list",
+    )
+    script = next((Path(path) for path in candidates if path and Path(path).is_file()), None)
+    if script is None:
         pytest.skip("Requires the host Distrobox script for the compatibility regression")
     engine = fake_engine
     engine.install(package_for(deb, engine), DEBIAN)
@@ -383,7 +389,7 @@ def test_fedora_rpm_reuses_toolbox_without_creating_another_environment(
     tmp_path,
     monkeypatch,
 ):
-    from multipak.models import ExistingEnvironment, Package
+    from multipak.models import ExistingEnvironment
 
     engine = fake_engine
     path = tmp_path / "chrome.rpm"
@@ -578,3 +584,62 @@ def test_custom_creation_cannot_use_the_managed_namespace(fake_engine, deb, name
         engine.install(package_for(deb, engine), DEBIAN, container_name=name)
     assert not any(call[:2] == ["distrobox", "create"] for call in engine.runner.calls)
     assert not engine.store.transactions()
+
+
+def test_image_download_reports_progress_before_version_lookup_and_container_creation(
+    fake_engine, deb
+):
+    engine = fake_engine
+    engine.install(package_for(deb, engine), DEBIAN)
+    calls = engine.runner.calls
+    pull = ["podman", "pull", "--policy=missing", DEBIAN.image]
+    fetch = calls.index(pull)
+    resolve = next(i for i, call in enumerate(calls) if call[:2] == ["podman", "run"])
+    create = next(i for i, call in enumerate(calls) if call[:2] == ["distrobox", "create"])
+    assert fetch < resolve < create
+    assert any(percent == 50 and "part 1" in text for percent, text in engine.test_progress)
+    assert (-1, "Initializing the container…") in engine.test_progress
+
+
+def test_rpm_reports_download_progress_during_setup_and_install(fake_engine, tmp_path):
+    engine = fake_engine
+    fedora = next(env for env in ENVIRONMENTS if env.id == "fedora-latest")
+    engine.runner.release = 'ID=fedora\nVERSION_ID="45"\n'
+    package_path = tmp_path / "demo.rpm"
+    package_path.write_bytes(b"\xed\xab\xee\xdb\x03\x00\x00\x00")
+    package = Package(package_path, "rpm", "demo", "1-1.fc45", "x86_64")
+    run = engine.runner.run
+
+    def emit_download(argv, **kwargs):
+        if argv[0] == "rpm":
+            return b"demo\x1f1-1.fc45\x1fx86_64" if kwargs.get("binary") else ""
+        if callback := kwargs.get("on_output"):
+            if argv[0] == "distrobox" and argv[-1] == "true":
+                callback("\x1b[0mInstalling basic packages...\n")
+                callback("[1/3] basic-1.noarch  25% | 1.0 MiB/s | 500 KiB\r")
+            if "--downloadonly" in argv:
+                callback("[1/2] dependency-1.noarch  50% | 1.0 MiB/s | 1.0 MiB\r")
+        return run(argv, **kwargs)
+
+    engine.runner.run = emit_download
+    assert engine.install(package, fedora).status == "installed"
+    progress = engine.test_progress
+    assert (-1, "Preparing the container's basic components…") in progress
+    assert (25, "Downloading basic-1.noarch — 25%") in progress
+    assert (50, "Downloading dependency-1.noarch — 50%") in progress
+
+
+def test_failed_image_download_does_not_create_or_initialize_a_container(fake_engine, deb):
+    engine = fake_engine
+    run = engine.runner.run
+
+    def fail_pull(argv, **kwargs):
+        if argv[:2] == ["podman", "pull"]:
+            raise CommandError(argv, 125, "download interrupted")
+        return run(argv, **kwargs)
+
+    engine.runner.run = fail_pull
+    with pytest.raises(CommandError, match="download interrupted"):
+        engine.install(package_for(deb, engine), DEBIAN)
+    assert not any(call[:2] == ["distrobox", "create"] for call in engine.runner.calls)
+    assert not any(percent == 100 for percent, _ in engine.test_progress)

@@ -6,24 +6,37 @@ from threading import Lock
 from PySide6.QtCore import Property, QProcess, Qt, QTimer, Signal, Slot
 from PySide6.QtWidgets import QApplication
 
-from multipak.bazaar import search_command
 from multipak.catalog import load_catalog, package_environment
+from multipak.distrobox_setup import (
+    DistroboxMissing,
+    DistroboxRequirement,
+    distrobox_requirement,
+    install_distrobox,
+    reboot_after_distrobox,
+)
 from multipak.environments import discover
 from multipak.file_associations import FileAssociations
 from multipak.localization import tr
 from multipak.metadata import inspect_package
 from multipak.models import ENVIRONMENTS, PackageInspection, Transaction
 from multipak.process import Cancelled
+from multipak.software_store import search_command
 from multipak.store import Store
 from multipak.suggestions import suggestion_details
 from multipak.system import install_system, system_install_available
 from multipak.worker import Worker
 
 from .main import Welcome
+from .update_notice import installation_allowed
 
 
 def inspect_installation(engine, path):
-    FileAssociations().initialize_defaults()
+    # File-type preferences are a convenience. A failure here must never prevent
+    # the package from being opened.
+    try:
+        FileAssociations().initialize_defaults()
+    except Exception as error:
+        engine._log(tr("Could not update file associations: {0}").format(error))
     package = inspect_package(path, engine.runner)
     if package.kind == "appimage":
         return PackageInspection(package)
@@ -83,13 +96,17 @@ class LiveInstaller(Welcome):
     def canCancel(self):
         return (
             self.worker is not None
-            and self._mode not in ("cleanup", "system")
+            and self._mode not in ("cleanup", "system", "distrobox", "reboot")
             and not self._cancel_pending
         )
 
     @Property(bool, notify=operationChanged)
     def canRetry(self):
-        return self.state == "error" and self.worker is None and self._mode != "system"
+        return (
+            self.state == "error"
+            and self.worker is None
+            and self._mode not in ("system", "distrobox", "reboot")
+        )
 
     @Property(bool, notify=Welcome.dataChanged)
     def systemInstallAvailable(self):
@@ -115,13 +132,15 @@ class LiveInstaller(Welcome):
             return
         self._mode, self._handler, self._outcome = mode, handler, None
         self._cancel_pending = False
-        self._percent = -1 if mode in ("inspect", "search", "cleanup") else 0
+        self._percent = -1 if mode in ("inspect", "search", "cleanup", "distrobox", "reboot") else 0
         self._status = {
             "inspect": tr("Loading package information…"),
-            "search": tr("Searching Bazaar for the application…"),
+            "search": tr("Opening the app store…"),
             "install": tr("Preparing installation…"),
             "system": tr("Preparing to install directly on your system…"),
             "cleanup": tr("Removing the components created by this installation…"),
+            "distrobox": tr("Installing Distrobox using rpm-ostree…"),
+            "reboot": tr("Requesting a system restart…"),
         }[mode]
         worker = self.worker_factory(self.store, operation, self)
         self.worker = worker
@@ -140,6 +159,8 @@ class LiveInstaller(Welcome):
                 "cleanup": "cleaning",
                 "install": "installing",
                 "system": "installing",
+                "distrobox": "installing",
+                "reboot": "installing",
             }[mode]
         )
         self._log_timer.start()
@@ -175,21 +196,21 @@ class LiveInstaller(Welcome):
         self._set_state("ready")
 
     @Slot()
-    def searchBazaar(self):
+    def searchStore(self):
         if self.package is not None:
             self._run(
                 lambda engine: search_command(engine.runner, self.package.name),
-                self._open_bazaar,
+                self._open_store,
                 "search",
             )
 
-    def _open_bazaar(self, command):
+    def _open_store(self, command):
         from multipak import host
 
         invocation = host.command(command.argv, watch_bus=False)
         success, _pid = QProcess.startDetached(invocation[0], invocation[1:])
         if not success:
-            raise RuntimeError(tr("Could not open Bazaar."))
+            raise RuntimeError(tr("Could not open the software store."))
         self._set_state("ready")
         if not command.search_supported:
             QApplication.clipboard().setText(command.term)
@@ -204,6 +225,7 @@ class LiveInstaller(Welcome):
     def requestInstallation(self):
         if (
             not self.installation_allowed()
+            or not installation_allowed(self)
             or self.transaction is not None
             or self.worker is not None
         ):
@@ -215,18 +237,74 @@ class LiveInstaller(Welcome):
         def install(engine):
             if package.kind == "appimage":
                 return engine.install_appimage(package)
-            if selection.custom_name:
-                return engine.install(
-                    package, selection.environment, container_name=selection.custom_name
-                )
-            return engine.install(package, selection.environment, selection.existing)
+            try:
+                if selection.custom_name:
+                    return engine.install(
+                        package, selection.environment, container_name=selection.custom_name
+                    )
+                return engine.install(package, selection.environment, selection.existing)
+            except DistroboxMissing:
+                return distrobox_requirement(engine)
 
         self._run(install, self._installed, "install")
+
+    def _show_distrobox_requirement(self, requirement):
+        self.transaction = None
+        self._distrobox_can_install = requirement.can_install
+        self._distrobox_restart_required = requirement.restart_required
+        self._distrobox_message = requirement.message
+        self._set_state("ready")
+        if self._close_pending:
+            self.closeRequested.emit()
+        else:
+            self.distroboxRequired.emit()
+
+    @Slot()
+    def requestDistroboxInstallation(self):
+        if (
+            not self.distroboxCanInstall
+            or self.worker is not None
+            or self.transaction is not None
+            or not installation_allowed(self)
+        ):
+            return
+        self._distrobox_can_install = False
+        self._logs = ""
+        self.logsChanged.emit()
+        self._run(install_distrobox, self._distrobox_installed, "distrobox")
+
+    def _distrobox_installed(self, restart_required):
+        if type(restart_required) is not bool:
+            raise RuntimeError(tr("Distrobox installation could not be confirmed."))
+        message = (
+            tr(
+                "Distrobox was installed using rpm-ostree. Restart your computer, then "
+                "reopen the package to install your application."
+            )
+            if restart_required
+            else tr("Distrobox is available. You can continue installing the application.")
+        )
+        self._show_distrobox_requirement(DistroboxRequirement(False, restart_required, message))
+
+    @Slot()
+    def requestDistroboxRestart(self):
+        if (
+            not self.distroboxRestartRequired
+            or self.worker is not None
+            or self.transaction is not None
+        ):
+            return
+        self._run(reboot_after_distrobox, self._distrobox_restart_requested, "reboot")
+
+    def _distrobox_restart_requested(self, _result):
+        self._set_state("ready")
+        self.closeRequested.emit()
 
     @Slot(bool)
     def requestSystemInstallation(self, accepted):
         if (
             not accepted
+            or not installation_allowed(self)
             or self.method != "system"
             or self.mode != "advanced"
             or self.package is None
@@ -260,6 +338,9 @@ class LiveInstaller(Welcome):
             self.closeRequested.emit()
 
     def _installed(self, tx):
+        if isinstance(tx, DistroboxRequirement):
+            self._show_distrobox_requirement(tx)
+            return
         if not isinstance(tx, Transaction) or tx.status != "installed":
             raise RuntimeError(
                 tr("Installation ended without confirming that the package was installed.")
@@ -341,7 +422,9 @@ class LiveInstaller(Welcome):
                 self._show_error(str(error), worker.engine.tx)
 
     def _show_error(self, message, transaction):
-        system = self._mode == "system" or (transaction and transaction.method == "system")
+        system = self._mode in ("system", "distrobox", "reboot") or (
+            transaction and transaction.method == "system"
+        )
         self.transaction = None if system else transaction
         self._status = message.splitlines()[0][:400]
         if system:
@@ -361,12 +444,14 @@ class LiveInstaller(Welcome):
             if self.transaction.status == "cleanup_failed":
                 self.abandon()
             else:
+                if not installation_allowed(self):
+                    return
                 tx = self.transaction
                 self._run(lambda engine: engine.retry(tx), self._installed, "install")
         elif self.package is None or self._mode == "inspect":
             self.inspect()
         elif self._mode == "search":
-            self.searchBazaar()
+            self.searchStore()
         else:
             self.requestInstallation()
 
@@ -381,7 +466,7 @@ class LiveInstaller(Welcome):
             if self.canCancel:
                 self._cancel_pending = True
                 self.worker.cancel_requested.set()
-                self._status = "Aguardando a etapa terminar e preparando a limpeza…"
+                self._status = tr("Waiting for the current step to finish before cleaning up…")
                 self.operationChanged.emit()
         elif self.transaction is not None:
             tx = self.transaction
@@ -410,7 +495,7 @@ class LiveInstaller(Welcome):
 
     @Slot()
     def requestClose(self):
-        if self.worker is not None and self._mode == "system":
+        if self.worker is not None and self._mode in ("system", "distrobox", "reboot"):
             self._close_pending = True
             self._status = tr(
                 "Wait for rpm-ostree to finish. The window will close when the operation ends."

@@ -49,7 +49,10 @@ Kirigami.ScrollablePage {
             Layout.fillWidth: true
         }
         Controls.Label {
-            text: qsTr("The system language follows your desktop session settings. English is used if no translation is available.")
+            objectName: "languageFallbackNotice"
+            text: qsTr("English is used if no translation is available.")
+            visible: languages.selectedIndex === 0
+            color: Kirigami.Theme.negativeTextColor
             wrapMode: Text.WordWrap
             Layout.fillWidth: true
         }

@@ -1,26 +1,63 @@
 """Cancellable subprocesses. Arguments are always lists, never shell fragments."""
 
+import errno
 import os
+import pty
+import re
 import selectors
 import signal
 import subprocess
 import threading
 import time
 from collections.abc import Callable
+from contextlib import contextmanager
+from termios import tcsetwinsize
 
 from multipak.localization import tr
 
 from . import host
+
+ANSI = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]|\x1b\][^\x07]*?(?:\x07|\x1b\\)")
+PARTIAL_CSI = re.compile(r"\x1b(?:\[[0-?]*[ -/]*)?$")
+
+
+class _LogOutput:
+    """Strip terminal control codes only from the human-readable log."""
+
+    def __init__(self):
+        self.pending = ""
+
+    def feed(self, text):
+        text = ANSI.sub("", self.pending + text)
+        self.pending = ""
+        if match := PARTIAL_CSI.search(text):
+            self.pending = match[0][-256:]
+            text = text[: match.start()]
+        return text
 
 
 class Cancelled(Exception):
     """Cancellation requested by the user."""
 
 
+@contextmanager
+def _terminal_output(enabled):
+    """Let tools report transfer sizes while keeping stdin noninteractive."""
+    if not enabled:
+        yield None
+        return
+    master, slave = pty.openpty()
+    with os.fdopen(master, "rb", buffering=0) as reader, os.fdopen(slave, "wb") as writer:
+        tcsetwinsize(writer.fileno(), (50, 160))
+        yield reader, writer
+
+
 class CommandError(RuntimeError):
     def __init__(self, argv: list[str], code: int, output: str):
         self.argv, self.code, self.output = argv, code, output
-        super().__init__(tr("{0} exited with code {1}.\n{2}").format(argv[0], code, output[-8000:]))
+        super().__init__(
+            tr("{0} exited with code {1}.\n{2}").format(argv[0], code, ANSI.sub("", output)[-8000:])
+        )
 
 
 class Runner:
@@ -40,7 +77,11 @@ class Runner:
         check: bool = True,
         binary: bool = False,
         output_limit: int = 4 * 1024 * 1024,
+        on_output: Callable[[str], None] | None = None,
+        terminal_output: bool = False,
     ) -> str | bytes:
+        if binary and terminal_output:
+            raise ValueError("Terminal output cannot carry binary data")
         if self.cancelled.is_set():
             raise Cancelled
         overrides = {
@@ -57,20 +98,35 @@ class Runner:
         start = time.monotonic()
         tail = bytearray()
         diagnostics = bytearray()
+        display = _LogOutput()
         with (
+            _terminal_output(terminal_output) as terminal,
             subprocess.Popen(
                 invocation,
                 stdin=subprocess.DEVNULL,
-                stdout=subprocess.PIPE,
+                stdout=terminal[1] if terminal else subprocess.PIPE,
                 stderr=subprocess.PIPE if binary else subprocess.STDOUT,
                 env=env,
                 start_new_session=True,
             ) as proc,
             selectors.DefaultSelector() as selector,
         ):
-            assert proc.stdout is not None
-            os.set_blocking(proc.stdout.fileno(), False)
-            selector.register(proc.stdout, selectors.EVENT_READ)
+            output = terminal[0] if terminal else proc.stdout
+            assert output is not None
+            if terminal:
+                terminal[1].close()
+            os.set_blocking(output.fileno(), False)
+            selector.register(output, selectors.EVENT_READ)
+
+            def read(fd):
+                try:
+                    return os.read(fd, 65536)
+                except OSError as error:
+                    # Linux PTYs signal EOF with EIO once all slave fds close.
+                    if terminal and fd == output.fileno() and error.errno == errno.EIO:
+                        return b""
+                    raise
+
             if binary:
                 selector.register(proc.stderr, selectors.EVENT_READ)
             try:
@@ -80,7 +136,7 @@ class Runner:
                     if time.monotonic() - start > timeout:
                         raise TimeoutError(tr("Operation timed out: {0}").format(argv[0]))
                     for key, _ in selector.select(timeout=0.15):
-                        chunk = os.read(key.fd, 65536)
+                        chunk = read(key.fd)
                         if not chunk:
                             selector.unregister(key.fileobj)
                             continue
@@ -96,8 +152,16 @@ class Runner:
                         # Bound captured output; full streamed logs are written by the engine.
                         if len(tail) > output_limit:
                             del tail[: len(tail) - output_limit]
-                        self.log(chunk.decode("utf-8", errors="replace"))
-                code = proc.wait(timeout=5)
+                        text = chunk.decode("utf-8", errors="replace")
+                        if clean := display.feed(text):
+                            self.log(clean)
+                        if on_output is not None:
+                            on_output(text)
+                try:
+                    code = proc.wait(timeout=5)
+                except subprocess.TimeoutExpired as exc:
+                    # Output closed, but the process kept running.
+                    raise TimeoutError(tr("Operation timed out: {0}").format(argv[0])) from exc
             finally:
                 # Also terminates descendants holding the pipe open after their parent exits.
                 # Interrupt the host launcher; its supervisor also cleans up
@@ -128,7 +192,7 @@ class Runner:
                     deadline = time.monotonic() + 1
                     while selector.get_map() and time.monotonic() < deadline:
                         for key, _ in selector.select(timeout=0.05):
-                            if not os.read(key.fd, 65536):
+                            if not read(key.fd):
                                 selector.unregister(key.fileobj)
         output = tail.decode("utf-8", errors="replace")
         if check and code:

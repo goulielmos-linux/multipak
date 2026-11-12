@@ -115,7 +115,7 @@ if __name__ == "__main__":
     if sys.argv[1] == "--run":
         raise SystemExit(run_transaction(sys.argv[2], sys.argv[3:]))
     if sys.argv[1] == "--busy":
-        result = {"busy": transaction_busy(sys.argv[2])}
+        result = {"busy": any(transaction_busy(marker) for marker in sys.argv[2:])}
     elif sys.argv[1] == "--state":
         result = {"present": package_present(sys.argv[2], sys.argv[3])}
     elif sys.argv[1] == "--remove":

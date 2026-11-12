@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
+import "BreezeIcons.js" as BreezeIcons
 
 Kirigami.ScrollablePage {
     id: page
@@ -91,7 +92,7 @@ Kirigami.ScrollablePage {
 
                     Controls.ToolButton {
                         objectName: "suggestionInfoButton"
-                        icon.name: "help-about"
+                        icon.source: BreezeIcons.source("help-about", Kirigami.Theme.backgroundColor)
                         icon.width: Kirigami.Units.iconSizes.small
                         icon.height: Kirigami.Units.iconSizes.small
                         padding: Kirigami.Units.smallSpacing / 2
@@ -213,7 +214,7 @@ Kirigami.ScrollablePage {
         Controls.ToolButton {
             objectName: "alternativeButton"
             text: page.alternativeExpanded ? qsTr("Hide alternative method") : qsTr("Show alternative method")
-            icon.name: page.alternativeExpanded ? "arrow-up" : "arrow-down"
+            icon.source: BreezeIcons.source(page.alternativeExpanded ? "arrow-up" : "arrow-down", Kirigami.Theme.backgroundColor)
             Layout.alignment: Qt.AlignLeft
             onClicked: page.alternativeExpanded = !page.alternativeExpanded
         }

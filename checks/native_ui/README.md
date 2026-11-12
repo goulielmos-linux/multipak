@@ -27,5 +27,5 @@ Qt plugin and QML import paths. Offscreen captures show window contents but cann
 verify the real desktop title bar or window-manager behavior.
 
 The interface source is in `src/multipak/kirigami`. See
-[Interface editing](../../docs/interface.md) and
-[Translation maintenance](../../docs/translations.md).
+[Interface editing](../../docs/development.md#interface) and
+[Translation maintenance](../../docs/development.md#translations).

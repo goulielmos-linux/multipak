@@ -8,22 +8,26 @@ from functools import lru_cache
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-APP_ID = "io.github.multipak.manager"
+APP_ID = "io.github.goulielmos_linux.multipak"
 HOST_TOOLS = frozenset(
     {
         "distrobox",
         "podman",
         "rpm-ostree",
+        "systemctl",
         "skopeo",
-        "rpm",
         "bazaar",
         "bazaar-daemon",
+        "gnome-software",
+        "plasma-discover",
         "flatpak",
         "kontainer",
         "xdg-mime",
         "update-mime-database",
         "kbuildsycoca6",
         "setsid",
+        "pkexec",
+        "cat",
     }
 )
 

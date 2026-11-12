@@ -220,6 +220,10 @@ def install_system(engine: Engine, package: Package) -> Transaction:
             engine._stage(5, tr("Preparing to install directly on the system…"))
             staged = engine.store.directory(token) / "package.rpm"
             engine._copy_package(package.path, staged)
+            # Fix the byte identity before inspection. Changing the file during
+            # metadata queries or authorization must fail in the root snapshot.
+            with staged.open("rb") as stream:
+                tx.sha256 = hashlib.file_digest(stream, "sha256").hexdigest()
             copied = inspect_package(staged, engine.runner)
             if (copied.name, copied.version, copied.architecture) != (
                 package.name,
@@ -227,14 +231,19 @@ def install_system(engine: Engine, package: Package) -> Transaction:
                 package.architecture,
             ):
                 raise ValueError(tr("The file has changed. Open the package again."))
-            with staged.open("rb") as stream:
-                tx.sha256 = hashlib.file_digest(stream, "sha256").hexdigest()
             tx.status = "system_installing"
             engine.store.save(tx)
             engine._stage(15, tr("Preparing a new system deployment…"))
-            # rpm-ostree delegates authorization to the active session's polkit agent.
-            # Do not wrap the whole GUI in sudo/pkexec.
-            engine.runner.run(["rpm-ostree", "install", str(staged)], timeout=7200)
+            # The installed helper verifies and snapshots the authorized bytes
+            # in a root-private directory before invoking rpm-ostree.
+            from .privileged import call
+
+            with host.accessible_file(staged) as accessible:
+                result = call(
+                    engine.runner, "system-install", str(accessible), tx.sha256, timeout=7500
+                )
+            if "MULTIPAK_SYSTEM_RPM_INSTALLED" not in result.splitlines():
+                raise RuntimeError(tr("System package installation was not confirmed."))
             engine._stage(95, tr("Verifying the pending deployment…"))
             after = json.loads(engine.runner.run(["rpm-ostree", "status", "--json"]))
             if not after.get("deployments") or after["deployments"][0].get("booted"):

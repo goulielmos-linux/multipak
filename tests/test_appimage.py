@@ -7,7 +7,6 @@ import subprocess
 import sys
 import threading
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 from conftest import make_appimage
@@ -120,51 +119,37 @@ def test_real_type1_install_launch_and_remove_preserves_original(image, engine, 
     assert (sibling / "another-app").is_file()
 
 
-@pytest.mark.parametrize("direct", [True, False])
-def test_real_type2_reader_and_fuse_fallback(tmp_path, engine, direct):
+def test_type2_is_extracted_without_running_its_runtime(tmp_path, engine):
     path = type2_image(tmp_path)
     package = inspect_package(path, engine.runner)
     assert package.name == "Type Two" and package.appimage_type == 2
-    assert package.version == "Not provided"
     assert appimage.elf_info(path)[2] == 4096
-    with patch.object(appimage, "fuse_works", return_value=direct) as probe:
-        tx = engine.install_appimage(package)
-    managed = engine.store.appimage_directory(tx.id)
-    probe.assert_called_once_with(managed / "application.AppImage", engine.cancelled)
-    assert tx.appimage_mode == ("direct" if direct else "extracted")
-    assert (managed / "AppDir").exists() is (not direct)
-    if direct:
-        with patch.object(appimage.os, "execv") as execute:
-            appimage.launch(tx.id, ["one two"])
-        execute.assert_called_once_with(
-            str(managed / "application.AppImage"),
-            [str(managed / "application.AppImage"), "one two"],
-        )
-    else:
-        result = subprocess.run(
-            [
-                sys.executable,
-                str(Path(appimage.__file__).with_name("appimage_launcher.py")),
-                tx.id,
-                "hello",
-            ],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        assert result.stdout.strip() == "TYPE_TWO_OK:hello"
+    calls = []
+    run = engine.runner.run
 
+    def tracked(argv, **kwargs):
+        calls.append(argv)
+        return run(argv, **kwargs)
 
-def test_unknown_mount_error_can_retry_without_silent_extraction(tmp_path, engine):
-    package = inspect_package(type2_image(tmp_path), engine.runner)
-    with patch.object(appimage, "fuse_works", side_effect=RuntimeError("Unknown mount error")):
-        with pytest.raises(RuntimeError, match="Unknown mount error"):
-            engine.install_appimage(package)
-    tx = engine.tx
-    assert tx.status == "failed" and not tx.launchers
-    assert not (engine.store.appimage_directory(tx.id) / "AppDir").exists()
-    with patch.object(appimage, "fuse_works", return_value=False):
-        assert engine.retry(tx).status == "installed"
+    engine.runner.run = tracked
+    tx = engine.install_appimage(package)
+    assert tx.appimage_mode == "extracted"
+    assert (engine.store.appimage_directory(tx.id) / "AppDir/AppRun").is_file()
+    assert not any(
+        "--appimage-mount" in command or "AppImage" in str(command[0]) for command in calls
+    )
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(Path(appimage.__file__).with_name("appimage_launcher.py")),
+            tx.id,
+            "hello",
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert result.stdout.strip() == "TYPE_TWO_OK:hello"
 
 
 def test_retry_rejects_changed_copy_and_records_failure(image, engine):
@@ -261,45 +246,7 @@ def test_binary_reader_stops_oversized_stream():
         runner.read_bytes([sys.executable, "-c", "print('x'*10000)"], limit=1024)
 
 
-def test_missing_fuse_does_not_invoke_runtime(image):
-    with (
-        patch.object(appimage.os, "access", return_value=False),
-        patch.object(appimage.subprocess, "Popen") as execute,
-    ):
-        assert appimage.fuse_works(image, threading.Event()) is False
-    execute.assert_not_called()
-
-
-@pytest.mark.parametrize(
-    "message, fallback",
-    [
-        ("dlopen(): error loading libfuse.so.2", True),
-        ("fuse: device not found", True),
-        ("unexpected runtime error", False),
-    ],
-)
-def test_fuse_probe_recognizes_only_fuse_errors(tmp_path, message, fallback):
-    runtime = tmp_path / "test-runtime"
-    runtime.write_text("#!/bin/sh\nprintf '%s\\n' '" + message + "'\nexit 1\n")
-    runtime.chmod(0o755)
-    with patch.object(appimage.os, "access", return_value=True):
-        if fallback:
-            assert appimage.fuse_works(runtime, threading.Event()) is False
-        else:
-            with pytest.raises(RuntimeError, match="verify the AppImage mount"):
-                appimage.fuse_works(runtime, threading.Event())
-
-
-def test_fuse_probe_honors_cancellation_and_stops_runtime(tmp_path):
-    runtime = tmp_path / "test-runtime"
-    runtime.write_text("#!/bin/sh\nsleep 20\n")
-    runtime.chmod(0o755)
-    cancelled = threading.Event()
-    timer = threading.Timer(0.1, cancelled.set)
-    timer.start()
-    try:
-        with patch.object(appimage.os, "access", return_value=True):
-            with pytest.raises(Cancelled):
-                appimage.fuse_works(runtime, cancelled)
-    finally:
-        timer.cancel()
+@pytest.mark.parametrize("member", ["-dangerous", "./-dangerous", "../escape", "/etc/shadow"])
+def test_rejects_internal_paths_that_could_be_options_or_escape(member):
+    with pytest.raises(ValueError):
+        appimage._member(member)

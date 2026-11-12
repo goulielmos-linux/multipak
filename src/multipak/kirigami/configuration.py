@@ -50,7 +50,7 @@ class Configuration(QObject):
     MODES = (
         ("default", mark("Use the default MultiPak container")),
         ("existing", mark("Use an existing container")),
-        ("custom", mark("Create and name a new container")),
+        ("custom", mark("Create a custom container")),
     )
 
     def __init__(self, parent=None):

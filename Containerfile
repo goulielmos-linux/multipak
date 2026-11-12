@@ -12,7 +12,7 @@ RUN python3 -m venv --system-site-packages /usr/libexec/multipak \
        /usr/share/applications/io.github.multipak.installer.desktop \
     && install -Dm644 /tmp/multipak-source/data/io.github.multipak.manager.desktop \
        /usr/share/applications/io.github.multipak.manager.desktop \
-    && install -Dm644 /tmp/multipak-source/data/io.github.multipak.packages.xml \
+    && install -Dm644 /tmp/multipak-source/src/multipak/assets/multipak-packages.xml \
        /usr/share/mime/packages/io.github.multipak.packages.xml \
     && install -Dm644 /tmp/multipak-source/src/multipak/assets/multipak-appimage.xml \
        /usr/share/mime/packages/io.github.multipak.appimage.xml \

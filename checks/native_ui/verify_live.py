@@ -23,7 +23,7 @@ from PySide6.QtQml import QQmlEngine, QQmlExpression  # noqa: E402
 from PySide6.QtTest import QTest  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from multipak.bazaar import BazaarCommand  # noqa: E402
+from multipak.distrobox_setup import DistroboxMissing, DistroboxRequirement  # noqa: E402
 from multipak.metadata import inspect_package  # noqa: E402
 from multipak.models import (  # noqa: E402
     Environment,
@@ -32,6 +32,7 @@ from multipak.models import (  # noqa: E402
     Transaction,
 )
 from multipak.process import Cancelled, Runner  # noqa: E402
+from multipak.software_store import StoreCommand  # noqa: E402
 from multipak.store import Store  # noqa: E402
 from multipak.worker import Worker  # noqa: E402
 
@@ -98,6 +99,8 @@ class LiveTests(unittest.TestCase):
                 self.runner = Runner(self.cancelled, worker.log.emit)
 
             def install(self, package, environment, existing=None, **options):
+                if config.get("missing_distrobox"):
+                    raise DistroboxMissing("Distrobox is required")
                 config["calls"].append(("install", package, environment, existing, options))
                 name = options.get("container_name") or (existing.name if existing else "new")
                 self.tx = Transaction(
@@ -239,7 +242,7 @@ class LiveTests(unittest.TestCase):
         self.assertEqual(self.bridge.confidence, "Medium")
         self.click("continueButton")
         self.click("methodContinueButton")
-        self.assertEqual(self.bridge.containerName, "MultiPak-Arch-rolling")
+        self.assertEqual(self.bridge.containerName, "MultiPak-Arch-Linux")
         label = self.page.findChild(QObject, "protectedInstallationExplanation")
         self.assertIn("Pacman", label.property("text"))
         self.assertIn("atualizados", label.property("text"))
@@ -345,18 +348,56 @@ class LiveTests(unittest.TestCase):
         self.assertTrue(self.window.flags() & Qt.WindowCloseButtonHint)
         timer.stop()
 
-    def test_bazaar_uses_the_inspected_package_name(self):
-        command = BazaarCommand(["bazaar", "--search-for=live demo"], True, "live demo")
+    def test_app_store_uses_the_inspected_package_name(self):
+        commands = (
+            ["gnome-software", "--search=live demo"],
+            ["plasma-discover", "--search=live demo"],
+            [
+                "flatpak",
+                "run",
+                "--user",
+                "--branch=stable",
+                "org.kde.discover",
+                "--search=live demo",
+            ],
+        )
+        for argv in commands:
+            with self.subTest(argv=argv):
+                command = StoreCommand(argv, True, "live demo")
+                with (
+                    patch("multipak.kirigami.live.search_command", return_value=command) as search,
+                    patch(
+                        "multipak.kirigami.live.QProcess.startDetached", return_value=(True, 1)
+                    ) as launch,
+                ):
+                    self.click("searchButton")
+                    self.wait(lambda: self.bridge.state == "ready")
+                    self.assertEqual(search.call_args.args[1], "live-demo")
+                    launch.assert_called_once_with(argv[0], argv[1:])
+
+    def test_older_store_copies_the_term_for_manual_search(self):
+        command = StoreCommand(["bazaar"], False, "live demo")
         with (
-            patch("multipak.kirigami.live.search_command", return_value=command) as search,
-            patch(
-                "multipak.kirigami.live.QProcess.startDetached", return_value=(True, 1)
-            ) as launch,
+            patch("multipak.kirigami.live.search_command", return_value=command),
+            patch("multipak.kirigami.live.QProcess.startDetached", return_value=(True, 1)),
+            patch("multipak.kirigami.live.QApplication.clipboard") as clipboard,
         ):
             self.click("searchButton")
             self.wait(lambda: self.bridge.state == "ready")
-            self.assertEqual(search.call_args.args[1], "live-demo")
-            launch.assert_called_once_with("bazaar", ["--search-for=live demo"])
+            clipboard.return_value.setText.assert_called_once_with("live demo")
+
+    def test_store_launch_failure_allows_returning_to_installation(self):
+        command = StoreCommand(["gnome-software", "--search=live demo"], True, "live demo")
+        with (
+            patch("multipak.kirigami.live.search_command", return_value=command),
+            patch("multipak.kirigami.live.QProcess.startDetached", return_value=(False, 0)),
+        ):
+            self.click("searchButton")
+            self.wait(lambda: self.bridge.state == "error")
+            self.assertIn("Could not open the software store", self.bridge.status)
+            self.assertTrue(self.bridge.canReturn)
+            self.bridge.returnToWelcome()
+            self.assertEqual(self.bridge.state, "ready")
 
     def advanced(self):
         self.click("continueButton")
@@ -364,6 +405,107 @@ class LiveTests(unittest.TestCase):
         self.click("methodContinueButton")
         self.assertEqual(self.page.objectName(), "advancedPage")
         self.assertTrue(self.window.isVisible())
+
+    def open_distrobox_dialog(self, *, can_install=True, restart=False):
+        self.config["missing_distrobox"] = True
+        requirement = DistroboxRequirement(
+            can_install,
+            restart,
+            "Distrobox will be installed using rpm-ostree. A restart is required.",
+        )
+        with patch("multipak.kirigami.live.distrobox_requirement", return_value=requirement):
+            self.install()
+            self.wait(lambda: self.bridge.worker is None)
+            dialog = self.window.findChild(QObject, "distroboxSetupDialog")
+            self.assertIsNotNone(dialog)
+            self.wait(lambda: dialog.property("visible"))
+        self.assertEqual(self.config["calls"], [])
+        self.assertIsNone(self.bridge.transaction)
+        return dialog
+
+    def click_distrobox_dialog(self, dialog, name):
+        item = dialog.findChild(QObject, name)
+        self.assertIsNotNone(item, name)
+        point = item.mapToScene(QPointF(item.width() / 2, item.height() / 2)).toPoint()
+        QTest.mouseClick(dialog, Qt.LeftButton, Qt.NoModifier, point)
+        QTest.qWait(250)
+
+    def test_missing_distrobox_requires_confirmation_and_can_be_cancelled(self):
+        dialog = self.open_distrobox_dialog()
+        self.assertIn(
+            "rpm-ostree", dialog.findChild(QObject, "distroboxSetupMessage").property("text")
+        )
+        with patch("multipak.kirigami.live.install_distrobox") as install:
+            self.click_distrobox_dialog(dialog, "distroboxSetupCloseButton")
+            self.assertFalse(dialog.property("visible"))
+            install.assert_not_called()
+        self.assertEqual(self.bridge.state, "ready")
+
+    def test_confirmed_distrobox_setup_waits_and_offers_restart_after_completion(self):
+        dialog = self.open_distrobox_dialog()
+        release = threading.Event()
+
+        def install(engine):
+            engine.progress(-1, "Installing Distrobox using rpm-ostree…")
+            release.wait(5)
+            return True
+
+        with patch("multipak.kirigami.live.install_distrobox", side_effect=install) as operation:
+            try:
+                self.click_distrobox_dialog(dialog, "distroboxSetupInstallButton")
+                self.wait(lambda: self.bridge.state == "installing")
+                self.assertFalse(self.bridge.canCancel)
+                self.assertFalse(self.window.flags() & Qt.WindowCloseButtonHint)
+            finally:
+                release.set()
+            self.wait(lambda: self.bridge.worker is None and dialog.property("visible"))
+            operation.assert_called_once()
+        self.assertTrue(self.bridge.distroboxRestartRequired)
+        self.assertFalse(self.bridge.distroboxCanInstall)
+        self.assertTrue(
+            dialog.findChild(QObject, "distroboxSetupRestartButton").property("visible")
+        )
+        with patch("multipak.kirigami.live.reboot_after_distrobox") as reboot:
+            self.click_distrobox_dialog(dialog, "distroboxSetupCloseButton")
+            reboot.assert_not_called()
+        self.assertEqual(self.config["calls"], [])
+
+    def test_pending_distrobox_offers_only_restart(self):
+        dialog = self.open_distrobox_dialog(can_install=False, restart=True)
+        self.assertFalse(
+            dialog.findChild(QObject, "distroboxSetupInstallButton").property("visible")
+        )
+        with patch("multipak.kirigami.live.reboot_after_distrobox") as reboot:
+            self.click_distrobox_dialog(dialog, "distroboxSetupRestartButton")
+            self.wait(lambda: self.bridge.worker is None)
+            reboot.assert_called_once()
+            self.assertFalse(self.window.isVisible())
+
+    def test_dependency_installation_error_is_not_application_success(self):
+        dialog = self.open_distrobox_dialog()
+        with patch(
+            "multipak.kirigami.live.install_distrobox",
+            side_effect=RuntimeError("Authorization denied"),
+        ):
+            self.click_distrobox_dialog(dialog, "distroboxSetupInstallButton")
+            self.wait(lambda: self.bridge.state == "error")
+        self.assertIn("Authorization denied", self.bridge.status)
+        self.assertFalse(self.bridge.canRetry)
+        self.assertTrue(self.bridge.canReturn)
+        self.assertEqual(self.config["calls"], [])
+
+    def test_unsupported_host_does_not_offer_dependency_installation(self):
+        dialog = self.open_distrobox_dialog(can_install=False)
+        self.assertFalse(
+            dialog.findChild(QObject, "distroboxSetupInstallButton").property("visible")
+        )
+        self.assertFalse(
+            dialog.findChild(QObject, "distroboxSetupRestartButton").property("visible")
+        )
+        with patch("multipak.kirigami.live.install_distrobox") as install:
+            self.bridge.requestDistroboxInstallation()
+            install.assert_not_called()
+        self.click_distrobox_dialog(dialog, "distroboxSetupCloseButton")
 
     def type_name(self, name):
         field = self.page.findChild(QObject, "customContainerName")

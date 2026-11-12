@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
+import "BreezeIcons.js" as BreezeIcons
 
 Kirigami.ScrollablePage {
     id: page
@@ -47,7 +48,7 @@ Kirigami.ScrollablePage {
             Layout.fillWidth: true
 
             Kirigami.Icon {
-                source: "dialog-warning"
+                source: BreezeIcons.source("dialog-warning", Kirigami.Theme.backgroundColor)
                 Layout.preferredWidth: Kirigami.Units.iconSizes.large
                 Layout.preferredHeight: Kirigami.Units.iconSizes.large
                 Layout.alignment: Qt.AlignTop

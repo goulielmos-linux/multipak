@@ -2,6 +2,7 @@
 
 from multipak.localization import tr
 
+from .container_progress import PackageProgress
 from .models import valid_environment_name
 from .process import CommandError
 
@@ -14,6 +15,11 @@ def upgrade_command(name: str) -> list[str]:
 
 def update_container(engine, name: str) -> None:
     command = upgrade_command(name)
+    with engine.store.lock():
+        _update(engine, name, command)
+
+
+def _update(engine, name, command):
     engine.progress(-1, tr("Updating {0}… Please wait.").format(name))
     # Do not let Distrobox create a replacement for a container removed since listing.
     try:
@@ -26,4 +32,4 @@ def update_container(engine, name: str) -> None:
         raise
     # Runner disables stdin interaction and fixes the backend to rootless Podman.
     # Keep the package manager's output and exit status; do not infer success from launch.
-    engine.runner.run(command, timeout=7200)
+    PackageProgress(engine.progress, updating=True).run(engine.runner, command, timeout=7200)

@@ -33,6 +33,18 @@ msgstr ""
 msgid "A new container will be created and named during setup."
 msgstr ""
 
+msgid "A new version of MultiPak is available."
+msgstr ""
+
+msgid "A system change is pending. Restart your computer before installing Distrobox."
+msgstr ""
+
+msgid "A system operation is in progress. Wait for it to finish before installing Distrobox."
+msgstr ""
+
+msgid "A system operation is in progress. Wait for it to finish before restarting."
+msgstr ""
+
 msgid "A system operation or change is pending. Complete it and restart before uninstalling."
 msgstr ""
 
@@ -43,9 +55,6 @@ msgid "About the Application Installer — MultiPak"
 msgstr ""
 
 msgid "About the Application Manager — MultiPak"
-msgstr ""
-
-msgid "About the author"
 msgstr ""
 
 msgid "About the recommended environment"
@@ -61,6 +70,9 @@ msgid "Additional dependencies:"
 msgstr ""
 
 msgid "Advanced settings"
+msgstr ""
+
+msgid "All files"
 msgstr ""
 
 msgid "Also delete the container's home folder, including its data and settings."
@@ -90,6 +102,9 @@ msgstr ""
 msgid "Application Manager — MultiPak"
 msgstr ""
 
+msgid "Application packages"
+msgstr ""
+
 msgid "Application uninstalled. The container and personal data were preserved."
 msgstr ""
 
@@ -117,7 +132,7 @@ msgstr ""
 msgid "Backend"
 msgstr ""
 
-msgid "Bazaar is not installed or could not be found on this computer."
+msgid "Before continuing with the installation, check whether it is already available in your system's app store."
 msgstr ""
 
 msgid "Cancel"
@@ -132,6 +147,15 @@ msgstr ""
 msgid "Changes operating system files. This can cause dependency conflicts or prevent applications from working after an update."
 msgstr ""
 
+msgid "Checking package repositories — {0}%"
+msgstr ""
+
+msgid "Checking package repositories…"
+msgstr ""
+
+msgid "Checking the container image…"
+msgstr ""
+
 msgid "Checking…"
 msgstr ""
 
@@ -139,6 +163,9 @@ msgid "Choose a custom name. The MultiPak prefix is reserved for the application
 msgstr ""
 
 msgid "Choose a custom name. This name and the MultiPak prefixes are reserved for containers managed by the application."
+msgstr ""
+
+msgid "Choose a package to install."
 msgstr ""
 
 msgid "Choose a valid name for the new environment."
@@ -153,9 +180,6 @@ msgstr ""
 msgid "Choose the language used by MultiPak."
 msgstr ""
 
-msgid "Choose which file extensions to open."
-msgstr ""
-
 msgid "Choose which file types should open in the MultiPak Installation Wizard."
 msgstr ""
 
@@ -163,6 +187,15 @@ msgid "Cleaning up the installation…"
 msgstr ""
 
 msgid "Close"
+msgstr ""
+
+msgid "Configure file types and the interface language."
+msgstr ""
+
+msgid "Configuring the container…"
+msgstr ""
+
+msgid "Connecting to the container image download…"
 msgstr ""
 
 msgid "Container"
@@ -210,6 +243,9 @@ msgstr ""
 msgid "Continue with direct installation"
 msgstr ""
 
+msgid "Copy information"
+msgstr ""
+
 msgid "Copying the AppImage…"
 msgstr ""
 
@@ -217,9 +253,6 @@ msgid "Copying the package to the container…"
 msgstr ""
 
 msgid "Copying the package to the existing container…"
-msgstr ""
-
-msgid "Copyright"
 msgstr ""
 
 msgid "Could not check whether the container can be removed: {0}"
@@ -258,13 +291,13 @@ msgstr ""
 msgid "Could not locate the AppImage contents."
 msgstr ""
 
-msgid "Could not open Bazaar."
+msgid "Could not open the application installer."
 msgstr ""
 
-msgid "Could not open Kontainer"
+msgid "Could not open the software store."
 msgstr ""
 
-msgid "Could not open Kontainer."
+msgid "Could not prepare a private temporary folder in the environment."
 msgstr ""
 
 msgid "Could not query direct installations: "
@@ -288,6 +321,9 @@ msgstr ""
 msgid "Could not remove the container: {0}"
 msgstr ""
 
+msgid "Could not remove the folder {0}."
+msgstr ""
+
 msgid "Could not retrieve the list of layered system packages."
 msgstr ""
 
@@ -297,19 +333,22 @@ msgstr ""
 msgid "Could not save the language preference: {0}"
 msgstr ""
 
+msgid "Could not save the update reminder."
+msgstr ""
+
+msgid "Could not update file associations: {0}"
+msgstr ""
+
 msgid "Could not update file types: shared-mime-info is missing."
 msgstr ""
 
 msgid "Could not verify container ownership."
 msgstr ""
 
-msgid "Could not verify the AppImage mount.\n"
-msgstr ""
-
 msgid "Could not verify the package status in the environment."
 msgstr ""
 
-msgid "Create and name a new container"
+msgid "Create a custom container"
 msgstr ""
 
 msgid "Creating the Distrobox container…"
@@ -319,6 +358,12 @@ msgid "Custom container name"
 msgstr ""
 
 msgid "Customize the settings or choose a different installation method."
+msgstr ""
+
+msgid "DEB metadata exceeds the permitted limit."
+msgstr ""
+
+msgid "Decompressed metadata exceeds the limit."
 msgstr ""
 
 msgid "Default settings (recommended)"
@@ -354,16 +399,49 @@ msgstr ""
 msgid "Distribution detection confidence: {0}.\n\n{1}"
 msgstr ""
 
+msgid "Distribution format."
+msgstr ""
+
+msgid "Distrobox installation could not be confirmed."
+msgstr ""
+
+msgid "Distrobox installation could not be confirmed. Check the rpm-ostree status before trying again."
+msgstr ""
+
+msgid "Distrobox is available. You can continue installing the application."
+msgstr ""
+
+msgid "Distrobox is scheduled for installation. Restart your computer, then reopen the package to continue."
+msgstr ""
+
+msgid "Distrobox was installed using rpm-ostree. Restart your computer, then reopen the package to install your application."
+msgstr ""
+
 msgid "Distrobox was not found."
 msgstr ""
 
 msgid "Downloading components and installing the application…"
 msgstr ""
 
+msgid "Downloading container image — part {0}: {1}%\n{2} of {3}"
+msgstr ""
+
+msgid "Downloading container packages — {0}%"
+msgstr ""
+
+msgid "Downloading container packages…"
+msgstr ""
+
+msgid "Downloading {0} — {1}%"
+msgstr ""
+
+msgid "English is used if no translation is available."
+msgstr ""
+
 msgid "Enter a name for the new container."
 msgstr ""
 
-msgid "Executable: %1"
+msgid "Execution environment and graphics system."
 msgstr ""
 
 msgid "Existing compatible container"
@@ -387,7 +465,13 @@ msgstr ""
 msgid "Finish"
 msgstr ""
 
-msgid "For containers created outside MultiPak, use <a href='kontainer'>Kontainer</a>."
+msgid "Finish the current application operation before installing Distrobox."
+msgstr ""
+
+msgid "Flatpak runtime"
+msgstr ""
+
+msgid "Foundation of the graphical interface."
 msgstr ""
 
 msgid "Hide alternative method"
@@ -405,19 +489,28 @@ msgstr ""
 msgid "I understand the risks and want to continue."
 msgstr ""
 
-msgid "I'm an IT technician turned historian. This app is an adventure made possible in large part by GPT-6.1 Sol."
-msgstr ""
-
 msgid "Initializing the container…"
 msgstr ""
 
 msgid "Install"
 msgstr ""
 
+msgid "Install Distrobox"
+msgstr ""
+
+msgid "Install Distrobox on the system to continue."
+msgstr ""
+
+msgid "Install Distrobox on your system to install applications in containers."
+msgstr ""
+
 msgid "Install a variety of packages safely and easily."
 msgstr ""
 
 msgid "Install anyway"
+msgstr ""
+
+msgid "Install applications"
 msgstr ""
 
 msgid "Install directly on the system"
@@ -456,13 +549,31 @@ msgstr ""
 msgid "Installed directly on the system"
 msgstr ""
 
+msgid "Installed version: %1 → New version: %2"
+msgstr ""
+
 msgid "Installer"
+msgstr ""
+
+msgid "Installing Distrobox using rpm-ostree…"
+msgstr ""
+
+msgid "Installing package updates…"
+msgstr ""
+
+msgid "Installing packages — {0}%"
 msgstr ""
 
 msgid "Installing the application…"
 msgstr ""
 
+msgid "Installing the container's basic components…"
+msgstr ""
+
 msgid "Installs the application safely and automatically."
+msgstr ""
+
+msgid "Integration between Python and Qt."
 msgstr ""
 
 msgid "Invalid .PKGINFO file."
@@ -478,6 +589,9 @@ msgid "Invalid DEB header."
 msgstr ""
 
 msgid "Invalid ELF header."
+msgstr ""
+
+msgid "Invalid RPM metadata record."
 msgstr ""
 
 msgid "Invalid application name in the AppImage."
@@ -513,19 +627,22 @@ msgstr ""
 msgid "Invalid managed environment name."
 msgstr ""
 
+msgid "Invalid multiline desktop entry."
+msgstr ""
+
 msgid "Invalid package name."
 msgstr ""
 
 msgid "Invalid shortcut argument."
 msgstr ""
 
+msgid "KDE interface components."
+msgstr ""
+
 msgid "Keep container"
 msgstr ""
 
 msgid "Kirigami preview"
-msgstr ""
-
-msgid "Kontainer was not found. Check that it is installed."
 msgstr ""
 
 msgid "LGPLv3 / GPLv3 / Commercial"
@@ -537,10 +654,10 @@ msgstr ""
 msgid "Language preference saved."
 msgstr ""
 
-msgid "Libraries in use"
+msgid "Language used for MultiPak’s application logic."
 msgstr ""
 
-msgid "License"
+msgid "Libraries in use"
 msgstr ""
 
 msgid "List of dependencies declared by the package"
@@ -588,6 +705,15 @@ msgstr ""
 msgid "MultiPak may not detect applications installed in this container by other means. Deleting the container will also remove those applications and all remaining packages."
 msgstr ""
 
+msgid "MultiPak needs Distrobox to install applications in containers. It will be installed on your system using rpm-ostree. System authorization may be required, and you will need to restart your computer to complete the installation."
+msgstr ""
+
+msgid "MultiPak settings"
+msgstr ""
+
+msgid "Native installation"
+msgstr ""
+
 msgid "No MultiPak containers are available to update."
 msgstr ""
 
@@ -598,6 +724,12 @@ msgid "No compatible environment is available in the catalog."
 msgstr ""
 
 msgid "No container base is available."
+msgstr ""
+
+msgid "No pending Distrobox installation was found. Check the system status before restarting."
+msgstr ""
+
+msgid "No supported app store was found. Install Bazaar, GNOME Software or KDE Discover to search for applications."
 msgstr ""
 
 msgid "Not available for %1."
@@ -615,13 +747,10 @@ msgstr ""
 msgid "Not provided"
 msgstr ""
 
-msgid "Open Kontainer"
-msgstr ""
-
 msgid "Open the package without --page or --screenshot; these options are for previews only."
 msgstr ""
 
-msgid "Opening Kontainer…"
+msgid "Opening the app store…"
 msgstr ""
 
 msgid "Operation timed out: {0}"
@@ -639,6 +768,9 @@ msgstr ""
 msgid "Preferences saved."
 msgstr ""
 
+msgid "Preparing Distrobox"
+msgstr ""
+
 msgid "Preparing a copy of the package…"
 msgstr ""
 
@@ -649,6 +781,9 @@ msgid "Preparing installation…"
 msgstr ""
 
 msgid "Preparing the AppImage…"
+msgstr ""
+
+msgid "Preparing the container's basic components…"
 msgstr ""
 
 msgid "Preparing the existing container {0}…"
@@ -672,6 +807,9 @@ msgstr ""
 msgid "Reload list"
 msgstr ""
 
+msgid "Remind me later"
+msgstr ""
+
 msgid "Remote Podman connections are not supported in this version."
 msgstr ""
 
@@ -690,10 +828,19 @@ msgstr ""
 msgid "Removing the components created by this installation…"
 msgstr ""
 
+msgid "Requesting a system restart…"
+msgstr ""
+
 msgid "Resolving dependencies and downloading components…"
 msgstr ""
 
 msgid "Resolving dependencies and installing the application…"
+msgstr ""
+
+msgid "Restart later"
+msgstr ""
+
+msgid "Restart now"
 msgstr ""
 
 msgid "Restart required"
@@ -711,6 +858,9 @@ msgstr ""
 msgid "Restart your computer to complete the uninstallation."
 msgstr ""
 
+msgid "Reusing downloaded image layers…"
+msgstr ""
+
 msgid "Run MultiPak as a regular user."
 msgstr ""
 
@@ -723,10 +873,13 @@ msgstr ""
 msgid "Saving preferences…"
 msgstr ""
 
+msgid "Saving the container image…"
+msgstr ""
+
 msgid "Search the app store"
 msgstr ""
 
-msgid "Searching Bazaar for the application…"
+msgid "Security update required"
 msgstr ""
 
 msgid "Select"
@@ -756,16 +909,10 @@ msgstr ""
 msgid "Select an application to uninstall"
 msgstr ""
 
-msgid "Select an application. Other applications and personal data will be preserved."
-msgstr ""
-
-msgid "Select file types"
-msgstr ""
-
-msgid "Select the interface language"
-msgstr ""
-
 msgid "Selected base image"
+msgstr ""
+
+msgid "Shortcuts created: {0}"
 msgstr ""
 
 msgid "Show alternative method"
@@ -783,7 +930,10 @@ msgstr ""
 msgid "System language"
 msgstr ""
 
-msgid "The .PKGINFO metadata identifies this as an Arch-based package, but does not distinguish Arch Linux from its derivatives. The recommended environment is Arch Linux, which uses a rolling release model rather than numbered versions."
+msgid "System package installation was not confirmed."
+msgstr ""
+
+msgid "The .PKGINFO metadata identifies this as an Arch-based package, but does not distinguish Arch Linux from its derivatives. The recommended environment is Arch Linux (rolling release)."
 msgstr ""
 
 msgid "The AppImage copy has changed. Open the file again."
@@ -801,6 +951,15 @@ msgstr ""
 msgid "The AppImage was installed and added to the application launcher."
 msgstr ""
 
+msgid "The DEB control file is missing the {0} field."
+msgstr ""
+
+msgid "The DEB file is truncated."
+msgstr ""
+
+msgid "The Release field in the package metadata indicates that it was built for Fedora {0}."
+msgstr ""
+
 msgid "The app store is open. Search for “{0}”. The search term has been copied to your clipboard."
 msgstr ""
 
@@ -808,9 +967,6 @@ msgid "The application directory must not be a symbolic link."
 msgstr ""
 
 msgid "The application entry point is unavailable."
-msgstr ""
-
-msgid "The application shown above was built for a different Linux distribution. We recommend checking your system's app store for a compatible version before continuing."
 msgstr ""
 
 msgid "The application was installed in the environment "
@@ -852,6 +1008,9 @@ msgstr ""
 msgid "The container's home folder could not be verified. It will be kept."
 msgstr ""
 
+msgid "The container's home folder was kept: {0}"
+msgstr ""
+
 msgid "The container's home folder will be kept unless you select the option below. Files in other folders inside the container will be deleted."
 msgstr ""
 
@@ -865,6 +1024,9 @@ msgid "The copy is incomplete or has changed. Cancel and reopen the package."
 msgstr ""
 
 msgid "The default container already exists. Reopen the package to reuse it."
+msgstr ""
+
+msgid "The disk is full. Free up disk space, then try again."
 msgstr ""
 
 msgid "The environment directory must not be a symbolic link."
@@ -945,7 +1107,7 @@ msgstr ""
 msgid "The operation ended without a result."
 msgstr ""
 
-msgid "The operation in the environment is still running. Wait and try cleanup again."
+msgid "The operation in the environment is still running. Wait and try again."
 msgstr ""
 
 msgid "The operation was cancelled."
@@ -975,9 +1137,6 @@ msgstr ""
 msgid "The package still exists in the shared environment."
 msgstr ""
 
-msgid "The package's internal metadata includes .fc{0}, which means it was built for Fedora {1}."
-msgstr ""
-
 msgid "The package's internal metadata indicates that it was built for {0}, so MultiPak recommends this version."
 msgstr ""
 
@@ -990,7 +1149,7 @@ msgstr ""
 msgid "The selected environment no longer exists."
 msgstr ""
 
-msgid "The system language follows your desktop session settings. English is used if no translation is available."
+msgid "The shortcut {0} was skipped because its desktop file is invalid."
 msgstr ""
 
 msgid "The target distribution could not be identified. Since the .deb format is used by both Ubuntu and Debian, the latest Ubuntu LTS version is used by default."
@@ -1005,13 +1164,25 @@ msgstr ""
 msgid "There are pending system changes. Restart before uninstalling."
 msgstr ""
 
+msgid "There is not enough free space to copy the package."
+msgstr ""
+
 msgid "This AppImage does not contain a recognized type 2 SquashFS payload."
 msgstr ""
 
 msgid "This AppImage installation is unavailable."
 msgstr ""
 
-msgid "This is a preview. Kontainer was not opened."
+msgid "This application is in the package format used by Arch Linux and its derivatives."
+msgstr ""
+
+msgid "This application is packaged in DEB format, used by distributions such as Debian and Ubuntu."
+msgstr ""
+
+msgid "This application is packaged in RPM format, used by distributions such as Fedora and Red Hat Enterprise Linux."
+msgstr ""
+
+msgid "This is a preview. No application was opened."
 msgstr ""
 
 msgid "This is a preview. No application was removed."
@@ -1048,6 +1219,9 @@ msgid "This shortcut does not belong to this installation."
 msgstr ""
 
 msgid "This system package cannot be uninstalled through MultiPak."
+msgstr ""
+
+msgid "This version of MultiPak has a security issue. Update to continue installing applications."
 msgstr ""
 
 msgid "Try again"
@@ -1092,13 +1266,19 @@ msgstr ""
 msgid "Update"
 msgstr ""
 
+msgid "Update MultiPak to continue installing applications."
+msgstr ""
+
 msgid "Update applications"
 msgstr ""
 
-msgid "Update complete. All applications and packages in the container are up to date."
+msgid "Update applications in a MultiPak Distrobox container."
 msgstr ""
 
-msgid "Update the applications and packages in a container."
+msgid "Update available"
+msgstr ""
+
+msgid "Update complete. All applications and packages in the container are up to date."
 msgstr ""
 
 msgid "Updating the Arch Linux environment…"
@@ -1122,6 +1302,9 @@ msgstr ""
 msgid "Use the default MultiPak container"
 msgstr ""
 
+msgid "Verifying the Distrobox installation…"
+msgstr ""
+
 msgid "Verifying the installation…"
 msgstr ""
 
@@ -1140,13 +1323,7 @@ msgstr ""
 msgid "View license"
 msgstr ""
 
-msgid "View the %1 license"
-msgstr ""
-
 msgid "View the full list of additional dependencies"
-msgstr ""
-
-msgid "Visit the %1 website"
 msgstr ""
 
 msgid "Visual completion preview; no application was installed."
@@ -1158,7 +1335,7 @@ msgstr ""
 msgid "Wait for the operation to finish before closing the manager."
 msgstr ""
 
-msgid "We recommend checking your system's app store for this application before continuing."
+msgid "Waiting for the current step to finish before cleaning up…"
 msgstr ""
 
 msgid "Welcome to the MultiPak Installation Wizard"
@@ -1167,7 +1344,7 @@ msgstr ""
 msgid "You can now open it from the application launcher."
 msgstr ""
 
-msgid "You chose to search Bazaar."
+msgid "You chose to search the app store."
 msgstr ""
 
 msgid "You confirmed the installation."

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.goulielmos_linux.multipak</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  <name>MultiPak</name>
+  <icon type="stock">io.github.goulielmos_linux.multipak</icon>
+  <summary>Install different package formats and manage your applications</summary>
+  <summary xml:lang="pt_BR">Instale diferentes formatos de pacotes e gerencie seus aplicativos</summary>
+  <description>
+    <p>MultiPak makes installing different package formats on Linux easier and more consistent, especially on atomic distributions. It brings RPM, DEB, compiled Arch Linux packages and AppImages together in a single graphical workflow, reducing the need to learn a separate installation process for each format.</p>
+  </description>
+  <launchable type="desktop-id">io.github.goulielmos_linux.multipak.desktop</launchable>
+  <developer id="io.github.goulielmos_linux"><name>Goulielmos</name></developer>
+  <url type="homepage">https://github.com/goulielmos-linux/multipak</url>
+  <url type="bugtracker">https://github.com/goulielmos-linux/multipak/issues</url>
+  <screenshots>
+    <screenshot type="default">
+      <image type="source" width="554" height="418">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/application-manager.png</image>
+      <caption>Manage applications, containers and preferences</caption>
+    </screenshot>
+    <screenshot>
+      <image type="source" width="554" height="376">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/installation-settings.png</image>
+      <caption>Choose installation settings</caption>
+    </screenshot>
+    <screenshot>
+      <image type="source" width="554" height="500">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/installation-summary.png</image>
+      <caption>Review the installation before continuing</caption>
+    </screenshot>
+  </screenshots>
+  <categories><category>System</category><category>PackageManager</category></categories>
+  <provides><binary>multipak-manager</binary><binary>multipak-installer</binary></provides>
+  <releases><release version="1.0.1" date="2026-11-11" type="stable"><description><p>Package security fixes, an updated About window, installation and unified settings in the Application Manager, and reliability fixes for cleanup after failed installations, free disk space checks and file associations.</p></description></release><release version="1.0.0a1" date="2026-11-09" type="development"/></releases>
+  <content_rating type="oars-1.1"/>
+</component>

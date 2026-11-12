@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
+import "BreezeIcons.js" as BreezeIcons
 
 Kirigami.AbstractCard {
     id: card
@@ -50,7 +51,7 @@ Kirigami.AbstractCard {
                 Repeater {
                     model: card.warning ? card.warningCount : 0
                     delegate: Kirigami.Icon {
-                        source: "dialog-warning"
+                        source: BreezeIcons.source("dialog-warning", Kirigami.Theme.backgroundColor)
                         Layout.preferredWidth: Kirigami.Units.iconSizes.small
                         Layout.preferredHeight: Kirigami.Units.iconSizes.small
                         Accessible.ignored: true

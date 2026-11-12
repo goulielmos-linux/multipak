@@ -1,0 +1,94 @@
+name: Publish Flatpak updates
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: multipak-flatpak-publication
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.repository == 'goulielmos-linux/multipak' && !github.event.release.prerelease
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      pages: read
+    env:
+      RELEASE_TAG: ${{ github.event.release.tag_name }}
+      GNUPGHOME: ${{ runner.temp }}/multipak-signing
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          persist-credentials: false
+      - name: Require the current stable release
+        run: |
+          test "$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq .tag_name)" = "$RELEASE_TAG"
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder gnupg
+          flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+          flatpak install --user --noninteractive flathub org.kde.Platform//6.11 org.kde.Sdk//6.11 io.qt.PySide.BaseApp//6.11
+      - name: Import release signing key
+        env:
+          PRIVATE_KEY: ${{ secrets.FLATPAK_GPG_PRIVATE_KEY }}
+          KEY_ID: ${{ secrets.FLATPAK_GPG_KEY_ID }}
+        run: |
+          test -n "$PRIVATE_KEY"
+          test -n "$KEY_ID"
+          install -d -m 700 "$GNUPGHOME"
+          printf '%s' "$PRIVATE_KEY" | gpg --batch --import
+          gpg --batch --list-secret-keys "$KEY_ID" > /dev/null
+      - name: Build signed release and update repository
+        env:
+          KEY_ID: ${{ secrets.FLATPAK_GPG_KEY_ID }}
+          PAGES_URL: ${{ steps.pages.outputs.base_url }}
+        run: |
+          python3 scripts/build_flatpak.py --local-source --expected-tag "$RELEASE_TAG" --gpg-key "$KEY_ID" --repo-url "$PAGES_URL/repo/"
+          python3 scripts/publish_flatpak.py --repository dist/flatpak/repo --output dist/pages --repo-url "$PAGES_URL/repo/" --gpg-key "$KEY_ID" --public-key dist/flatpak/multipak.gpg --version "${RELEASE_TAG#v}"
+      - name: Verify release is still current
+        run: |
+          test "$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq .tag_name)" = "$RELEASE_TAG"
+      - name: Attach installation files to the release
+        run: |
+          gh release upload "$RELEASE_TAG" dist/flatpak/*.flatpak dist/flatpak/*.sha256 dist/pages/multipak.flatpakref dist/pages/multipak.flatpakrepo --clobber
+      - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
+        with:
+          path: dist/pages
+      - name: Remove temporary private key
+        if: always()
+        run: |
+          gpgconf --kill gpg-agent || true
+          rm -rf "$GNUPGHOME"
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+      contents: read
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      RELEASE_TAG: ${{ github.event.release.tag_name }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Verify release before publishing
+        run: |
+          test "$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq .tag_name)" = "$RELEASE_TAG"
+      - name: Publish update repository
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4

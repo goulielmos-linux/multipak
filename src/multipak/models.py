@@ -157,6 +157,7 @@ class Transaction:
     warnings: list[str] = field(default_factory=list)
     container_created: bool = True
     managed_home: bool = False
+    home_created: bool = False
     package_install_started: bool = False
     environment_id: str = ""
     custom_container_name: bool = False

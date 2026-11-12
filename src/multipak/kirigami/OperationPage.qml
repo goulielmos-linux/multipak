@@ -45,6 +45,7 @@ Kirigami.ScrollablePage {
             visible: welcome.state !== "loading"
             text: welcome.state === "searching" ? qsTr("Search the app store")
                 : welcome.state === "error" ? qsTr("Could not complete the operation")
+                : welcome.distroboxSetupActive ? qsTr("Preparing Distrobox")
                 : welcome.state === "cleaning" ? qsTr("Cancelling installation")
                 : qsTr("Installation in progress")
             level: 2
@@ -105,7 +106,8 @@ Kirigami.ScrollablePage {
             Controls.Button {
                 objectName: "operationCancelButton"
                 text: welcome.state === "error"
-                    ? (welcome.selectedMethod === "system" ? qsTr("Close") : qsTr("Cancel installation"))
+                    ? (welcome.selectedMethod === "system" || welcome.distroboxSetupActive
+                        ? qsTr("Close") : qsTr("Cancel installation"))
                     : qsTr("Cancel")
                 visible: welcome.canCancel || welcome.state === "error"
                 onClicked: welcome.abandon()

@@ -1,0 +1,161 @@
+{
+  "app-id": "io.github.goulielmos_linux.multipak",
+  "default-branch": "stable",
+  "separate-locales": false,
+  "runtime": "org.kde.Platform",
+  "runtime-version": "6.11",
+  "sdk": "org.kde.Sdk",
+  "base": "io.qt.PySide.BaseApp",
+  "base-version": "6.11",
+  "command": "multipak-manager",
+  "finish-args": [
+    "--share=ipc",
+    "--socket=wayland",
+    "--socket=fallback-x11",
+    "--device=dri",
+    "--share=network",
+    "--filesystem=home",
+    "--talk-name=org.freedesktop.Flatpak"
+  ],
+  "build-options": {
+    "env": {
+      "BASEAPP_REMOVE_WEBENGINE": "1",
+      "BASEAPP_DISABLE_NUMPY": "1"
+    }
+  },
+  "cleanup": [
+    "/include",
+    "/lib/pkgconfig",
+    "/share/man",
+    "*.a",
+    "*.la"
+  ],
+  "cleanup-commands": [
+    "/app/cleanup-BaseApp.sh"
+  ],
+  "modules": [
+    {
+      "name": "rpm",
+      "buildsystem": "cmake-ninja",
+      "config-opts": [
+        "-DENABLE_PYTHON=OFF",
+        "-DENABLE_PLUGINS=OFF",
+        "-DENABLE_NLS=OFF",
+        "-DENABLE_NDB=OFF",
+        "-DWITH_SEQUOIA=OFF",
+        "-DWITH_CAP=OFF",
+        "-DWITH_ACL=OFF",
+        "-DWITH_SELINUX=OFF",
+        "-DWITH_DBUS=OFF",
+        "-DWITH_AUDIT=OFF",
+        "-DWITH_FAPOLICYD=OFF",
+        "-DWITH_READLINE=OFF",
+        "-DWITH_LIBDW=OFF",
+        "-DWITH_LIBELF=OFF"
+      ],
+      "post-install": [
+        "install -Dm644 ../COPYING /app/share/licenses/io.github.goulielmos_linux.multipak/rpm/COPYING"
+      ],
+      "sources": [
+        {
+          "type": "archive",
+          "url": "https://github.com/rpm-software-management/rpm/releases/download/rpm-4.20.1-release/rpm-4.20.1.tar.bz2",
+          "sha256": "52647e12638364533ab671cbc8e485c96f9f08889d93fe0ed104a6632661124f"
+        }
+      ],
+      "modules": [
+        {
+          "name": "lua",
+          "buildsystem": "simple",
+          "build-commands": [
+            "for source in l*.c; do case \"$source\" in lua.c|luac.c|ltests.c) continue ;; esac; ${CC:-cc} $CFLAGS -fPIC -DLUA_USE_LINUX -c \"$source\" || exit 1; done",
+            "${CC:-cc} $LDFLAGS -shared -Wl,-soname,liblua.so -o liblua.so *.o -lm -ldl",
+            "install -Dm755 liblua.so /app/lib/liblua.so",
+            "install -Dm644 lua.h lauxlib.h lualib.h luaconf.h -t /app/include",
+            "install -Dm644 lua.h /app/share/licenses/io.github.goulielmos_linux.multipak/lua/LICENSE"
+          ],
+          "sources": [
+            {
+              "type": "archive",
+              "url": "https://github.com/lua/lua/archive/refs/tags/v5.4.8.tar.gz",
+              "sha256": "d85b70a65f43c5d2254944d58d625e822c8e2e10d9c6a3bd9b5b657e46376a19"
+            }
+          ]
+        },
+        {
+          "name": "popt",
+          "buildsystem": "autotools",
+          "config-opts": [
+            "--disable-nls"
+          ],
+          "post-install": [
+            "install -Dm644 COPYING /app/share/licenses/io.github.goulielmos_linux.multipak/popt/COPYING"
+          ],
+          "sources": [
+            {
+              "type": "archive",
+              "url": "https://ftp.osuosl.org/pub/rpm/popt/releases/popt-1.x/popt-1.19.tar.gz",
+              "sha256": "c25a4838fc8e4c1c8aacb8bd620edb3084a3d63bf8987fdad3ca2758c63240f9"
+            }
+          ]
+        }
+      ],
+      "builddir": true
+    },
+    {
+      "name": "squashfs-tools",
+      "buildsystem": "simple",
+      "build-commands": [
+        "make -C squashfs-tools -j${FLATPAK_BUILDER_N_JOBS} unsquashfs",
+        "install -Dm755 squashfs-tools/unsquashfs /app/bin/unsquashfs",
+        "install -Dm644 COPYING /app/share/licenses/io.github.goulielmos_linux.multipak/squashfs-tools/COPYING"
+      ],
+      "sources": [
+        {
+          "type": "archive",
+          "url": "https://github.com/plougher/squashfs-tools/archive/refs/tags/4.7.5.tar.gz",
+          "sha256": "547b7b7f4d2e44bf91b6fc554664850c69563701deab9fd9cd7e21f694c88ea6"
+        }
+      ]
+    },
+    {
+      "name": "python3-zstandard",
+      "buildsystem": "simple",
+      "build-commands": [
+        "pip3 install --no-index --no-deps --no-build-isolation --prefix=/app .",
+        "install -Dm644 LICENSE /app/share/licenses/io.github.goulielmos_linux.multipak/python3-zstandard/LICENSE"
+      ],
+      "sources": [
+        {
+          "type": "archive",
+          "url": "https://files.pythonhosted.org/packages/fd/aa/3e0508d5a5dd96529cdc5a97011299056e14c6505b678fd58938792794b1/zstandard-0.25.0.tar.gz",
+          "sha256": "7713e1179d162cf5c7906da876ec2ccb9c3a9dcbdffef0cc7f70c3667a205f0b"
+        }
+      ]
+    },
+    {
+      "name": "multipak",
+      "buildsystem": "simple",
+      "build-commands": [
+        "python3 scripts/build_privileged_helpers.py",
+        "python3 scripts/translations.py --template",
+        "python3 packaging/install_flatpak.py"
+      ],
+      "sources": [
+        {
+          "type": "dir",
+          "path": "..",
+          "skip": [
+            ".git",
+            ".venv",
+            ".pytest_cache",
+            ".ruff_cache",
+            "build",
+            "dist",
+            ".flatpak-builder"
+          ]
+        }
+      ]
+    }
+  ]
+}

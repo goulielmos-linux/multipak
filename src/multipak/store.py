@@ -1,5 +1,6 @@
 """Atomic journals, a single-writer lock, and strictly scoped application data."""
 
+import dataclasses
 import fcntl
 import json
 import os
@@ -12,6 +13,8 @@ from multipak.localization import tr
 
 from . import host
 from .models import Transaction, valid_environment_name
+
+_TRANSACTION_FIELDS = frozenset(field.name for field in dataclasses.fields(Transaction))
 
 
 class Store:
@@ -74,7 +77,12 @@ class Store:
         result = []
         for path in sorted(self.root.glob("*/manifest.json")):
             try:
-                tx = Transaction(**json.loads(path.read_text()))
+                data = json.loads(path.read_text())
+                if not isinstance(data, dict):
+                    continue
+                # Ignore fields written by another MultiPak version instead of
+                # hiding the whole installation from the manager.
+                tx = Transaction(**{k: v for k, v in data.items() if k in _TRANSACTION_FIELDS})
                 if self.directory(tx.id) != path.parent:
                     continue
                 result.append(tx)

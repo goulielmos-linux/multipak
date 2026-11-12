@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
+import "BreezeIcons.js" as BreezeIcons
 
 Kirigami.ApplicationWindow {
     id: root
@@ -51,15 +52,16 @@ Kirigami.ApplicationWindow {
         function onConfirmationRequested() { removalDialog.open(); }
         function onContainerRemovalRequested() { containerRemovalDialog.open(); }
         function onCompanionWarning(message) {
-            kontainerWarningText.text = message;
-            kontainerWarningDialog.open();
+            companionWarningText.text = message;
+            companionWarningDialog.open();
         }
         function onLanguageSettingsRequested() {
             languages.reset();
             if (currentPage.objectName !== "languagePage") pageStack.push(languagePage);
         }
         function onAssociationSettingsRequested() {
-            if (currentPage.objectName !== "associationPage") pageStack.push(associationPage);
+            languages.reset();
+            if (currentPage.objectName !== "managerSettingsPage") pageStack.push(associationPage);
         }
     }
 
@@ -85,11 +87,21 @@ Kirigami.ApplicationWindow {
         }
     }
 
+    pageStack.defaultColumnWidth: pageStack.width
+    pageStack.interactive: false
+    pageStack.columnView.scrollDuration: 0
+    pageStack.columnView.clip: true
+    pageStack.enabled: !appUpdates.checking
+    UpdateNotice {
+        transientParent: root
+    }
+
     pageStack.globalToolBar.style: Kirigami.ApplicationHeaderStyle.None
     pageStack.initialPage: Component {
         ManagerPage {
             onAboutRequested: aboutDialog.open()
             onCloseRequested: root.close()
+            onSettingsRequested: manager.openAssociations()
         }
     }
 
@@ -149,7 +161,7 @@ Kirigami.ApplicationWindow {
             Layout.fillWidth: true
             Kirigami.Icon {
                 objectName: "containerRemovalWarningIcon"
-                source: "dialog-warning"
+                source: BreezeIcons.source("dialog-warning", Kirigami.Theme.backgroundColor)
                 Accessible.ignored: true
                 Layout.preferredWidth: Kirigami.Units.iconSizes.large
                 Layout.preferredHeight: Kirigami.Units.iconSizes.large
@@ -217,15 +229,15 @@ Kirigami.ApplicationWindow {
     }
 
     InformationWindow {
-        id: kontainerWarningDialog
-        objectName: "kontainerWarningDialog"
+        id: companionWarningDialog
+        objectName: "companionWarningDialog"
         transientParent: root
-        title: qsTr("Could not open Kontainer")
+        title: qsTr("Could not open the application installer.")
         color: Kirigami.Theme.backgroundColor
-        onShown: kontainerWarningOk.forceActiveFocus()
+        onShown: companionWarningOk.forceActiveFocus()
         Controls.Label {
-            id: kontainerWarningText
-            objectName: "kontainerWarningText"
+            id: companionWarningText
+            objectName: "companionWarningText"
             textFormat: Text.PlainText
             wrapMode: Text.WordWrap
             Layout.fillWidth: true
@@ -235,11 +247,11 @@ Kirigami.ApplicationWindow {
             contentItem: RowLayout {
                 Item { Layout.fillWidth: true }
                 Controls.Button {
-                    id: kontainerWarningOk
-                    objectName: "kontainerWarningOk"
+                    id: companionWarningOk
+                    objectName: "companionWarningOk"
                     text: "OK"
                     highlighted: true
-                    onClicked: kontainerWarningDialog.close()
+                    onClicked: companionWarningDialog.close()
                 }
             }
         }

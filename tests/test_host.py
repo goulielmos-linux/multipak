@@ -118,4 +118,8 @@ def test_host_supervisor_removes_children_when_launcher_dies(tmp_path):
         process.terminate()
         process.communicate(timeout=3)
     path = Path(f"/proc/{pid}/stat")
-    assert not path.exists() or path.read_text().split()[2] == "Z"
+    try:
+        state = path.read_text().split()[2]
+    except (FileNotFoundError, ProcessLookupError):
+        return
+    assert state == "Z"

@@ -9,7 +9,7 @@ from multipak.updates import update_container
 
 @pytest.mark.parametrize("exit_code", [0, 7])
 def test_container_update_streams_output_and_checks_process_result(
-    tmp_path, monkeypatch, exit_code
+    tmp_path, monkeypatch, exit_code, store
 ):
     command = tmp_path / "distrobox"
     command.write_text(
@@ -29,6 +29,7 @@ def test_container_update_streams_output_and_checks_process_result(
     monkeypatch.setenv("PATH", str(tmp_path))
     logs, progress = [], []
     engine = SimpleNamespace(
+        store=store,
         runner=Runner(threading.Event(), logs.append),
         progress=lambda percent, text: progress.append((percent, text)),
     )
@@ -39,7 +40,10 @@ def test_container_update_streams_output_and_checks_process_result(
     else:
         update_container(engine, "MultiPak-Fedora-45")
     assert "Downloading packages" in "".join(logs)
-    assert progress == [(-1, "Updating MultiPak-Fedora-45… Please wait.")]
+    assert progress == [
+        (-1, "Updating MultiPak-Fedora-45… Please wait."),
+        (-1, "Downloading container packages…"),
+    ]
 
 
 def test_invalid_update_target_never_starts_a_process():
@@ -48,14 +52,14 @@ def test_invalid_update_target_never_starts_a_process():
         update_container(update_container_engine, "--all")
 
 
-def test_removed_container_does_not_start_distrobox():
+def test_removed_container_does_not_start_distrobox(store):
     calls = []
 
     def run(argv, **kwargs):
         calls.append(argv)
         raise CommandError(argv, 1, "")
 
-    engine = SimpleNamespace(runner=SimpleNamespace(run=run), progress=lambda *_: None)
+    engine = SimpleNamespace(store=store, runner=SimpleNamespace(run=run), progress=lambda *_: None)
     with pytest.raises(RuntimeError, match="Reload"):
         update_container(engine, "MultiPak-Fedora-45")
     assert calls == [["podman", "container", "exists", "MultiPak-Fedora-45"]]

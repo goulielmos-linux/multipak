@@ -21,7 +21,9 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 
 @pytest.fixture
-def store(tmp_path):
+def store(tmp_path, monkeypatch):
+    monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path / "xdg-data"))
+    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "xdg-config"))
     return Store(tmp_path / "data", tmp_path / "applications")
 
 
@@ -193,6 +195,13 @@ class FakeRunner:
         if argv[:2] == ["podman", "inspect"]:
             assert self.container is not None
             return json.dumps([self.container])
+        if argv[:2] == ["podman", "pull"]:
+            if not self.image_exists:
+                self.image_exists = True
+                if callback := _kwargs.get("on_output"):
+                    callback("Copying blob abcdef123456 [----] 1.0MiB / 2.0MiB\r")
+                    callback("Writing manifest to image destination\r")
+            return ""
         if argv[:2] == ["distrobox", "create"]:
             self.image_exists = True
             if self.create_failure_after_pull:
@@ -215,7 +224,13 @@ class FakeRunner:
             assert argv[argv.index("--") + 1 :][:4] == ["sudo", "-n", "rm", "-f"]
             if self.fail_temp_cleanup:
                 raise CommandError(argv, 1, "Permission denied")
-        if "python3" in argv and any(arg.endswith("-guest.py") for arg in argv):
+        if argv[:2] == ["distrobox", "enter"]:
+            command = argv[argv.index("--") + 1 :]
+            if command[0] == "stat":
+                return "1000:41c0"
+            if command == ["id", "-u"]:
+                return "1000"
+        if "python3" in argv and any(arg.endswith("/guest.py") for arg in argv):
             if "--state" in argv:
                 return MARKER + json.dumps({"present": self.package_present})
             if "--busy" in argv:
@@ -256,7 +271,7 @@ class FakeRunner:
 @pytest.fixture
 def fake_engine(store, monkeypatch):
     runner = FakeRunner()
-    monkeypatch.setattr("multipak.engine.shutil.which", lambda name: f"/usr/bin/{name}")
+    monkeypatch.setattr("shutil.which", lambda name: f"/usr/bin/{name}")
     progress = []
     engine = Engine(store, threading.Event(), lambda p, label: progress.append((p, label)))
     engine.runner = runner
