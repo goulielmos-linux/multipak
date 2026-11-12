@@ -21,9 +21,10 @@ jobs:
       pages: read
     env:
       RELEASE_TAG: ${{ github.event.release.tag_name }}
-      GNUPGHOME: ${{ runner.temp }}/multipak-signing
       GH_TOKEN: ${{ github.token }}
     steps:
+      - name: Set the temporary GnuPG directory
+        run: echo "GNUPGHOME=$RUNNER_TEMP/multipak-signing" >> "$GITHUB_ENV"
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           ref: ${{ github.event.release.tag_name }}
@@ -67,7 +68,7 @@ jobs:
         with:
           path: dist/pages
       - name: Remove temporary private key
-        if: always()
+        if: ${{ always() && env.GNUPGHOME != '' }}
         run: |
           gpgconf --kill gpg-agent || true
           rm -rf "$GNUPGHOME"

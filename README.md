@@ -11,22 +11,22 @@ Application Manager, available from the application launcher.
 ## Screenshots
 
 ### Application Manager
-![Application Manager](docs/screenshots/application-manager.png)
+![Application Manager](docs/screenshots/1.0.1/application-manager.png)
 
 ### Installation Wizard
-![Installation Wizard](docs/screenshots/installation-welcome.png)
+![Installation Wizard](docs/screenshots/1.0.1/installation-welcome.png)
 
 ### Installation settings
-![Installation settings](docs/screenshots/installation-settings.png)
+![Installation settings](docs/screenshots/1.0.1/installation-settings.png)
 
 ### Installation summary
-![Installation summary](docs/screenshots/installation-summary.png)
+![Installation summary](docs/screenshots/1.0.1/installation-summary.png)
 
 ### Installation progress
-![Installation progress](docs/screenshots/installation-progress.png)
+![Installation progress](docs/screenshots/1.0.1/installation-progress.png)
 
 ### Installation completed
-![Installation completed](docs/screenshots/installation-completed-1.0.1.png)
+![Installation completed](docs/screenshots/1.0.1/installation-completed.png)
 
 ## Features
 

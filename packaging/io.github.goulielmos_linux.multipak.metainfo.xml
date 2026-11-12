@@ -16,15 +16,15 @@
   <url type="bugtracker">https://github.com/goulielmos-linux/multipak/issues</url>
   <screenshots>
     <screenshot type="default">
-      <image type="source" width="554" height="418">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/application-manager.png</image>
+      <image type="source" width="554" height="418">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.0.1/application-manager.png</image>
       <caption>Manage applications, containers and preferences</caption>
     </screenshot>
     <screenshot>
-      <image type="source" width="554" height="376">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/installation-settings.png</image>
+      <image type="source" width="554" height="376">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.0.1/installation-settings.png</image>
       <caption>Choose installation settings</caption>
     </screenshot>
     <screenshot>
-      <image type="source" width="554" height="500">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/installation-summary.png</image>
+      <image type="source" width="554" height="500">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.0.1/installation-summary.png</image>
       <caption>Review the installation before continuing</caption>
     </screenshot>
   </screenshots>
