@@ -317,8 +317,8 @@ msgstr "Criando o contêiner Distrobox…"
 msgid "Custom container name"
 msgstr "Nome personalizado do contêiner"
 
-msgid "Customize the settings or choose a different installation method."
-msgstr "Permite personalizar parâmetros ou escolher métodos alternativos."
+msgid "Customize the installation or choose a different method."
+msgstr "Personalize a instalação ou escolha outro método."
 
 msgid "Default settings (recommended)"
 msgstr "Configurações padrões (recomendado)"
@@ -755,8 +755,8 @@ msgstr "Selecione um contêiner compatível."
 msgid "Select a container to update"
 msgstr "Selecionar contêiner para atualizar"
 
-msgid "Select a container. All its applications and packages will be updated. The host system will not be updated."
-msgstr "Selecione um contêiner. A atualização inclui todos os seus aplicativos e pacotes. O sistema principal não será atualizado."
+msgid "Choose a container to update everything installed in it, including applications and their dependencies. Your system itself is not changed."
+msgstr "Escolha um contêiner para atualizar tudo o que está instalado nele, incluindo aplicativos e suas dependências. O sistema em si não é alterado."
 
 msgid "Select a prebuilt Arch package, not a source package."
 msgstr "Selecione um pacote Arch já compilado, não um pacote fonte."
@@ -1100,8 +1100,8 @@ msgstr "Atualizar"
 msgid "Update applications"
 msgstr "Atualizar aplicativos"
 
-msgid "Update applications in a MultiPak Distrobox container."
-msgstr "Atualize os aplicativos de um contêiner Distrobox do MultiPak."
+msgid "Choose a MultiPak container to update."
+msgstr "Escolha um contêiner do MultiPak para atualizar."
 
 msgid "Update complete. All applications and packages in the container are up to date."
 msgstr "Atualização concluída. Os aplicativos e pacotes do contêiner estão atualizados."
@@ -1382,3 +1382,24 @@ msgstr "Não foi possível remover a pasta {0}."
 
 msgid "The operation in the environment is still running. Wait and try again."
 msgstr "A operação no ambiente ainda está em andamento. Aguarde e tente novamente."
+
+msgid "An older MultiPak with a different Flatpak ID is still installed. It must be removed to avoid duplicate shortcuts and packages opening in the old version."
+msgstr "Uma versão anterior do MultiPak, com outro ID do Flatpak, ainda está instalada. Ela precisa ser removida para evitar atalhos duplicados e pacotes abrindo na versão antiga."
+
+msgid "Could not migrate the old MultiPak. Try again or close this window."
+msgstr "Não foi possível migrar a versão anterior do MultiPak. Tente novamente ou feche esta janela."
+
+msgid "Could not remove the old MultiPak. You can remove it from a terminal and then try again:\n\nflatpak uninstall io.github.multipak.manager"
+msgstr "Não foi possível remover a versão anterior do MultiPak. Você pode removê-la pelo terminal e tentar novamente:\n\nflatpak uninstall io.github.multipak.manager"
+
+msgid "Could not update the old file associations. Try again or close this window."
+msgstr "Não foi possível atualizar as associações de arquivos antigas. Tente novamente ou feche esta janela."
+
+msgid "Remove"
+msgstr "Remover"
+
+msgid "Remove the old MultiPak"
+msgstr "Remover a versão anterior do MultiPak"
+
+msgid "Could not update the old AppImage shortcuts. Try again or close this window."
+msgstr "Não foi possível atualizar os atalhos antigos de AppImage. Tente novamente ou feche esta janela."

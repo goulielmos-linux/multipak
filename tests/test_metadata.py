@@ -54,7 +54,9 @@ def test_rpm_metadata_uses_query_and_never_executes_scripts(tmp_path):
 
     package = inspect_package(path, Query())
     assert package.distro_hint == "fedora-44"
-    assert all("-qp" in command for command in calls)
+    assert all(
+        command[:2] == ["rpm", "-qp"] and "--nosignature" not in command for command in calls
+    )
     assert all("-i" not in command for command in calls)
 
 
@@ -131,4 +133,5 @@ def test_flatpak_rpm_inspection_uses_bundled_tool_and_sandbox_path(tmp_path, mon
     package = inspect_package(path, Query())
     assert package.name == "demo"
     assert len(calls) == 2
-    assert all(argv[0] == "/app/bin/rpm" and argv[-1] == str(path) for argv in calls)
+    assert all(argv[:3] == ["/app/bin/rpm", "-qp", "--nosignature"] for argv in calls)
+    assert all(argv[-1] == str(path) for argv in calls)

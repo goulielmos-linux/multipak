@@ -311,3 +311,65 @@ def test_first_start_recovers_from_invalid_saved_preferences(settings, monkeypat
     settings.state_path.write_text("{incomplete")
     assert settings.initialize_defaults()
     assert settings.load() == selection()
+
+
+def test_legacy_migration_preserves_other_associations_and_saved_preferences(settings, monkeypatch):
+    from multipak.file_associations import LEGACY_INSTALLER
+
+    monkeypatch.setattr("multipak.host.is_flatpak", lambda: True)
+    settings.state_path.parent.mkdir(parents=True)
+    original = (
+        "# Keep this comment\n"
+        "[Default Applications]\n"
+        f"application/x-rpm={LEGACY_INSTALLER};rpm-viewer.desktop;\n"
+        f"text/plain={LEGACY_INSTALLER};editor.desktop;\n"
+        "[Added Associations]\n"
+        f"application/x-rpm=rpm-viewer.desktop;{LEGACY_INSTALLER};{DESKTOP_ID};\n"
+        "[Removed Associations]\n"
+        f"application/x-rpm={LEGACY_INSTALLER};\n"
+    )
+    settings.path.write_text(original)
+    settings.state_path.write_text(
+        json.dumps(
+            {
+                "desktop_id": LEGACY_INSTALLER,
+                "before": {"application/x-rpm": f"{LEGACY_INSTALLER};rpm-viewer.desktop"},
+                "selected": {"rpm": True, "deb": False},
+            }
+        )
+    )
+    settings.migrate_legacy(removed=True)
+    expected = original.replace(
+        f"application/x-rpm={LEGACY_INSTALLER};rpm-viewer.desktop;",
+        f"application/x-rpm={DESKTOP_ID};rpm-viewer.desktop;",
+    ).replace(
+        f"application/x-rpm=rpm-viewer.desktop;{LEGACY_INSTALLER};{DESKTOP_ID};",
+        f"application/x-rpm=rpm-viewer.desktop;{DESKTOP_ID};",
+    )
+    assert settings.path.read_text() == expected
+    assert json.loads(settings.state_path.read_text()) == {
+        "desktop_id": DESKTOP_ID,
+        "before": {"application/x-rpm": f"{DESKTOP_ID};rpm-viewer.desktop"},
+        "selected": {"rpm": True, "deb": False},
+    }
+    assert not settings.initialize_defaults()
+    settings.apply(selection(rpm=False, deb=False))
+    assert settings.load()["rpm"] is False
+
+
+def test_legacy_migration_rolls_back_associations_if_refresh_fails(settings, monkeypatch):
+    from multipak.file_associations import LEGACY_INSTALLER
+
+    monkeypatch.setattr("multipak.host.is_flatpak", lambda: True)
+    settings.path.parent.mkdir(parents=True)
+    before = f"[Default Applications]\napplication/x-rpm={LEGACY_INSTALLER};\n"
+    settings.path.write_text(before)
+
+    def fail_refresh():
+        raise RuntimeError("fixture refresh failed")
+
+    settings.refresher = fail_refresh
+    with pytest.raises(RuntimeError, match="fixture refresh failed"):
+        settings.migrate_legacy(removed=True)
+    assert settings.path.read_text() == before
+    assert not settings.state_path.exists()

@@ -164,11 +164,10 @@ InformationWindow {
                 }
             }
         }
-    }
-
-    FormCard.FormCard {
-        visible: aboutInfo.flatpak
+        FormCard.FormDelegateSeparator { visible: aboutInfo.flatpak }
         FormCard.FormTextDelegate {
+            objectName: "aboutDistributionFormat"
+            visible: aboutInfo.flatpak
             text: "Flatpak"
             description: qsTr("Distribution format.")
         }

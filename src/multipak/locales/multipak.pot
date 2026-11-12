@@ -78,6 +78,9 @@ msgstr ""
 msgid "Also delete the container's home folder, including its data and settings."
 msgstr ""
 
+msgid "An older MultiPak with a different Flatpak ID is still installed. It must be removed to avoid duplicate shortcuts and packages opening in the old version."
+msgstr ""
+
 msgid "Another application uses this container. It will be kept."
 msgstr ""
 
@@ -157,6 +160,12 @@ msgid "Checking the container image…"
 msgstr ""
 
 msgid "Checking…"
+msgstr ""
+
+msgid "Choose a MultiPak container to update."
+msgstr ""
+
+msgid "Choose a container to update everything installed in it, including applications and their dependencies. Your system itself is not changed."
 msgstr ""
 
 msgid "Choose a custom name. The MultiPak prefix is reserved for the application."
@@ -291,6 +300,9 @@ msgstr ""
 msgid "Could not locate the AppImage contents."
 msgstr ""
 
+msgid "Could not migrate the old MultiPak. Try again or close this window."
+msgstr ""
+
 msgid "Could not open the application installer."
 msgstr ""
 
@@ -324,6 +336,9 @@ msgstr ""
 msgid "Could not remove the folder {0}."
 msgstr ""
 
+msgid "Could not remove the old MultiPak. You can remove it from a terminal and then try again:\n\nflatpak uninstall io.github.multipak.manager"
+msgstr ""
+
 msgid "Could not retrieve the list of layered system packages."
 msgstr ""
 
@@ -342,6 +357,12 @@ msgstr ""
 msgid "Could not update file types: shared-mime-info is missing."
 msgstr ""
 
+msgid "Could not update the old AppImage shortcuts. Try again or close this window."
+msgstr ""
+
+msgid "Could not update the old file associations. Try again or close this window."
+msgstr ""
+
 msgid "Could not verify container ownership."
 msgstr ""
 
@@ -357,7 +378,7 @@ msgstr ""
 msgid "Custom container name"
 msgstr ""
 
-msgid "Customize the settings or choose a different installation method."
+msgid "Customize the installation or choose a different method."
 msgstr ""
 
 msgid "DEB metadata exceeds the permitted limit."
@@ -816,10 +837,16 @@ msgstr ""
 msgid "Removal pending"
 msgstr ""
 
+msgid "Remove"
+msgstr ""
+
 msgid "Remove applications installed through MultiPak."
 msgstr ""
 
 msgid "Remove container?"
+msgstr ""
+
+msgid "Remove the old MultiPak"
 msgstr ""
 
 msgid "Removing container {0}…"
@@ -889,9 +916,6 @@ msgid "Select a compatible container."
 msgstr ""
 
 msgid "Select a container to update"
-msgstr ""
-
-msgid "Select a container. All its applications and packages will be updated. The host system will not be updated."
 msgstr ""
 
 msgid "Select a prebuilt Arch package, not a source package."
@@ -1270,9 +1294,6 @@ msgid "Update MultiPak to continue installing applications."
 msgstr ""
 
 msgid "Update applications"
-msgstr ""
-
-msgid "Update applications in a MultiPak Distrobox container."
 msgstr ""
 
 msgid "Update available"

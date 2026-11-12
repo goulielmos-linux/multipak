@@ -2,14 +2,17 @@
 
 import hashlib
 import io
+import logging
 import os
 import platform
 import re
 import shlex
 import shutil
+import stat
 import struct
 import uuid
 from pathlib import Path, PurePosixPath
+from tempfile import NamedTemporaryFile
 
 from multipak.localization import current_language, tr
 
@@ -18,6 +21,8 @@ from .desktop import parse_desktop, quote_exec
 from .models import Package, Transaction
 from .process import CommandError
 from .storage import record_install_failure
+
+LOG = logging.getLogger(__name__)
 
 MAX_METADATA = 1024 * 1024
 MAX_ICON = 4 * 1024 * 1024
@@ -286,6 +291,62 @@ def _desktop(store, tx, package):
     temporary = target.with_suffix(".tmp")
     temporary.write_text(text.getvalue(), encoding="utf-8")
     temporary.replace(target)
+
+
+def migrate_legacy_launchers(store):
+    """Retarget AppImage shortcuts written by the Alpha Flatpak."""
+    prefix = re.compile(
+        r'^(Exec[ \t]*=[ \t]*(?:"/usr/bin/flatpak"|/usr/bin/flatpak)[ \t]+'
+        r'(?:"run"|run)[ \t]+(?:"--command=multipak-appimage"|--command=multipak-appimage)[ \t]+)'
+        r'("?)' + re.escape(host.LEGACY_APP_ID) + r"\2(?=[ \t\r\n]|$)"
+    )
+    with store.lock():
+        for tx in store.transactions():
+            if tx.method != "appimage" or not isinstance(tx.launchers, list):
+                continue
+            for name in tx.launchers:
+                if not isinstance(name, str):
+                    continue
+                try:
+                    path = store.launcher(tx, name)
+                except ValueError:
+                    continue
+                try:
+                    attrs = path.lstat()
+                except FileNotFoundError:
+                    continue
+                if not stat.S_ISREG(attrs.st_mode):
+                    continue
+                try:
+                    original = path.read_bytes().decode("utf-8")
+                except UnicodeDecodeError:
+                    LOG.warning("Skipping an unreadable AppImage shortcut: %s", name)
+                    continue
+                section = ""
+                lines = []
+                for line in original.splitlines(keepends=True):
+                    content = line.strip()
+                    if content.startswith("[") and content.endswith("]"):
+                        section = content[1:-1]
+                    if section == "Desktop Entry" or section.startswith("Desktop Action "):
+                        line = prefix.sub(
+                            lambda match: f"{match[1]}{match[2]}{host.APP_ID}{match[2]}",
+                            line,
+                            count=1,
+                        )
+                    lines.append(line)
+                migrated = "".join(lines)
+                if migrated == original:
+                    continue
+                with NamedTemporaryFile(dir=path.parent, delete=False) as stream:
+                    temporary = Path(stream.name)
+                    try:
+                        stream.write(migrated.encode("utf-8"))
+                        stream.flush()
+                        os.fchmod(stream.fileno(), stat.S_IMODE(attrs.st_mode))
+                        temporary.replace(path)
+                    finally:
+                        temporary.unlink(missing_ok=True)
 
 
 def _complete(engine, package):

@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.2
+
+- Fix an error that prevented the Flatpak from opening signed RPM packages,
+  such as Google Chrome.
+- Require removal of the old 1.0.0 Alpha 1 Flatpak and migrate its file
+  associations and AppImage shortcuts.
+- Correct the KDE runtime name and Kirigami version shown in About.
+- Minor text corrections.
+
 ## 1.0.1
 
 **Upgrading from 1.0.0 Alpha 1**
@@ -7,7 +16,8 @@
 MultiPak 1.0.1 uses a new Flatpak app ID. Uninstall the old MultiPak before
 installing 1.0.1 to avoid duplicate launcher entries and file associations that
 still point to the old installer. Uninstalling the old Flatpak without deleting
-its data preserves your containers and installed applications.
+its data preserves your containers and installation records. AppImage shortcuts
+created by the Alpha may need to be migrated to the new Flatpak.
 
 ### MultiPak updates
 

@@ -38,6 +38,7 @@ from multipak.worker import Worker
 from .about import bind_about, license_text
 from .identity import configure_application
 from .languages import bind_languages
+from .legacy_migration import bind_legacy_migration
 from .manager_icons import GENERIC_ICON, application_icon
 from .update_notice import bind_update_notice, installation_allowed
 
@@ -633,7 +634,8 @@ def create_manager(app, controller):
     engine = QQmlApplicationEngine(app)
     languages = bind_languages(app, engine, controller, manager=True)
     bind_about(engine, languages)
-    bind_update_notice(engine, controller, preview=controller.preview)
+    migration = bind_legacy_migration(engine, controller, preview=controller.preview)
+    bind_update_notice(engine, controller, preview=controller.preview, migration=migration)
     controller.setParent(engine)
     engine.rootContext().setContextProperty("manager", controller)
     engine.load(QUrl.fromLocalFile(str(Path(__file__).with_name("Manager.qml"))))
@@ -642,7 +644,7 @@ def create_manager(app, controller):
     window = engine.rootObjects()[0]
     window.setIcon(app.windowIcon())
     if host.is_flatpak() and not controller.preview:
-        QTimer.singleShot(0, controller.initializeAssociations)
+        migration.when_ready(controller.initializeAssociations)
     return engine, controller, window
 
 
@@ -699,7 +701,7 @@ def main():
         create_preview_manager(app) if args.preview else create_manager(app, Manager(Store()))
     )
     if args.page != "home":
-        controller.openList(args.page)
+        controller._legacy_migration.when_ready(lambda: controller.openList(args.page))
     window.requestActivate()
     if args.screenshot:
 

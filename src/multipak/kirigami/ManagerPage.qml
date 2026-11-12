@@ -118,7 +118,7 @@ Kirigami.ScrollablePage {
                             Layout.fillWidth: true
                         }
                         Controls.Label {
-                            text: qsTr("Update applications in a MultiPak Distrobox container.")
+                            text: qsTr("Choose a MultiPak container to update.")
                             wrapMode: Text.WordWrap
                             Layout.fillWidth: true
                         }
@@ -152,7 +152,7 @@ Kirigami.ScrollablePage {
 
         Controls.Label {
             visible: manager.mode === "update"
-            text: qsTr("Select a container. All its applications and packages will be updated. The host system will not be updated.")
+            text: qsTr("Choose a container to update everything installed in it, including applications and their dependencies. Your system itself is not changed.")
             wrapMode: Text.WordWrap
             Layout.fillWidth: true
         }

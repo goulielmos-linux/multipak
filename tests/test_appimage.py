@@ -11,9 +11,10 @@ from pathlib import Path
 import pytest
 from conftest import make_appimage
 
-from multipak import appimage
+from multipak import appimage, host
 from multipak.engine import Engine
 from multipak.metadata import inspect_package, package_kind
+from multipak.models import Transaction
 from multipak.process import Cancelled, Runner
 from multipak.store import Store
 
@@ -250,3 +251,34 @@ def test_binary_reader_stops_oversized_stream():
 def test_rejects_internal_paths_that_could_be_options_or_escape(member):
     with pytest.raises(ValueError):
         appimage._member(member)
+
+
+def test_migrate_legacy_appimage_shortcut_preserves_actions_and_other_files(store):
+    tx = Transaction("a" * 32, "", "", "Demo", "1", "appimage", "hash", method="appimage")
+    name = f"multipak-{tx.id}-appimage.desktop"
+    unreadable = f"multipak-{tx.id}-invalid.desktop"
+    tx.launchers = [unreadable, name, "external.desktop"]
+    store.save(tx)
+    invalid_shortcut = store.launcher(tx, unreadable)
+    invalid_shortcut.write_bytes(b"\xff\xfe")
+    shortcut = store.launcher(tx, name)
+    legacy = host.LEGACY_APP_ID
+    prefix = 'Exec="/usr/bin/flatpak" "run" "--command=multipak-appimage" '
+    main = f'{prefix}"{legacy}" "--" "{tx.id}" "{legacy}" %U'
+    action = f"Exec=/usr/bin/flatpak run --command=multipak-appimage {legacy} -- {tx.id}"
+    original = f"[Desktop Entry]\r\n{main}\r\n[Desktop Action New]\r\n{action}\r\n"
+    original += f"[Other Section]\r\n{main}\r\n"
+    shortcut.write_bytes(original.encode())
+    other = store.applications / "external.desktop"
+    other.write_text(original)
+    appimage.migrate_legacy_launchers(store)
+    expected = original.replace(f'{prefix}"{legacy}"', f'{prefix}"{host.APP_ID}"', 1).replace(
+        action, action.replace(legacy, host.APP_ID, 1), 1
+    )
+    assert shortcut.read_bytes() == expected.encode()
+    assert other.read_bytes() == original.encode()
+    assert invalid_shortcut.read_bytes() == b"\xff\xfe"
+    before = shortcut.stat()
+    appimage.migrate_legacy_launchers(store)
+    assert shortcut.stat().st_ino == before.st_ino
+    assert shortcut.read_bytes() == expected.encode()

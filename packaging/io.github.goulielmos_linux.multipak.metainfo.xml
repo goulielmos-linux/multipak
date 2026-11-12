@@ -16,20 +16,32 @@
   <url type="bugtracker">https://github.com/goulielmos-linux/multipak/issues</url>
   <screenshots>
     <screenshot type="default">
-      <image type="source" width="554" height="418">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.0.1/application-manager.png</image>
+      <image type="source" width="554" height="418">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.0.2/application-manager.png</image>
       <caption>Manage applications, containers and preferences</caption>
     </screenshot>
     <screenshot>
-      <image type="source" width="554" height="376">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.0.1/installation-settings.png</image>
+      <image type="source" width="554" height="238">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.0.1/installation-welcome.png</image>
+      <caption>Review the package and search the app store</caption>
+    </screenshot>
+    <screenshot>
+      <image type="source" width="554" height="376">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.0.2/installation-settings.png</image>
       <caption>Choose installation settings</caption>
     </screenshot>
     <screenshot>
       <image type="source" width="554" height="500">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.0.1/installation-summary.png</image>
       <caption>Review the installation before continuing</caption>
     </screenshot>
+    <screenshot>
+      <image type="source" width="554" height="296">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.0.1/installation-progress.png</image>
+      <caption>Follow installation progress</caption>
+    </screenshot>
+    <screenshot>
+      <image type="source" width="554" height="282">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.0.1/installation-completed.png</image>
+      <caption>Confirm the installation completed</caption>
+    </screenshot>
   </screenshots>
   <categories><category>System</category><category>PackageManager</category></categories>
   <provides><binary>multipak-manager</binary><binary>multipak-installer</binary></provides>
-  <releases><release version="1.0.1" date="2026-11-11" type="stable"><description><p>Package security fixes, an updated About window, installation and unified settings in the Application Manager, and reliability fixes for cleanup after failed installations, free disk space checks and file associations.</p></description></release><release version="1.0.0a1" date="2026-11-09" type="development"/></releases>
+  <releases><release version="1.0.2" date="2026-11-12" type="stable"><description><p>Fix signed RPM inspection and migrate file associations and AppImage shortcuts from the old Alpha Flatpak.</p></description></release><release version="1.0.1" date="2026-11-11" type="stable"><description><p>Package security fixes, an updated About window, installation and unified settings in the Application Manager, and reliability fixes for cleanup after failed installations, free disk space checks and file associations.</p></description></release><release version="1.0.0a1" date="2026-11-09" type="development"/></releases>
   <content_rating type="oars-1.1"/>
 </component>

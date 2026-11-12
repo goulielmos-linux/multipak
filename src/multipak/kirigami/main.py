@@ -24,6 +24,7 @@ from .about import bind_about
 from .configuration import Configuration
 from .identity import configure_application
 from .languages import bind_languages
+from .legacy_migration import bind_legacy_migration
 from .update_notice import bind_update_notice
 
 # Preview fixtures only; the live installer obtains these versions from its catalog.
@@ -351,7 +352,8 @@ def create_window(app, bridge):
     engine = QQmlApplicationEngine(app)
     languages = bind_languages(app, engine, bridge)
     bind_about(engine, languages)
-    bind_update_notice(engine, bridge, preview=not bridge.live)
+    migration = bind_legacy_migration(engine, bridge, preview=not bridge.live)
+    bind_update_notice(engine, bridge, preview=not bridge.live, migration=migration)
     engine.warnings.connect(
         lambda warnings: print(
             "\n".join(warning.toString() for warning in warnings), file=sys.stderr
@@ -405,7 +407,7 @@ def main():
 
         bridge = LiveInstaller(args.package)
         engine, bridge, window = create_window(app, bridge)
-        QTimer.singleShot(0, bridge.inspect)
+        bridge._legacy_migration.when_ready(bridge.inspect)
     else:
         engine, bridge, window = create_preview(app, args.name, version, args.packaging)
     window.requestActivate()

@@ -14,7 +14,7 @@ Kirigami.ApplicationWindow {
            | Qt.WindowMinimizeButtonHint
            | (installationBusy ? 0 : Qt.WindowCloseButtonHint)
 
-    readonly property var currentPage: pageStack.currentItem
+    readonly property var currentPage: legacyPage.item || pageStack.currentItem
     readonly property int fittedWidth: Math.ceil(Math.min(
         700, Screen.desktopAvailableWidth,
         currentPage ? currentPage.preferredWindowWidth : Kirigami.Units.gridUnit * 31
@@ -73,7 +73,7 @@ Kirigami.ApplicationWindow {
         } else if (welcome.state === "success" || welcome.state === "cancelled") {
             pageStack.clear();
             pageStack.push(completionComponent);
-        } else if (!currentPage || currentPage.objectName !== "operationPage") {
+        } else if (!pageStack.currentItem || pageStack.currentItem.objectName !== "operationPage") {
             pageStack.clear();
             pageStack.push(operationComponent);
         }
@@ -152,7 +152,17 @@ Kirigami.ApplicationWindow {
         }
     }
 
-    pageStack.enabled: !appUpdates.checking
+    pageStack.enabled: !appUpdates.checking && !legacyMigration.checking && !legacyMigration.required
+    pageStack.visible: !legacyMigration.required
+    Loader {
+        id: legacyPage
+        parent: root.contentItem
+        anchors.fill: parent
+        active: legacyMigration.required
+        sourceComponent: LegacyMigrationPage {
+            onCloseRequested: root.close()
+        }
+    }
     UpdateNotice {
         transientParent: root
         installer: true

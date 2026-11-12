@@ -9,6 +9,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 APP_ID = "io.github.goulielmos_linux.multipak"
+LEGACY_APP_ID = "io.github.multipak.manager"
 HOST_TOOLS = frozenset(
     {
         "distrobox",

@@ -61,7 +61,7 @@ python3 scripts/build_flatpak.py
 To install and open the test build on x86-64:
 
 ```bash
-flatpak install --user dist/flatpak/multipak-1.0.1-x86_64.flatpak
+flatpak install --user dist/flatpak/multipak-1.0.2-x86_64.flatpak
 flatpak run io.github.goulielmos_linux.multipak
 ```
 

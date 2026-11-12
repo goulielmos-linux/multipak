@@ -97,15 +97,21 @@ class UpdateNotice(QObject):
             self.changed.emit()
 
 
-def bind_update_notice(engine, controller, *, preview=False):
+def bind_update_notice(engine, controller, *, preview=False, migration=None):
     notice = UpdateNotice(engine, enabled=not preview and KEY.is_file())
     engine._update_notice = notice
     controller._application_updates = notice
     engine.rootContext().setContextProperty("appUpdates", notice)
-    QTimer.singleShot(0, notice.start)
+    if migration is None:
+        QTimer.singleShot(0, notice.start)
+    else:
+        migration.when_ready(notice.start)
     return notice
 
 
 def installation_allowed(controller):
+    migration = getattr(controller, "_legacy_migration", None)
+    if migration is not None and (migration.checking or migration.required):
+        return False
     notice = getattr(controller, "_application_updates", None)
     return notice is None or notice.installAllowed

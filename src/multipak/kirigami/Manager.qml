@@ -11,7 +11,7 @@ Kirigami.ApplicationWindow {
     visible: true
     flags: Qt.Window | Qt.CustomizeWindowHint | Qt.WindowTitleHint
            | (manager.canClose ? Qt.WindowCloseButtonHint : 0) | Qt.WindowMinimizeButtonHint
-    readonly property var currentPage: pageStack.currentItem
+    readonly property var currentPage: legacyPage.item || pageStack.currentItem
     readonly property int fittedWidth: Math.ceil(Math.min(700, Screen.desktopAvailableWidth,
         currentPage ? currentPage.preferredWindowWidth : Kirigami.Units.gridUnit * 31))
     readonly property int fittedHeight: Math.ceil(Math.min(
@@ -91,7 +91,17 @@ Kirigami.ApplicationWindow {
     pageStack.interactive: false
     pageStack.columnView.scrollDuration: 0
     pageStack.columnView.clip: true
-    pageStack.enabled: !appUpdates.checking
+    pageStack.enabled: !appUpdates.checking && !legacyMigration.checking && !legacyMigration.required
+    pageStack.visible: !legacyMigration.required
+    Loader {
+        id: legacyPage
+        parent: root.contentItem
+        anchors.fill: parent
+        active: legacyMigration.required
+        sourceComponent: LegacyMigrationPage {
+            onCloseRequested: root.close()
+        }
+    }
     UpdateNotice {
         transientParent: root
     }

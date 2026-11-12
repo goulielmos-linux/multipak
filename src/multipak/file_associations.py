@@ -7,6 +7,7 @@ import json
 import os
 import shutil
 import subprocess
+from contextlib import contextmanager
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -15,6 +16,7 @@ from multipak.localization import mark, tr
 from . import host
 from .integration import DESKTOP_ID
 
+LEGACY_INSTALLER = host.LEGACY_APP_ID + ".installer.desktop"
 APPIMAGE_MIME = "application/x-multipak-appimage"
 FORMATS = {
     "rpm": ("RPM (.rpm)", ("application/x-rpm",)),
@@ -41,6 +43,46 @@ SECTIONS = ("Default Applications", "Added Associations", "Removed Associations"
 
 def _without_multipak(value):
     return ";".join(item for item in (value or "").split(";") if item and item != DESKTOP_ID)
+
+
+def _replace_legacy_installer(value):
+    items = value.split(";")
+    if LEGACY_INSTALLER not in items:
+        return value
+    result = []
+    for item in items:
+        if item in (LEGACY_INSTALLER, DESKTOP_ID):
+            if DESKTOP_ID not in result:
+                result.append(DESKTOP_ID)
+        else:
+            result.append(item)
+    return ";".join(result)
+
+
+def _migrate_mimeapps(text, mimes):
+    section = ""
+    lines = []
+    for line in text.splitlines(keepends=True):
+        content = line.strip()
+        if content.startswith("[") and content.endswith("]"):
+            section = content[1:-1]
+        if section in SECTIONS[:2]:
+            key, delimiter, value = line.partition("=")
+            if delimiter and key.strip() in mimes:
+                updated = _replace_legacy_installer(value.strip())
+                if updated != value.strip():
+                    newline = line[len(line.rstrip("\r\n")) :]
+                    line = f"{key}={updated}{newline}"
+        lines.append(line)
+    return "".join(lines)
+
+
+def _restore(snapshots):
+    for path, content in snapshots.items():
+        if content is None:
+            path.unlink(missing_ok=True)
+        else:
+            _atomic_write_bytes(path, content)
 
 
 def _atomic_write(path, content):
@@ -98,17 +140,68 @@ class FileAssociations:
         self.reader = reader or _preferred_application
         self.refresher = refresher or self._refresh
 
-    def initialize_defaults(self):
-        if not host.is_flatpak():
-            return False
+    @contextmanager
+    def _locked(self):
         self.state_path.parent.mkdir(parents=True, exist_ok=True)
         with self.state_path.with_suffix(".lock").open("a") as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
-            saved = self._read_state()
-            if saved.get("desktop_id") == DESKTOP_ID:
+            yield
+
+    def initialize_defaults(self):
+        if not host.is_flatpak():
+            return False
+        with self._locked():
+            if self._read_state().get("desktop_id") == DESKTOP_ID:
                 return False
-            self.apply({key: True for key in FORMATS})
+            self._apply({key: True for key in FORMATS})
         return True
+
+    def migrate_legacy(self, *, removed=False):
+        if not host.is_flatpak():
+            return
+        with self._locked():
+            mimes = {mime for _, aliases in FORMATS.values() for mime in aliases}
+            writes = {}
+            snapshots = {}
+            for path in dict.fromkeys((self.config / "mimeapps.list", self.path)):
+                if not path.exists():
+                    continue
+                original = path.read_bytes()
+                text = original.decode("utf-8")
+                migrated_text = _migrate_mimeapps(text, mimes)
+                if migrated_text != text:
+                    writes[path] = migrated_text
+                    snapshots[path] = original
+            state = self._read_state()
+            before = state.get("before")
+            if isinstance(before, dict):
+                migrated = {
+                    mime: _replace_legacy_installer(value)
+                    if mime in mimes and isinstance(value, str)
+                    else value
+                    for mime, value in before.items()
+                }
+                if migrated != before:
+                    state["before"] = migrated
+            if (
+                removed
+                or writes
+                or state.get("before") != before
+                or state.get("desktop_id") == LEGACY_INSTALLER
+            ):
+                state["desktop_id"] = DESKTOP_ID
+                state_path = self.state_path
+                writes[state_path] = json.dumps(state, ensure_ascii=False, indent=2)
+                snapshots[state_path] = state_path.read_bytes() if state_path.exists() else None
+            if not writes:
+                return
+            try:
+                for path, content in writes.items():
+                    _atomic_write(path, content)
+                self.refresher()
+            except Exception:
+                _restore(snapshots)
+                raise
 
     def _read_state(self):
         try:
@@ -160,6 +253,10 @@ class FileAssociations:
             )
 
     def apply(self, selected):
+        with self._locked():
+            return self._apply(selected)
+
+    def _apply(self, selected):
         if set(selected) != set(FORMATS) or any(
             type(value) is not bool for value in selected.values()
         ):
@@ -195,7 +292,7 @@ class FileAssociations:
                         config["Removed Associations"].pop(mime, None)
                 else:
                     if DESKTOP_ID in current.split(";"):
-                        restored = before.get(mime, _without_multipak(current))
+                        restored = _without_multipak(before.get(mime, current))
                         if restored:
                             config["Default Applications"][mime] = restored + ";"
                         else:
@@ -256,11 +353,7 @@ class FileAssociations:
             _atomic_write(self.path, output.getvalue())
             self.refresher()
         except Exception:
-            for path, content in snapshots.items():
-                if content is None:
-                    path.unlink(missing_ok=True)
-                else:
-                    _atomic_write_bytes(path, content)
+            _restore(snapshots)
             try:
                 self.refresher()
             except Exception:

@@ -10,6 +10,7 @@ from PySide6.QtCore import (
     Property,
     QFile,
     QIODevice,
+    QLibraryInfo,
     QObject,
     QProcess,
     QProcessEnvironment,
@@ -44,7 +45,15 @@ def kirigami_version(import_paths):
             resource.close()
             if re.fullmatch(r"\d+(?:\.\d+){1,3}", value):
                 return value
-    return ""
+
+    # The KDE Flatpak runtime ships a versioned library even without the QML version file.
+    libraries = Path(QLibraryInfo.path(QLibraryInfo.LibraryPath.LibrariesPath))
+    try:
+        library = (libraries / "libKirigami.so.6").resolve(strict=True)
+    except (OSError, RuntimeError):
+        return ""
+    version = re.fullmatch(r"libKirigami\.so\.(\d+(?:\.\d+){2,3})", library.name)
+    return version[1] if version and library.is_file() else ""
 
 
 class AboutInfo(QObject):
@@ -132,7 +141,8 @@ class AboutInfo(QObject):
             try:
                 with Path("/.flatpak-info").open(encoding="utf-8") as stream:
                     info.read_string(stream.read(65536))
-                if info.get("Application", "runtime", fallback="").startswith("org.kde.Platform/"):
+                runtime = info.get("Application", "runtime", fallback="").removeprefix("runtime/")
+                if runtime.startswith("org.kde.Platform/"):
                     name = "KDE Flatpak runtime"
             except (OSError, configparser.Error):
                 pass

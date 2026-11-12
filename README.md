@@ -1,6 +1,6 @@
 # MultiPak
 
-Version: 1.0.1
+Version: 1.0.2
 
 MultiPak makes installing different package formats on atomic Linux distributions
 easier and more consistent, with a Kirigami interface that follows KDE’s design.
@@ -11,13 +11,13 @@ Application Manager, available from the application launcher.
 ## Screenshots
 
 ### Application Manager
-![Application Manager](docs/screenshots/1.0.1/application-manager.png)
+![Application Manager](docs/screenshots/1.0.2/application-manager.png)
 
 ### Installation Wizard
 ![Installation Wizard](docs/screenshots/1.0.1/installation-welcome.png)
 
 ### Installation settings
-![Installation settings](docs/screenshots/1.0.1/installation-settings.png)
+![Installation settings](docs/screenshots/1.0.2/installation-settings.png)
 
 ### Installation summary
 ![Installation summary](docs/screenshots/1.0.1/installation-summary.png)

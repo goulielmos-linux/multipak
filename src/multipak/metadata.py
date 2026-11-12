@@ -208,11 +208,11 @@ def inspect_package(path: Path, runner: Runner) -> Package:
         deps = "\n".join(fields.get("depend", ()))
         hint, hint_source = "arch-rolling", "metadata"
     elif kind == "rpm":
-        executable = "/app/bin/rpm" if host.is_flatpak() else "rpm"
+        # The bundled RPM needs this option to inspect signed package headers.
+        query = ["/app/bin/rpm", "-qp", "--nosignature"] if host.is_flatpak() else ["rpm", "-qp"]
         raw = runner.run(
             [
-                executable,
-                "-qp",
+                *query,
                 "--queryformat",
                 "%{NAME}\x1f%{VERSION}-%{RELEASE}\x1f%{ARCH}",
                 str(path),
@@ -220,7 +220,7 @@ def inspect_package(path: Path, runner: Runner) -> Package:
             binary=True,
             output_limit=MAX_CONTROL_FILE,
         )
-        deps = runner.run([executable, "-qp", "--requires", str(path)])
+        deps = runner.run([*query, "--requires", str(path)])
         # Binary reads keep diagnostics on stderr, separate from this record.
         if isinstance(raw, bytes):
             raw = raw.decode("utf-8", errors="strict")

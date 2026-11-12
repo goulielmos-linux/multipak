@@ -57,7 +57,7 @@ Kirigami.ScrollablePage {
             objectName: "advancedCard"
             choiceObjectName: "advancedMode"
             heading: qsTr("Advanced settings")
-            description: qsTr("Customize the settings or choose a different installation method.")
+            description: qsTr("Customize the installation or choose a different method.")
             checked: page.selectedMode === "advanced"
             Layout.fillWidth: true
             onSelectionRequested: {
