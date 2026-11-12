@@ -2,6 +2,13 @@
 
 ## 1.0.1
 
+**Upgrading from 1.0.0 Alpha 1**
+
+MultiPak 1.0.1 uses a new Flatpak app ID. Uninstall the old MultiPak before
+installing 1.0.1 to avoid duplicate launcher entries and file associations that
+still point to the old installer. Uninstalling the old Flatpak without deleting
+its data preserves your containers and installed applications.
+
 ### MultiPak updates
 
 - Add support for signed Flatpak updates through the system's software store.
