@@ -1,6 +1,6 @@
 # MultiPak
 
-Version: 1.0.X
+Version: Unreleased
 
 MultiPak makes installing different package formats on atomic Linux distributions
 easier and more consistent, with a Kirigami interface that follows KDE’s design.
