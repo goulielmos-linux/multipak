@@ -97,6 +97,11 @@ class Welcome(QObject):
         self.method = "appimage" if self.kind == "APPIMAGE" else "container"
         self.mode = "standard"
         self.existing = ()
+        self._dependency_report = None
+        self._appimage_container = False
+        self._appimage_verify = True
+        self._appimage_environment = ""
+        self._appimage_container_exists = False
         self._configuration = Configuration(self)
         self._configuration.changed.connect(self._configuration_changed)
         self._selection = None
@@ -167,6 +172,88 @@ class Welcome(QObject):
     @Property(bool, notify=dataChanged)
     def isAppImage(self):
         return self.kind == "APPIMAGE"
+
+    def set_dependency_report(self, report):
+        """Missing required components select the container option by default."""
+        self._dependency_report = report
+        self._appimage_container = bool(report is not None and report.required)
+        self._appimage_verify = True
+        self.dataChanged.emit()
+
+    def appimage_options(self):
+        report = self._dependency_report
+        if not (self.isAppImage and self._appimage_container and report and report.required):
+            return {}
+        return {
+            "container": True,
+            # The container is a different system: request everything the AppImage uses;
+            # DNF skips what is already installed there.
+            "packages": report.container_packages,
+            "verify": self._appimage_verify,
+        }
+
+    def set_appimage_environment(self, title, exists):
+        self._appimage_environment = title
+        self._appimage_container_exists = bool(exists)
+        self.dataChanged.emit()
+
+    @Property(str, notify=dataChanged)
+    def appImageEnvironmentTitle(self):
+        return self._appimage_environment or "Fedora"
+
+    @Property(str, constant=True)
+    def appImageContainerName(self):
+        from multipak.appimage_container import CONTAINER_NAME
+
+        return CONTAINER_NAME
+
+    @Property(bool, notify=dataChanged)
+    def appImageContainerExists(self):
+        return self._appimage_container_exists
+
+    @Property(str, notify=dataChanged)
+    def appImageRequirementsText(self):
+        report = self._dependency_report
+        return report.requirements_text() if report is not None else ""
+
+    @Property(str, notify=dataChanged)
+    def appImageEnvironmentExplanation(self):
+        return tr(
+            "Fedora can locate the correct package from the name of each missing library, "
+            "which makes it possible to install the dependencies automatically. All AppImages "
+            "installed in a container will share this same environment."
+        )
+
+    @Property(bool, notify=dataChanged)
+    def appImageNeedsDependencies(self):
+        report = self._dependency_report
+        return bool(self.isAppImage and report is not None and report.required)
+
+    @Property(str, notify=dataChanged)
+    def appImageDependencyText(self):
+        report = self._dependency_report
+        return report.text() if report is not None else ""
+
+    @Property(bool, notify=dataChanged)
+    def appImageContainerSelected(self):
+        return self.appImageNeedsDependencies and self._appimage_container
+
+    @Property(bool, notify=dataChanged)
+    def appImageVerify(self):
+        return self._appimage_verify
+
+    @Slot(bool)
+    def chooseAppImageContainer(self, selected):
+        # The verification choice is kept when the user switches back and forth.
+        if self.appImageNeedsDependencies and selected != self._appimage_container:
+            self._appimage_container = bool(selected)
+            self.dataChanged.emit()
+
+    @Slot(bool)
+    def setAppImageVerify(self, value):
+        if value != self._appimage_verify:
+            self._appimage_verify = bool(value)
+            self.dataChanged.emit()
 
     @Property(QUrl, notify=dataChanged)
     def applicationIcon(self):
@@ -383,8 +470,22 @@ def main():
     parser.add_argument("--version", default=None)
     parser.add_argument("--packaging", choices=("RPM", "DEB", "ARCH", "APPIMAGE"), default="RPM")
     parser.add_argument(
+        "--missing-dependencies",
+        action="store_true",
+        help="AppImage preview: show the screen for missing dependencies",
+    )
+    parser.add_argument(
         "--page",
-        choices=("welcome", "method", "mode", "advanced", "environment", "review", "completion"),
+        choices=(
+            "welcome",
+            "method",
+            "mode",
+            "advanced",
+            "environment",
+            "review",
+            "container",
+            "completion",
+        ),
         default="welcome",
     )
     parser.add_argument("--screenshot", type=Path)
@@ -410,6 +511,25 @@ def main():
         bridge._legacy_migration.when_ready(bridge.inspect)
     else:
         engine, bridge, window = create_preview(app, args.name, version, args.packaging)
+        if args.missing_dependencies and args.packaging == "APPIMAGE":
+            from multipak.appimage_dependencies import Dependency, DependencyReport
+
+            bridge.set_dependency_report(
+                DependencyReport(
+                    (
+                        Dependency("python", "_tkinter", "python3-tkinter"),
+                        Dependency("python", "yaml", "python3-pyyaml", optional=True),
+                    ),
+                    incomplete=True,
+                    requirements=(
+                        Dependency("interpreter", "python3", "python3"),
+                        Dependency("library", "libX11.so.6", "libX11.so.6()(64bit)"),
+                        Dependency("python", "_tkinter", "python3-tkinter"),
+                        Dependency("python", "yaml", "python3-pyyaml", optional=True),
+                    ),
+                )
+            )
+            bridge.set_appimage_environment("Fedora 45", False)
     window.requestActivate()
 
     if args.page == "method":
@@ -422,6 +542,14 @@ def main():
         QTimer.singleShot(0, lambda: QMetaObject.invokeMethod(window, "openEnvironment"))
     elif args.page == "review":
         QTimer.singleShot(0, lambda: QMetaObject.invokeMethod(window, "openReview"))
+    elif args.page == "container":
+        # AppImage preview with --missing-dependencies: the container review page.
+
+        def open_container():
+            QMetaObject.invokeMethod(window, "openMethod")
+            QMetaObject.invokeMethod(window, "openAppImageContainer")
+
+        QTimer.singleShot(0, open_container)
     elif args.page == "completion":
         print(tr("Visual completion preview; no application was installed."))
         QTimer.singleShot(0, lambda: QMetaObject.invokeMethod(window, "previewCompletion"))

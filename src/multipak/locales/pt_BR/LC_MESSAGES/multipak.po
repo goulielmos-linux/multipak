@@ -1403,3 +1403,111 @@ msgstr "Remover a versão anterior do MultiPak"
 
 msgid "Could not update the old AppImage shortcuts. Try again or close this window."
 msgstr "Não foi possível atualizar os atalhos antigos de AppImage. Tente novamente ou feche esta janela."
+
+msgid "(optional)"
+msgstr "(opcional)"
+
+msgid "A container named {0} already exists and was not created by MultiPak."
+msgstr "Já existe um contêiner chamado {0} que não foi criado pelo MultiPak."
+
+msgid "AppImage in container: {0}"
+msgstr "AppImage em contêiner: {0}"
+
+msgid "Checking the application in an isolated environment…"
+msgstr "Verificando o aplicativo em um ambiente isolado…"
+
+msgid "Could not check the AppImage dependencies: {0}"
+msgstr "Não foi possível verificar as dependências do AppImage: {0}"
+
+msgid "Creating the container for AppImages…"
+msgstr "Criando o contêiner para AppImages…"
+
+msgid "GNU C Library {0} or newer"
+msgstr "Biblioteca C GNU (glibc) {0} ou mais recente"
+
+msgid "Install the application and its dependencies in a container (recommended)"
+msgstr "Instalar o aplicativo e as dependências em um contêiner (recomendado)"
+
+msgid "Installing the dependencies found by the check…"
+msgstr "Instalando as dependências encontradas na verificação…"
+
+msgid "Installing the dependencies in the container…"
+msgstr "Instalando as dependências no contêiner…"
+
+msgid "Installing the dependencies…"
+msgstr "Instalando as dependências…"
+
+msgid "Library {0}"
+msgstr "Biblioteca {0}"
+
+msgid "Missing dependencies"
+msgstr "Dependências ausentes"
+
+msgid "Note: this list was obtained without running the application and may be incomplete."
+msgstr "Obs.: esta lista foi obtida sem executar o aplicativo e pode estar incompleta."
+
+msgid "Preparing the container for the application…"
+msgstr "Preparando o contêiner para o aplicativo…"
+
+msgid "Python 3 interpreter"
+msgstr "Interpretador Python 3"
+
+msgid "Python module {0}"
+msgstr "Módulo Python {0}"
+
+msgid "See which"
+msgstr "Ver quais"
+
+msgid "See which dependencies are missing"
+msgstr "Ver quais dependências estão ausentes"
+
+msgid "The AppImage container identity or ownership has changed. It was not used."
+msgstr "A identidade ou a propriedade do contêiner de AppImages mudou. Ele não foi usado."
+
+msgid "The application will be installed, but you will need to install the missing dependencies later."
+msgstr "O aplicativo será instalado, mas você precisará instalar depois as dependências que faltam."
+
+msgid "The check installed additional dependencies: {0}."
+msgstr "A verificação instalou dependências adicionais: {0}."
+
+msgid "The container for this AppImage is unavailable. Install the AppImage again."
+msgstr "O contêiner deste AppImage não está disponível. Instale o AppImage novamente."
+
+msgid "The isolated check could not be completed: {0}"
+msgstr "Não foi possível concluir a verificação isolada: {0}"
+
+msgid "The system will not be changed."
+msgstr "O sistema não será alterado."
+
+msgid "These dependencies could not be installed automatically: {0}."
+msgstr "Não foi possível instalar automaticamente estas dependências: {0}."
+
+msgid "This AppImage does not include all the dependencies it needs."
+msgstr "Este AppImage não inclui todas as dependências de que precisa."
+
+msgid "When finished, open the application for a few seconds in an isolated environment to find other missing dependencies and install them."
+msgstr "Ao final, abrir o aplicativo por alguns segundos em um ambiente isolado para procurar outras dependências ausentes e instalá-las."
+
+msgid "Another container is now using the name {0}. It was not updated. Reload the list before updating."
+msgstr "Outro contêiner está usando o nome {0} agora. Ele não foi atualizado. Recarregue a lista antes de atualizar."
+
+msgid "Fedora can locate the correct package from the name of each missing library, which makes it possible to install the dependencies automatically. All AppImages installed in a container will share this same environment."
+msgstr "O Fedora permite localizar o pacote correto a partir do nome de cada biblioteca ausente, o que torna possível instalar as dependências automaticamente. Todos os AppImages instalados em contêiner compartilharão este mesmo ambiente."
+
+msgid "MultiPak will install in the container the dependencies it does not already have."
+msgstr "O MultiPak instalará no contêiner as dependências que ainda não estiverem nele."
+
+msgid "Required dependencies"
+msgstr "Dependências exigidas"
+
+msgid "Required dependencies:"
+msgstr "Dependências exigidas:"
+
+msgid "The check could not confirm that the application starts correctly. Applications that need a display, for example, cannot be checked this way."
+msgstr "A verificação não conseguiu confirmar se o aplicativo abre corretamente. Aplicativos que precisam de uma tela, por exemplo, não podem ser verificados dessa forma."
+
+msgid "The check runs without access to your files or to the network."
+msgstr "A verificação roda sem acesso aos seus arquivos ou à rede."
+
+msgid "View the full list of required dependencies"
+msgstr "Ver a lista completa de dependências exigidas"

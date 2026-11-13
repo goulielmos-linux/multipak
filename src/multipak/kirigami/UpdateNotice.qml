@@ -12,12 +12,9 @@ InformationWindow {
     title: "MultiPak"
     preferredWidth: Kirigami.Units.gridUnit * 34
     function dismiss() { dialog.close(); }
-    onClosing: event => {
-        if (appUpdates.required) {
-            if (installer) Qt.callLater(installerCloseRequested);
-        } else if (!appUpdates.remindLater()) {
-            event.accepted = false;
-        }
+    onClosing: {
+        if (appUpdates.required && installer)
+            Qt.callLater(installerCloseRequested);
     }
     Connections {
         target: appUpdates
@@ -71,7 +68,10 @@ InformationWindow {
             Controls.Button {
                 objectName: "updateRemindButton"
                 text: appUpdates.required ? qsTr("Close") : qsTr("Remind me later")
-                onClicked: dialog.dismiss()
+                onClicked: {
+                    if (appUpdates.required || appUpdates.remindLater())
+                        dialog.dismiss();
+                }
             }
             Controls.Button {
                 objectName: "updateNowButton"

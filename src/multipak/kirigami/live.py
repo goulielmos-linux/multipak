@@ -39,7 +39,11 @@ def inspect_installation(engine, path):
         engine._log(tr("Could not update file associations: {0}").format(error))
     package = inspect_package(path, engine.runner)
     if package.kind == "appimage":
-        return PackageInspection(package)
+        report = appimage_dependencies(engine, package)
+        if report is None or not report.required:
+            return PackageInspection(package, dependencies=report)
+        existing, profiles = appimage_environment(engine)
+        return PackageInspection(package, existing, profiles, dependencies=report)
     profiles = load_catalog(engine.runner, engine.store.root / "image-catalog.json")
     try:
         existing = tuple(discover(engine.runner, profiles))
@@ -49,6 +53,49 @@ def inspect_installation(engine, path):
         engine._log(tr("Could not query existing environments: {0}").format(error))
         existing = ()
     return PackageInspection(package, existing, profiles)
+
+
+def appimage_dependencies(engine, package):
+    """Reads the AppImage without running it. A failed check never blocks installation."""
+    from multipak.appimage import Archive
+    from multipak.appimage_dependencies import analyze
+
+    try:
+        return analyze(
+            Archive(package.path, engine.runner), engine.runner, scratch=engine.store.root
+        )
+    except Cancelled:
+        raise
+    except Exception as error:
+        engine._log(tr("Could not check the AppImage dependencies: {0}").format(error))
+        return None
+
+
+def appimage_environment(engine):
+    """The catalog's current Fedora and MultiPak's AppImage container, if it exists.
+
+    Both only describe the installation on screen; failures are logged, never raised.
+    """
+    from multipak.appimage_container import CONTAINER_NAME, update_entry
+
+    profiles = ()
+    try:
+        profiles = load_catalog(engine.runner, engine.store.root / "image-catalog.json")
+    except Cancelled:
+        raise
+    except Exception as error:
+        engine._log(tr("Could not query existing environments: {0}").format(error))
+    existing = ()
+    try:
+        entry = update_entry(engine.store)
+        if entry is not None and entry.name == CONTAINER_NAME:
+            engine.runner.run(["podman", "container", "exists", entry.container_id], timeout=30)
+            existing = (entry,)
+    except Cancelled:
+        raise
+    except Exception:
+        existing = ()  # Missing or unreadable: it will be created.
+    return existing, profiles
 
 
 class LiveInstaller(Welcome):
@@ -175,8 +222,23 @@ class LiveInstaller(Welcome):
         self.name, self.version = self.package.name, self.package.version
         self.kind = self.package.kind.upper()
         if self.isAppImage:
+            from multipak.appimage_container import CONTAINER_NAME
+
             self.method, self.mode = "appimage", "standard"
             self.environment, self._selection = None, None
+            self.set_dependency_report(inspection.dependencies)
+            fedora = next(
+                (
+                    item
+                    for item in (*inspection.environments, *ENVIRONMENTS)
+                    if item.id == "fedora-latest"
+                ),
+                None,
+            )
+            self.set_appimage_environment(
+                tr(fedora.title) if fedora is not None else "Fedora",
+                any(item.name == CONTAINER_NAME for item in inspection.existing),
+            )
             self._set_state("ready")
             return
         self.existing = inspection.existing
@@ -231,12 +293,16 @@ class LiveInstaller(Welcome):
         ):
             return
         package, selection = self.package, self._selection
+        appimage_options = self.appimage_options()
         self._logs = ""
         self.logsChanged.emit()
 
         def install(engine):
             if package.kind == "appimage":
-                return engine.install_appimage(package)
+                try:
+                    return engine.install_appimage(package, **appimage_options)
+                except DistroboxMissing:
+                    return distrobox_requirement(engine)
             try:
                 if selection.custom_name:
                     return engine.install(

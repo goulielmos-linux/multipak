@@ -30,6 +30,32 @@ def _update(engine, name, command):
                 tr("The container is no longer available. Reload the list before updating.")
             ) from exc
         raise
+    _check_identity(engine, name)
     # Runner disables stdin interaction and fixes the backend to rootless Podman.
     # Keep the package manager's output and exit status; do not infer success from launch.
     PackageProgress(engine.progress, updating=True).run(engine.runner, command, timeout=7200)
+
+
+def _check_identity(engine, name):
+    """A container recorded by MultiPak must still be the one that answers to its name."""
+    from .containers import _read_record
+
+    store = getattr(engine, "store", None)
+    if store is None:
+        return
+    try:
+        record = _read_record(store, name)
+    except (OSError, TypeError, ValueError):
+        record = None
+    if record is None:
+        return
+    current = engine.runner.run(
+        ["podman", "container", "inspect", "--format", "{{.Id}}", "--", name], timeout=30
+    ).strip()
+    if current != record.container_id:
+        raise RuntimeError(
+            tr(
+                "Another container is now using the name {0}. It was not updated. "
+                "Reload the list before updating."
+            ).format(name)
+        )

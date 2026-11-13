@@ -1,5 +1,38 @@
 # Changelog
 
+## Unreleased
+
+### AppImages
+
+- Check, without running the application, whether an AppImage needs libraries or
+  Python modules that are not installed on the system. The check reads the
+  AppImage's ELF files and Python sources and asks the system's own Python which
+  components exist. It stays within fixed size limits and reads one file at a time.
+- When something is missing, offer to install the AppImage and its dependencies in
+  MultiPak's Fedora container for AppImages, without changing the system, or to
+  install it anyway. "See which" lists what is missing.
+- Before a container installation, show the container and the application as on the
+  review page for other formats, with the full list of required dependencies. All of
+  them are requested in the container, since it can lack components the system has.
+- Optionally, after a container installation, start the application for a few
+  seconds in a throwaway copy of the container without network or access to personal
+  files, and install other dependencies it reports as missing. Report when the check
+  cannot confirm that the application starts, and always remove the copy, even after
+  cancelling.
+- Open and update the AppImage container only while its name still leads to the
+  recorded container.
+- Offer to remove the AppImage container after its last application is uninstalled,
+  and include it in the container update list.
+
+### MultiPak updates
+
+- Only postpone update notices when Remind me later is selected.
+
+### Containers
+
+- Do not update a container recorded by MultiPak if another container has taken its
+  name.
+
 ## 1.0.2
 
 - Fix an error that prevented the Flatpak from opening signed RPM packages,

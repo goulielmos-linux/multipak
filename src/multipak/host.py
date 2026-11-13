@@ -29,6 +29,8 @@ HOST_TOOLS = frozenset(
         "setsid",
         "pkexec",
         "cat",
+        # Only MultiPak's own trusted dependency probe uses the host's Python.
+        "python3",
     }
 )
 

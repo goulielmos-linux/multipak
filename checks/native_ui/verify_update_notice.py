@@ -17,11 +17,12 @@ from PySide6.QtGui import QDesktopServices  # noqa: E402
 from PySide6.QtTest import QTest  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
+from multipak import __version__  # noqa: E402
 from multipak.kirigami.main import create_preview  # noqa: E402
 from multipak.kirigami.manager import Manager, create_manager  # noqa: E402
 from multipak.kirigami.update_notice import UpdateNotice  # noqa: E402
 from multipak.store import Store  # noqa: E402
-from multipak.update_notice import DAY, Policy  # noqa: E402
+from multipak.update_notice import DAY, Policy, version_tuple  # noqa: E402
 
 
 def find(window, name):
@@ -50,7 +51,9 @@ def main():
             app, Manager(Store(Path(directory) / "records", Path(directory) / "apps"), preview=True)
         )
         manager_notice = manager_engine._update_notice
-        ordinary = Policy("1.0.2", "1.0.1")
+        major, minor, patch_number = version_tuple(__version__)
+        next_version = f"{major}.{minor}.{patch_number + 1}"
+        ordinary = Policy(next_version, __version__)
         asynchronous = UpdateNotice(manager_engine, enabled=True, state=manager_notice.state)
         with patch.object(asynchronous.state, "checked_policy", return_value=ordinary):
             asynchronous.start()
@@ -64,6 +67,12 @@ def main():
         manager_dialog = find(manager_window, "applicationUpdateDialog")
         assert manager_dialog.property("opened")
         assert find(manager_dialog, "updateRemindButton").property("text") == "Lembrar depois"
+        manager_dialog.close()
+        assert not manager_dialog.property("opened")
+        assert "snooze_until" not in manager_notice.state.read()
+        manager_notice._received(ordinary)
+        QTest.qWait(100)
+        assert manager_dialog.property("opened")
         QMetaObject.invokeMethod(find(manager_dialog, "updateRemindButton"), "clicked")
         assert not manager_dialog.property("opened")
         deadline = manager_notice.state.read()["snooze_until"]
@@ -81,9 +90,9 @@ def main():
         assert dialog.property("opened")
         assert dialog.grabWindow().save(str(output / "update-optional.png"))
         QMetaObject.invokeMethod(find(dialog, "updateRemindButton"), "clicked")
-        assert not manager_notice.state.should_show(ordinary, "1.0.1")
+        assert not manager_notice.state.should_show(ordinary, __version__)
 
-        critical = Policy("1.0.3", "1.0.2")
+        critical = Policy(next_version, next_version)
         notice._received(critical)
         QTest.qWait(100)
         assert dialog.property("opened") and notice.required and not notice.installAllowed

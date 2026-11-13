@@ -279,6 +279,8 @@ class Manager(QObject):
                     "detail": (
                         tr("Installed directly on the system")
                         if tx.method == "system"
+                        else tr("AppImage in container: {0}").format(tx.container)
+                        if tx.method == "appimage" and tx.appimage_mode == "container"
                         else tr("AppImage managed by MultiPak")
                         if tx.method == "appimage"
                         else tr("Container: {0}").format(tx.container)
@@ -439,11 +441,19 @@ class Manager(QObject):
         else:
 
             def operation(engine):
-                environments = self.discoverer(engine.runner)
-                return sorted(
-                    (env for env in environments if env.multipak_managed or env.custom_named),
-                    key=lambda env: env.name.casefold(),
-                )
+                from multipak.appimage_container import update_entry
+
+                environments = [
+                    env
+                    for env in self.discoverer(engine.runner)
+                    if env.multipak_managed or env.custom_named
+                ]
+                # The AppImage container is private to MultiPak and not offered for
+                # package installations, but its packages still need updates.
+                appimages = update_entry(self.store)
+                if appimages and all(env.name != appimages.name for env in environments):
+                    environments.append(appimages)
+                return sorted(environments, key=lambda env: env.name.casefold())
 
             self._run(operation, self._loaded_environments)
 

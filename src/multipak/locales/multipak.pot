@@ -21,7 +21,13 @@ msgstr ""
 msgid " — stable version"
 msgstr ""
 
+msgid "(optional)"
+msgstr ""
+
 msgid "<a href='dependencies'>View full list</a>"
+msgstr ""
+
+msgid "A container named {0} already exists and was not created by MultiPak."
 msgstr ""
 
 msgid "A container with that name already exists. Choose another name."
@@ -84,10 +90,16 @@ msgstr ""
 msgid "Another application uses this container. It will be kept."
 msgstr ""
 
+msgid "Another container is now using the name {0}. It was not updated. Reload the list before updating."
+msgstr ""
+
 msgid "Another container uses this home folder. It will be kept."
 msgstr ""
 
 msgid "Another installation is already in progress."
+msgstr ""
+
+msgid "AppImage in container: {0}"
 msgstr ""
 
 msgid "AppImage managed by MultiPak"
@@ -154,6 +166,9 @@ msgid "Checking package repositories — {0}%"
 msgstr ""
 
 msgid "Checking package repositories…"
+msgstr ""
+
+msgid "Checking the application in an isolated environment…"
 msgstr ""
 
 msgid "Checking the container image…"
@@ -262,6 +277,9 @@ msgid "Copying the package to the container…"
 msgstr ""
 
 msgid "Copying the package to the existing container…"
+msgstr ""
+
+msgid "Could not check the AppImage dependencies: {0}"
 msgstr ""
 
 msgid "Could not check whether the container can be removed: {0}"
@@ -375,6 +393,9 @@ msgstr ""
 msgid "Creating the Distrobox container…"
 msgstr ""
 
+msgid "Creating the container for AppImages…"
+msgstr ""
+
 msgid "Custom container name"
 msgstr ""
 
@@ -471,6 +492,9 @@ msgstr ""
 msgid "Extracting the application so it can run…"
 msgstr ""
 
+msgid "Fedora can locate the correct package from the name of each missing library, which makes it possible to install the dependencies automatically. All AppImages installed in a container will share this same environment."
+msgstr ""
+
 msgid "Fedora — latest stable"
 msgstr ""
 
@@ -493,6 +517,9 @@ msgid "Flatpak runtime"
 msgstr ""
 
 msgid "Foundation of the graphical interface."
+msgstr ""
+
+msgid "GNU C Library {0} or newer"
 msgstr ""
 
 msgid "Hide alternative method"
@@ -538,6 +565,9 @@ msgid "Install directly on the system"
 msgstr ""
 
 msgid "Install directly on your system"
+msgstr ""
+
+msgid "Install the application and its dependencies in a container (recommended)"
 msgstr ""
 
 msgid "Install xdg-utils to associate RPM, DEB, Arch and AppImage packages."
@@ -589,6 +619,15 @@ msgid "Installing the application…"
 msgstr ""
 
 msgid "Installing the container's basic components…"
+msgstr ""
+
+msgid "Installing the dependencies found by the check…"
+msgstr ""
+
+msgid "Installing the dependencies in the container…"
+msgstr ""
+
+msgid "Installing the dependencies…"
 msgstr ""
 
 msgid "Installs the application safely and automatically."
@@ -681,6 +720,9 @@ msgstr ""
 msgid "Libraries in use"
 msgstr ""
 
+msgid "Library {0}"
+msgstr ""
+
 msgid "List of dependencies declared by the package"
 msgstr ""
 
@@ -703,6 +745,9 @@ msgid "Manager"
 msgstr ""
 
 msgid "Medium"
+msgstr ""
+
+msgid "Missing dependencies"
 msgstr ""
 
 msgid "Missing or duplicate Arch metadata: {0}."
@@ -730,6 +775,9 @@ msgid "MultiPak needs Distrobox to install applications in containers. It will b
 msgstr ""
 
 msgid "MultiPak settings"
+msgstr ""
+
+msgid "MultiPak will install in the container the dependencies it does not already have."
 msgstr ""
 
 msgid "Native installation"
@@ -768,6 +816,9 @@ msgstr ""
 msgid "Not provided"
 msgstr ""
 
+msgid "Note: this list was obtained without running the application and may be incomplete."
+msgstr ""
+
 msgid "Open the package without --page or --screenshot; these options are for previews only."
 msgstr ""
 
@@ -804,6 +855,9 @@ msgstr ""
 msgid "Preparing the AppImage…"
 msgstr ""
 
+msgid "Preparing the container for the application…"
+msgstr ""
+
 msgid "Preparing the container's basic components…"
 msgstr ""
 
@@ -820,6 +874,12 @@ msgid "Preparing to uninstall the system package…"
 msgstr ""
 
 msgid "Preview: {0} × {1} px"
+msgstr ""
+
+msgid "Python 3 interpreter"
+msgstr ""
+
+msgid "Python module {0}"
 msgstr ""
 
 msgid "Ready to install"
@@ -856,6 +916,12 @@ msgid "Removing the components created by this installation…"
 msgstr ""
 
 msgid "Requesting a system restart…"
+msgstr ""
+
+msgid "Required dependencies"
+msgstr ""
+
+msgid "Required dependencies:"
 msgstr ""
 
 msgid "Resolving dependencies and downloading components…"
@@ -909,6 +975,12 @@ msgstr ""
 msgid "Security update required"
 msgstr ""
 
+msgid "See which"
+msgstr ""
+
+msgid "See which dependencies are missing"
+msgstr ""
+
 msgid "Select"
 msgstr ""
 
@@ -960,6 +1032,9 @@ msgstr ""
 msgid "The .PKGINFO metadata identifies this as an Arch-based package, but does not distinguish Arch Linux from its derivatives. The recommended environment is Arch Linux (rolling release)."
 msgstr ""
 
+msgid "The AppImage container identity or ownership has changed. It was not used."
+msgstr ""
+
 msgid "The AppImage copy has changed. Open the file again."
 msgstr ""
 
@@ -999,6 +1074,18 @@ msgstr ""
 msgid "The application was installed in the {0} environment."
 msgstr ""
 
+msgid "The application will be installed, but you will need to install the missing dependencies later."
+msgstr ""
+
+msgid "The check could not confirm that the application starts correctly. Applications that need a display, for example, cannot be checked this way."
+msgstr ""
+
+msgid "The check installed additional dependencies: {0}."
+msgstr ""
+
+msgid "The check runs without access to your files or to the network."
+msgstr ""
+
 msgid "The command finished, but no pending deployment was found. Check rpm-ostree status in the system details."
 msgstr ""
 
@@ -1009,6 +1096,9 @@ msgid "The components owned by this installation were removed. Shared environmen
 msgstr ""
 
 msgid "The container does not belong to this installation; cleanup was blocked."
+msgstr ""
+
+msgid "The container for this AppImage is unavailable. Install the AppImage again."
 msgstr ""
 
 msgid "The container identity or ownership has changed. It will be kept."
@@ -1101,6 +1191,9 @@ msgstr ""
 msgid "The internal file exceeds the read limit."
 msgstr ""
 
+msgid "The isolated check could not be completed: {0}"
+msgstr ""
+
 msgid "The managed AppImage copy and its shortcuts will be removed. Personal data will be preserved."
 msgstr ""
 
@@ -1176,6 +1269,9 @@ msgstr ""
 msgid "The shortcut {0} was skipped because its desktop file is invalid."
 msgstr ""
 
+msgid "The system will not be changed."
+msgstr ""
+
 msgid "The target distribution could not be identified. Since the .deb format is used by both Ubuntu and Debian, the latest Ubuntu LTS version is used by default."
 msgstr ""
 
@@ -1191,7 +1287,13 @@ msgstr ""
 msgid "There is not enough free space to copy the package."
 msgstr ""
 
+msgid "These dependencies could not be installed automatically: {0}."
+msgstr ""
+
 msgid "This AppImage does not contain a recognized type 2 SquashFS payload."
+msgstr ""
+
+msgid "This AppImage does not include all the dependencies it needs."
 msgstr ""
 
 msgid "This AppImage installation is unavailable."
@@ -1347,6 +1449,9 @@ msgstr ""
 msgid "View the full list of additional dependencies"
 msgstr ""
 
+msgid "View the full list of required dependencies"
+msgstr ""
+
 msgid "Visual completion preview; no application was installed."
 msgstr ""
 
@@ -1360,6 +1465,9 @@ msgid "Waiting for the current step to finish before cleaning up…"
 msgstr ""
 
 msgid "Welcome to the MultiPak Installation Wizard"
+msgstr ""
+
+msgid "When finished, open the application for a few seconds in an isolated environment to find other missing dependencies and install them."
 msgstr ""
 
 msgid "You can now open it from the application launcher."

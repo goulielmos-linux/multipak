@@ -80,7 +80,7 @@ class UpdateNotice(QObject):
 
     @Slot(result=bool)
     def remindLater(self):
-        if self.required:
+        if not self.policy or self.required or not self.policy.available(__version__):
             return False
         try:
             self.state.remember_later()

@@ -40,12 +40,12 @@ from .store import Store
 
 
 class Engine:
-    def install_appimage(self, package: Package) -> Transaction:
+    def install_appimage(self, package: Package, **options) -> Transaction:
         from . import appimage
 
         if package.kind != "appimage":
             raise ValueError(tr("Select an AppImage."))
-        return appimage.install(self, package)
+        return appimage.install(self, package, **options)
 
     def __init__(
         self,

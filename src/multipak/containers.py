@@ -91,7 +91,19 @@ def _registered_shortcut(store, container):
     )
 
 
+def _uses_container(transaction):
+    return transaction.method == "distrobox" or (
+        transaction.method == "appimage" and transaction.appimage_mode == "container"
+    )
+
+
 def _candidate(store, transaction):
+    if transaction.method == "appimage" and transaction.appimage_mode == "container":
+        # The shared AppImage container is owned only through its own record.
+        record = _read_record(store, transaction.container)
+        if record is not None and record.container_id == transaction.container_id:
+            return record
+        return None
     if transaction.method != "distrobox":
         return None
     container = ManagedContainer(transaction.container, transaction.container_id)
@@ -131,7 +143,7 @@ def remove_tree(runner, path: Path) -> None:
 
 def _referenced(store, container):
     return any(
-        tx.method == "distrobox"
+        _uses_container(tx)
         and (tx.container_id == container.container_id or tx.container == container.name)
         for tx in store.transactions()
     )

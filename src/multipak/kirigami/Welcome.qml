@@ -91,6 +91,13 @@ Kirigami.ApplicationWindow {
         }
     }
 
+    function openAppImageContainer() {
+        if (welcome.appImageContainerSelected && currentPage
+                && currentPage.objectName === "appimagePage") {
+            pageStack.push(appimageContainerComponent);
+        }
+    }
+
     function openModes() {
         if (welcome.selectedMethod !== "container") {
             return;
@@ -238,6 +245,17 @@ Kirigami.ApplicationWindow {
     Component {
         id: appimageComponent
         AppImagePage {
+            parent: root.pageStack
+            onAboutRequested: aboutDialog.open()
+            onReturnRequested: root.pageStack.pop()
+            onCancelRequested: root.close()
+            onContainerRequested: root.openAppImageContainer()
+        }
+    }
+
+    Component {
+        id: appimageContainerComponent
+        AppImageContainerPage {
             parent: root.pageStack
             onAboutRequested: aboutDialog.open()
             onReturnRequested: root.pageStack.pop()

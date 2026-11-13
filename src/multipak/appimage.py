@@ -10,6 +10,7 @@ import shlex
 import shutil
 import stat
 import struct
+import subprocess
 import uuid
 from pathlib import Path, PurePosixPath
 from tempfile import NamedTemporaryFile
@@ -120,6 +121,53 @@ class Archive:
             ]
         return [_member(name) for name in rows if name and name != "."]
 
+    def listing(self):
+        """Type ("-" file, "d", "l", other) and size of each member that can be parsed.
+
+        Used to stay within size limits before extracting. Unparsed members are omitted.
+        """
+        entries = {}
+        if self.kind == 2:
+            output = self.runner.run(
+                [self.tool, "-o", str(self.offset), "-lls", str(self.path)], timeout=30
+            )
+            pattern = re.compile(
+                r"^([-dlcbps])\S{9}\s+\S+\s+([0-9]+)\s+\d{4}-\d\d-\d\d \d\d:\d\d "
+                r"squashfs-root/(.+)$"
+            )
+            for line in output.splitlines():
+                match = pattern.match(line)
+                if not match:
+                    continue
+                kind, size, name = match[1], int(match[2]), match[3]
+                if kind == "l":
+                    name = name.partition(" -> ")[0]
+                entries[name] = (kind, size)
+        elif Path(self.tool).name == "bsdtar":
+            output = self.runner.run([self.tool, "-tvf", str(self.path)], timeout=30)
+            pattern = re.compile(
+                r"^([-dlcbps])\S{9}\s+\S+\s+\S+\s+\S+\s+([0-9]+)\s+\w{3}\s+\d+\s+"
+                r"(?:\d{4}|\d\d:\d\d)\s+(.+)$"
+            )
+            for line in output.splitlines():
+                if match := pattern.match(line):
+                    name = match[3].partition(" -> ")[0] if match[1] == "l" else match[3]
+                    entries[name] = (match[1], int(match[2]))
+        else:
+            output = self.runner.run([self.tool, "l", "-slt", "-tiso", str(self.path)], timeout=30)
+            for block in output.partition("----------")[2].split("\n\n"):
+                fields = dict(line.split(" = ", 1) for line in block.splitlines() if " = " in line)
+                if "Path" in fields and fields.get("Size", "").isdigit():
+                    kind = "d" if fields.get("Folder") == "+" else "-"
+                    entries[fields["Path"]] = (kind, int(fields["Size"]))
+        result = {}
+        for name, value in entries.items():
+            try:
+                result[_member(name)] = value
+            except ValueError:
+                continue
+        return result
+
     def read(self, name, limit=MAX_METADATA):
         name = _member(name)
         if self.kind == 2:
@@ -129,6 +177,58 @@ class Archive:
         else:
             argv = [self.tool, "x", "-so", "-tiso", str(self.path), name]
         return self.runner.read_bytes(argv, limit=limit)
+
+    def extract_paths(self, destination, names):
+        """Extract only the named members, for reading. Links are extracted as links."""
+        destination = Path(destination)
+        if destination.exists() or destination.is_symlink():
+            raise ValueError(tr("The extraction directory already exists."))
+        names = [_member(name) for name in names]
+        if not names:
+            destination.mkdir()
+            return
+        if self.kind == 2:
+            command = [
+                self.tool,
+                "-o",
+                str(self.offset),
+                "-d",
+                str(destination),
+                "-no-xattrs",
+                "-no-progress",
+                "-processors",
+                "2",
+                "-mem",
+                "64M",
+                str(self.path),
+                *names,
+            ]
+        elif Path(self.tool).name == "bsdtar":
+            destination.mkdir()
+            command = [
+                self.tool,
+                "-xf",
+                str(self.path),
+                "-C",
+                str(destination),
+                "--no-same-owner",
+                "--no-same-permissions",
+                "--",
+                *names,
+            ]
+        else:
+            command = [
+                self.tool,
+                "x",
+                "-tiso",
+                "-y",
+                f"-o{destination}",
+                str(self.path),
+                "--",
+                *names,
+            ]
+        self.runner.run(command, timeout=600)
+        destination.mkdir(exist_ok=True)
 
     def extract(self, destination):
         destination = Path(destination)
@@ -351,6 +451,7 @@ def migrate_legacy_launchers(store):
 
 def _complete(engine, package):
     tx = engine.tx
+    tx.warnings.clear()
     directory = engine.store.appimage_directory(tx.id)
     application = directory / "application.AppImage"
     application.chmod(0o755)
@@ -364,16 +465,45 @@ def _complete(engine, package):
     if destination.exists():
         shutil.rmtree(destination)
     Archive(application, engine.runner).extract(destination)
-    tx.appimage_mode = "extracted"
+    container = None
+    if tx.appimage_container:
+        from .appimage_container import ensure_container, install_packages
+
+        engine._stage(70, tr("Preparing the container for the application…"))
+        container = ensure_container(engine)
+        tx.container, tx.container_id = container.name, container.container_id
+        engine.store.save(tx)
+        engine._stage(80, tr("Installing the dependencies in the container…"))
+        unavailable = install_packages(engine, container, tx.appimage_packages)
+        if unavailable:
+            tx.warnings.append(
+                tr("These dependencies could not be installed automatically: {0}.").format(
+                    ", ".join(unavailable)
+                )
+            )
+        tx.appimage_mode = "container"
+    else:
+        tx.appimage_mode = "extracted"
     engine._stage(90, tr("Adding the application to the application launcher…"))
     _desktop(engine.store, tx, package)
+    if container is not None and tx.appimage_verify:
+        from .appimage_container import verify_and_complete
+
+        engine._stage(95, tr("Checking the application in an isolated environment…"))
+        try:
+            tx.warnings.extend(verify_and_complete(engine, container, destination, tx.id))
+        except (CommandError, OSError, RuntimeError, TimeoutError, ValueError) as error:
+            # The application is installed; an incomplete check must not undo that.
+            tx.warnings.append(tr("The isolated check could not be completed: {0}").format(error))
     tx.status, tx.error = "installed", ""
     engine.store.save(tx)
     engine.progress(100, tr("Installation completed."))
     return tx
 
 
-def install(engine, package):
+def install(engine, package, *, container=False, packages=(), verify=False):
+    """container: install packages in MultiPak's AppImage container and run the
+    application there; verify: afterwards, start it briefly in an isolated copy."""
     with engine.store.lock():
         tx = Transaction(
             uuid.uuid4().hex,
@@ -385,6 +515,9 @@ def install(engine, package):
             "",
             method="appimage",
             container_created=False,
+            appimage_container=bool(container),
+            appimage_packages=list(packages) if container else [],
+            appimage_verify=bool(container and verify),
         )
         engine.tx = tx
         try:
@@ -491,5 +624,54 @@ def launch(transaction_id, arguments, extra_environment=None):
             )
             os.execv(invocation[0], invocation)
         os.execve(str(entry), [str(entry), *arguments], environment)
+    elif tx.appimage_mode == "container":
+        from .appimage_container import launch_command
+
+        appdir = directory / "AppDir"
+        entry = appdir / "AppRun"
+        if (
+            appdir.is_symlink()
+            or not entry.is_file()
+            or not entry.resolve().is_relative_to(appdir.resolve())
+            or not re.fullmatch(r"[0-9a-f]{64}", tx.container_id)
+        ):
+            raise RuntimeError(tr("The application entry point is unavailable."))
+        # The name must still lead to the recorded container: never let Distrobox create
+        # a replacement, and never open the application in another container that has
+        # taken the name.
+        try:
+            result = host.run(
+                ["podman", "container", "inspect", "--format", "{{.Id}}", "--", tx.container],
+                capture_output=True,
+                text=True,
+                timeout=30,
+                check=False,
+            )
+            current = result.stdout.strip() if result.returncode == 0 else ""
+        except (OSError, subprocess.TimeoutExpired):
+            current = ""
+        if not current:
+            raise RuntimeError(
+                tr("The container for this AppImage is unavailable. Install the AppImage again.")
+            )
+        if current != tx.container_id:
+            raise RuntimeError(
+                tr("The AppImage container identity or ownership has changed. It was not used.")
+            )
+        environment = {
+            "APPIMAGE": str(application),
+            "APPDIR": str(appdir),
+            "OWD": os.getcwd(),
+            "ARGV0": str(application),
+            **(extra_environment or {}),
+        }
+        argv = launch_command(tx.container, entry, arguments, environment)
+        if host.is_flatpak():
+            invocation = host.command(argv, watch_bus=False)
+            os.execv(invocation[0], invocation)
+        executable = shutil.which("distrobox")
+        if not executable:
+            raise RuntimeError(tr("Distrobox was not found."))
+        os.execv(executable, [executable, *argv[1:]])
     else:
         raise RuntimeError(tr("Invalid AppImage launch method."))

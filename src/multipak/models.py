@@ -100,6 +100,8 @@ class PackageInspection:
     package: Package
     existing: tuple[ExistingEnvironment, ...] = ()
     environments: tuple[Environment, ...] = ()
+    # appimage_dependencies.DependencyReport for AppImages; None when not checked.
+    dependencies: object = None
 
 
 # Offline fallback only. The installed Distrobox catalog and registry metadata supply live versions.
@@ -164,6 +166,10 @@ class Transaction:
     force_new_environment: bool = False
     preserve_environment_on_cleanup: bool = False
     appimage_mode: str = "direct"
+    # AppImages that need extra system components run in MultiPak's AppImage container.
+    appimage_container: bool = False
+    appimage_packages: list[str] = field(default_factory=list)
+    appimage_verify: bool = False
 
     def to_dict(self) -> dict:
         return asdict(self)
