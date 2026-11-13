@@ -303,6 +303,10 @@ class Welcome(QObject):
         return getattr(self, "_result_note", "")
 
     @Property(bool, notify=dataChanged)
+    def resultWarning(self):
+        return getattr(self, "_result_warning", False)
+
+    @Property(bool, notify=dataChanged)
     def systemInstallAvailable(self):
         return self.kind == "RPM"
 

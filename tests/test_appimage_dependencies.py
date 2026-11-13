@@ -327,7 +327,7 @@ def test_check_repeats_while_it_finds_installable_dependencies(store, monkeypatc
     monkeypatch.setattr(
         appimage_container,
         "install_packages",
-        lambda engine, container, specs: installed.extend(specs) or [],
+        lambda engine, container, specs, *_: installed.extend(specs) or [],
     )
     engine = engine_for(store, Recorder())
     warnings = appimage_container.verify_and_complete(engine, None, tmp_path, "f" * 32)
@@ -365,12 +365,12 @@ def test_container_installation_records_the_container_and_installs_packages(stor
     monkeypatch.setattr(
         appimage_container,
         "install_packages",
-        lambda engine, container, specs: calls.append(("install", specs)) or ["python3dist(x)"],
+        lambda engine, container, specs, *_: calls.append(("install", specs)) or ["python3dist(x)"],
     )
     monkeypatch.setattr(
         appimage_container,
         "verify_and_complete",
-        lambda engine, container, appdir, tx_id, packages: (
+        lambda engine, container, appdir, tx_id, packages, *_: (
             calls.append(("verify", appdir)) or ["checked"]
         ),
     )
@@ -399,7 +399,9 @@ def test_container_installation_records_the_container_and_installs_packages(stor
     assert (result.container, result.container_id) == (record.name, record.container_id)
     assert calls[0] == ("install", ["python3-tkinter", "python3dist(x)"])
     assert calls[1] == ("verify", directory / "AppDir")
-    assert any("python3dist(x)" in warning for warning in result.warnings)
+    assert any("Python module x" in warning for warning in result.warnings)
+    # Something is still missing: the completion screen shows a warning.
+    assert result.appimage_missing == ["Python module x"]
     assert "checked" in result.warnings
     assert len(result.launchers) == 1
 
@@ -928,7 +930,7 @@ def test_repair_installs_the_dependencies_in_a_new_container(store, monkeypatch)
     monkeypatch.setattr(
         appimage_container,
         "install_packages",
-        lambda engine, container, specs: installed.append((container, list(specs))) or [],
+        lambda engine, container, specs, *_: installed.append((container, list(specs))) or [],
     )
     repaired = appimage_container.repair(engine_for(store, Recorder()), tx.id)
     assert installed == [(new, ["python3-tkinter", "libfoo.so.1()(64bit)"])]

@@ -465,6 +465,7 @@ def migrate_legacy_launchers(store):
 def _complete(engine, package):
     tx = engine.tx
     tx.warnings.clear()
+    tx.appimage_missing.clear()
     directory = engine.store.appimage_directory(tx.id)
     application = directory / "application.AppImage"
     application.chmod(0o755)
@@ -480,18 +481,23 @@ def _complete(engine, package):
     Archive(application, engine.runner).extract(destination)
     container = None
     if tx.appimage_container:
-        from .appimage_container import ensure_container, install_packages
+        from .appimage_container import ensure_container, install_packages, pypi_note
+        from .appimage_dependencies import package_label
 
         engine._stage(70, tr("Preparing the container for the application…"))
         container = ensure_container(engine)
         tx.container, tx.container_id = container.name, container.container_id
         engine.store.save(tx)
         engine._stage(80, tr("Installing the dependencies in the container…"))
-        unavailable = install_packages(engine, container, tx.appimage_packages)
+        from_pypi = []
+        unavailable = install_packages(engine, container, tx.appimage_packages, from_pypi)
+        if from_pypi:
+            tx.warnings.append(pypi_note(from_pypi))
         if unavailable:
+            tx.appimage_missing.extend(package_label(spec) for spec in unavailable)
             tx.warnings.append(
                 tr("These dependencies could not be installed automatically: {0}.").format(
-                    ", ".join(unavailable)
+                    ", ".join(tx.appimage_missing)
                 )
             )
         tx.appimage_mode = "container"
@@ -505,7 +511,14 @@ def _complete(engine, package):
         engine._stage(95, tr("Checking the application in an isolated environment…"))
         try:
             tx.warnings.extend(
-                verify_and_complete(engine, container, destination, tx.id, tx.appimage_packages)
+                verify_and_complete(
+                    engine,
+                    container,
+                    destination,
+                    tx.id,
+                    tx.appimage_packages,
+                    tx.appimage_missing,
+                )
             )
         except (CommandError, OSError, RuntimeError, TimeoutError, ValueError) as error:
             # The application is installed; an incomplete check must not undo that.
@@ -558,6 +571,79 @@ def install(engine, package, *, container=False, packages=(), verify=False):
             if reported is not error:
                 raise reported from error
             raise
+
+
+def update(engine, transaction_id, staged, *, packages=(), container=None):
+    """Install a downloaded new version in place of the current one.
+
+    The current copy is kept until the new one works and is put back if anything fails.
+    packages are added to those installed in the container; container moves an AppImage
+    that ran on the system into MultiPak's AppImage container."""
+    with engine.store.lock():
+        tx = next((item for item in engine.store.transactions() if item.id == transaction_id), None)
+        if tx is None or tx.method != "appimage" or tx.status != "installed":
+            raise RuntimeError(tr("This AppImage installation is unavailable."))
+        directory = engine.store.appimage_directory(tx.id)
+        staged = Path(staged)
+        if staged.is_symlink() or not staged.is_file() or staged.parent != directory:
+            raise ValueError(tr("The downloaded AppImage is unavailable."))
+        engine.tx = tx
+        snapshot = tx.to_dict()
+        application = directory / "application.AppImage"
+        appdir = directory / "AppDir"
+        previous, previous_appdir = directory / "previous.AppImage", directory / "previous.AppDir"
+        for path in (previous, previous_appdir):
+            if path.is_symlink() or path.is_file():
+                path.unlink()
+            elif path.exists():
+                shutil.rmtree(path)
+        package = inspect_appimage(staged, engine.runner)
+        with staged.open("rb") as stream:
+            digest = hashlib.file_digest(stream, "sha256").hexdigest()
+        os.replace(application, previous)
+        os.replace(staged, application)
+        if appdir.exists() and not appdir.is_symlink():
+            os.replace(appdir, previous_appdir)
+        icons = {
+            path.name: path.read_bytes() for path in directory.glob("icon.*") if path.is_file()
+        }
+        try:
+            for name in icons:
+                (directory / name).unlink()
+            tx.sha256 = digest
+            tx.package_name, tx.package_version = package.name, package.version
+            if container:
+                tx.appimage_container = True
+            tx.appimage_packages = list(dict.fromkeys([*tx.appimage_packages, *packages]))
+            engine.store.save(tx)
+            result = _complete(engine, package)
+        except BaseException:
+            if appdir.exists() and not appdir.is_symlink():
+                shutil.rmtree(appdir)
+            if previous_appdir.exists():
+                os.replace(previous_appdir, appdir)
+            application.unlink(missing_ok=True)
+            os.replace(previous, application)
+            for name in list(directory.glob("icon.*")):
+                name.unlink()
+            for name, data in icons.items():
+                (directory / name).write_bytes(data)
+            restored = Transaction(**snapshot)
+            engine.store.save(restored)
+            engine.tx = restored
+            try:
+                _desktop(engine.store, restored, inspect_appimage(application, engine.runner))
+            except Exception as error:
+                engine._log(tr("Could not restore the shortcut: {0}").format(error))
+            finally:
+                # The installation itself stays: a cancelled update must never lead the
+                # worker to clean up, and so uninstall, the application.
+                engine.tx = None
+            raise
+        engine.tx = None
+        previous.unlink(missing_ok=True)
+        shutil.rmtree(previous_appdir, ignore_errors=True)
+        return result
 
 
 def retry(engine, tx):

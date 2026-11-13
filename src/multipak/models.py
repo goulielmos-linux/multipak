@@ -189,6 +189,11 @@ class Transaction:
     appimage_container: bool = False
     appimage_packages: list[str] = field(default_factory=list)
     appimage_verify: bool = False
+    # Dependencies that could not be installed, from the last installation or update.
+    appimage_missing: list[str] = field(default_factory=list)
+    # Where to look for new versions when the AppImage does not say it itself: a link
+    # the user entered, or the project page MultiPak found and confirmed.
+    appimage_update_source: str = ""
 
     def to_dict(self) -> dict:
         return asdict(self)

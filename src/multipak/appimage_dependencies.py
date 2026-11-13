@@ -313,6 +313,18 @@ def fedora_python_package(module: str) -> str:
     return f"python3dist({module.lower().replace('_', '-')})"
 
 
+def package_label(spec: str) -> str:
+    """How a requested Fedora package or capability is shown to the user."""
+    module = next((key for key, value in FEDORA_PYTHON_PACKAGES.items() if value == spec), None)
+    if module is not None:
+        return Dependency("python", module).label
+    if match := re.fullmatch(r"python3dist\((.+)\)", spec):
+        return Dependency("python", match[1]).label
+    if match := re.fullmatch(r"(.+\.so[0-9.]*)(?:\(\)\(64bit\))?", spec):
+        return Dependency("library", match[1]).label
+    return spec
+
+
 def _bin_or_library(name: str) -> bool:
     path = PurePosixPath(name)
     return (len(path.parts) >= 2 and path.parts[-2] in BIN_DIRECTORIES) or bool(

@@ -40,7 +40,11 @@ Kirigami.ScrollablePage {
             Layout.fillWidth: true
 
             Kirigami.Icon {
-                source: BreezeIcons.source(welcome.state === "cancelled" ? "dialog-information" : "dialog-positive", Kirigami.Theme.backgroundColor)
+                objectName: "completionIcon"
+                source: BreezeIcons.source(
+                    welcome.state === "cancelled" ? "dialog-information"
+                        : welcome.resultWarning ? "dialog-warning" : "dialog-positive",
+                    Kirigami.Theme.backgroundColor)
                 Layout.preferredWidth: Kirigami.Units.iconSizes.medium
                 Layout.preferredHeight: Kirigami.Units.iconSizes.medium
                 Accessible.ignored: true

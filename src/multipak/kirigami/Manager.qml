@@ -52,6 +52,9 @@ Kirigami.ApplicationWindow {
         function onConfirmationRequested() { removalDialog.open(); }
         function onRepairConfirmationRequested() { repairDialog.open(); }
         function onDeleteConfirmationRequested() { deleteDialog.open(); }
+        function onUpdateLinkRequested() { updateLinkDialog.open(); }
+        function onUpdateClosingRequested() { updateClosingDialog.open(); }
+        function onUpdateDependenciesRequested() { updateDependenciesDialog.open(); }
         function onContainerRemovalRequested() { containerRemovalDialog.open(); }
         function onCompanionWarning(message) {
             companionWarningText.text = message;
@@ -226,6 +229,180 @@ Kirigami.ApplicationWindow {
                 }
             }
         }
+    }
+
+    // Updating an AppImage. Each window either continues the update or cancels it.
+    InformationWindow {
+        id: updateLinkDialog
+        objectName: "updateLinkDialog"
+        property bool proceeding: false
+        transientParent: root
+        title: qsTr("Update application")
+        onShown: {
+            proceeding = false;
+            // A new update starts empty; after an error the link stays to be corrected.
+            if (manager.updateLinkError.length === 0)
+                updateLinkField.text = "";
+            updateLinkField.forceActiveFocus();
+        }
+        onClosing: if (!proceeding) manager.cancelAppImageUpdate()
+        Controls.Label {
+            objectName: "updateLinkText"
+            text: qsTr("The application does not indicate its update address. Enter it below:")
+            textFormat: Text.PlainText
+            wrapMode: Text.Wrap
+            Layout.fillWidth: true
+        }
+        Controls.TextField {
+            id: updateLinkField
+            objectName: "updateLinkField"
+            placeholderText: "https://"
+            Accessible.name: qsTr("Update address")
+            Layout.fillWidth: true
+            onAccepted: if (text.trim().length > 0) continueLinkButton.clicked()
+        }
+        Controls.Label {
+            objectName: "updateLinkError"
+            text: manager.updateLinkError
+            visible: text.length > 0
+            textFormat: Text.PlainText
+            color: Kirigami.Theme.negativeTextColor
+            wrapMode: Text.Wrap
+            Layout.fillWidth: true
+        }
+        footer: Controls.ToolBar {
+            padding: Kirigami.Units.largeSpacing * 2
+            contentItem: RowLayout {
+                Item { Layout.fillWidth: true }
+                Controls.Button {
+                    objectName: "cancelUpdateLinkButton"
+                    text: qsTr("Back")
+                    onClicked: updateLinkDialog.close()
+                }
+                Controls.Button {
+                    id: continueLinkButton
+                    objectName: "continueUpdateLinkButton"
+                    text: qsTr("Continue")
+                    highlighted: true
+                    enabled: updateLinkField.text.trim().length > 0
+                    onClicked: {
+                        updateLinkDialog.proceeding = true;
+                        manager.submitUpdateLink(updateLinkField.text.trim());
+                        updateLinkDialog.close();
+                    }
+                }
+            }
+        }
+    }
+
+    InformationWindow {
+        id: updateClosingDialog
+        objectName: "updateClosingDialog"
+        property bool proceeding: false
+        transientParent: root
+        title: qsTr("Update application")
+        onShown: {
+            proceeding = false;
+            backClosingButton.forceActiveFocus();
+        }
+        onClosing: if (!proceeding) manager.cancelAppImageUpdate()
+        Controls.Label {
+            objectName: "updateClosingText"
+            text: qsTr("%1 needs to be closed.\n\nIf MultiPak closes it for you, unsaved work in it may be lost.").arg(manager.updateName)
+            textFormat: Text.PlainText
+            wrapMode: Text.Wrap
+            Layout.fillWidth: true
+        }
+        footer: Controls.ToolBar {
+            padding: Kirigami.Units.largeSpacing * 2
+            contentItem: RowLayout {
+                Item { Layout.fillWidth: true }
+                Controls.Button {
+                    id: backClosingButton
+                    objectName: "cancelUpdateClosingButton"
+                    text: qsTr("Back")
+                    onClicked: updateClosingDialog.close()
+                }
+                Controls.Button {
+                    objectName: "confirmUpdateClosingButton"
+                    text: qsTr("Close it for me")
+                    onClicked: {
+                        updateClosingDialog.proceeding = true;
+                        manager.closeUpdatedApplication();
+                        updateClosingDialog.close();
+                    }
+                }
+            }
+        }
+    }
+
+    InformationWindow {
+        id: updateDependenciesDialog
+        objectName: "updateDependenciesDialog"
+        property bool proceeding: false
+        transientParent: root
+        title: qsTr("Update application")
+        onShown: {
+            proceeding = false;
+            backDependenciesButton.forceActiveFocus();
+        }
+        onClosing: if (!proceeding) manager.cancelAppImageUpdate()
+        RowLayout {
+            spacing: Kirigami.Units.smallSpacing
+            Layout.fillWidth: true
+            Controls.Label {
+                objectName: "updateDependenciesText"
+                text: qsTr("The new version requires new dependencies.")
+                textFormat: Text.PlainText
+                wrapMode: Text.Wrap
+            }
+            Controls.Label {
+                objectName: "updateDependenciesLink"
+                text: qsTr("<a href='dependencies'>View full list</a>")
+                textFormat: Text.RichText
+                linkColor: Kirigami.Theme.linkColor
+                Accessible.role: Accessible.Link
+                Accessible.name: qsTr("View the full list of required dependencies")
+                activeFocusOnTab: true
+                onLinkActivated: updateDependencyList.open()
+                Keys.onReturnPressed: updateDependencyList.open()
+                Keys.onSpacePressed: updateDependencyList.open()
+                HoverHandler {
+                    cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
+                }
+            }
+            Item { Layout.fillWidth: true }
+        }
+        footer: Controls.ToolBar {
+            padding: Kirigami.Units.largeSpacing * 2
+            contentItem: RowLayout {
+                Item { Layout.fillWidth: true }
+                Controls.Button {
+                    id: backDependenciesButton
+                    objectName: "cancelUpdateDependenciesButton"
+                    text: qsTr("Back")
+                    onClicked: updateDependenciesDialog.close()
+                }
+                Controls.Button {
+                    objectName: "confirmUpdateDependenciesButton"
+                    text: qsTr("Install")
+                    highlighted: true
+                    onClicked: {
+                        updateDependenciesDialog.proceeding = true;
+                        manager.confirmAppImageUpdate();
+                        updateDependenciesDialog.close();
+                    }
+                }
+            }
+        }
+    }
+
+    AppImageDependenciesDialog {
+        id: updateDependencyList
+        objectName: "updateDependencyList"
+        transientParent: updateDependenciesDialog
+        title: qsTr("Required dependencies")
+        dependencies: manager.updateDependencies
     }
 
     InformationWindow {

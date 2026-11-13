@@ -57,6 +57,9 @@ class Manager(QObject):
     companionWarning = Signal(str)
     repairConfirmationRequested = Signal()
     deleteConfirmationRequested = Signal()
+    updateLinkRequested = Signal()
+    updateClosingRequested = Signal()
+    updateDependenciesRequested = Signal()
     _repairsFound = Signal(object)
 
     def __init__(
@@ -101,6 +104,11 @@ class Manager(QObject):
         self._repair_target = ""
         self._pending_delete = None
         self._delete_name = ""
+        # AppImage updates: the result of each check, and the update in progress.
+        self._checks = {}
+        self._force_check = False
+        self._appimage_update = None
+        self._update_link_error = ""
         self._repairsFound.connect(self._set_repairs, Qt.QueuedConnection)
         # Long container updates print many lines. Batch them so each line does not
         # trigger a full interface refresh, as the installer already does.
@@ -178,6 +186,13 @@ class Manager(QObject):
         if self.busy or not 0 <= self._selected < len(self._items):
             return False
         item = self._items[self._selected]
+        if self._mode == "appimages":
+            check = self._checks.get(item.id)
+            return (
+                check is not None
+                and check.status in ("available", "no-source")
+                and item.id not in {identifier for identifier, _ in self._repairs}
+            )
         return (
             self._mode != "remove"
             or item.method != "system"
@@ -485,6 +500,8 @@ class Manager(QObject):
                 }
                 for tx in self._items
             ]
+        if self._mode == "appimages":
+            return [self._appimage_row(tx) for tx in self._items]
         return [
             {
                 "title": env.display_name,
@@ -494,6 +511,42 @@ class Manager(QObject):
             }
             for env in self._items
         ]
+
+    def _appimage_row(self, tx):
+        check = self._checks.get(tx.id)
+        if tx.id in {identifier for identifier, _ in self._repairs}:
+            note = tr("This application's container was replaced.")
+        elif check is None:
+            note = ""
+        elif check.status == "available":
+            release = check.release
+            version = (release.version or release.name) if release else ""
+            note = (
+                tr("Update available: {0}").format(version) if version else tr("Update available")
+            )
+        elif check.status == "current":
+            note = tr("Up to date")
+        elif check.status == "no-source":
+            note = tr("The application does not indicate its update address.")
+        else:
+            note = tr("Could not check for updates: {0}").format(check.error)
+        if check is not None and check.stale:
+            note += "\n" + tr("Could not check for updates now. Showing the last result.")
+        return {
+            "id": tx.id,
+            "title": tx.package_name,
+            "icon": GENERIC_ICON if self.preview else application_icon(self.store, tx),
+            "subtitle": tr("Version: {0} · {1}").format(
+                tr("Not provided") if tx.package_version == "Not provided" else tx.package_version,
+                tx.package_kind.upper(),
+            ),
+            "detail": (
+                tr("AppImage in container: {0}").format(tx.container)
+                if tx.appimage_mode == "container"
+                else tr("AppImage managed by MultiPak")
+            ),
+            "note": note,
+        }
 
     @Slot(int)
     def select(self, index):
@@ -617,7 +670,7 @@ class Manager(QObject):
 
     @Slot(str)
     def openList(self, mode):
-        if self.busy or mode not in ("remove", "update"):
+        if self.busy or mode not in ("remove", "update", "appimages"):
             return
         self._mode, self._selected, self._items = mode, -1, []
         self._pending = None
@@ -625,6 +678,10 @@ class Manager(QObject):
         self._status, self._logs, self._error = tr("Loading…"), "", False
         if mode == "remove":
             self._run(self._load_removals, self._loaded_removals)
+        elif mode == "appimages":
+            force, self._force_check = self._force_check, False
+            self._appimage_update = None
+            self._run(lambda engine: self._load_appimages(engine, force), self._loaded_appimages)
         else:
 
             def operation(engine):
@@ -684,6 +741,214 @@ class Manager(QObject):
             "" if self._items else tr("No applications are available to uninstall.")
         )
 
+    def _load_appimages(self, engine, force):
+        from multipak.appimage_updates import check, managed
+
+        if self.preview:
+            return [], {}
+        checks = check(engine, force=force)
+        return [tx for tx in managed(self.store) if tx.id in checks], checks
+
+    def _loaded_appimages(self, result):
+        self._items, self._checks = result
+        self._status = "" if self._items else tr("No AppImages are available to update.")
+
+    def _replace_check(self, transaction_id, check):
+        self._checks = dict(self._checks) | {transaction_id: check}
+        self.rowsChanged.emit()
+
+    def _update_name(self):
+        return self._appimage_update["name"] if self._appimage_update else ""
+
+    @Property(str, notify=changed)
+    def updateName(self):
+        return self._update_name()
+
+    @Property(str, notify=changed)
+    def updateLinkError(self):
+        return self._update_link_error
+
+    @Property(str, notify=changed)
+    def updateDependencies(self):
+        prepared = (self._appimage_update or {}).get("prepared")
+        return prepared.dependencies if prepared else ""
+
+    def _start_appimage_update(self):
+        tx = self._items[self._selected]
+        check = self._checks.get(tx.id)
+        self._appimage_update = {
+            "id": tx.id,
+            "name": tx.package_name,
+            "release": check.release,
+            "link": "",
+            "prepared": None,
+        }
+        if check.status == "no-source":
+            self._update_link_error = ""
+            self.changed.emit()
+            self.updateLinkRequested.emit()
+        else:
+            self._download_update()
+
+    @Slot(str)
+    def submitUpdateLink(self, text):
+        if self.busy or self._appimage_update is None:
+            return
+        from multipak.appimage_updates import check_link
+
+        identifier = self._appimage_update["id"]
+        self._status, self._logs, self._error = tr("Loading…"), "", False
+        self._run(
+            lambda engine: check_link(engine, identifier, text),
+            self._checked_link,
+            self._link_failed,
+        )
+
+    def _checked_link(self, check):
+        update = self._appimage_update
+        self._replace_check(update["id"], check)
+        if check.status == "current":
+            self._appimage_update, self._progress = None, 100
+            self._status = tr("{0} is up to date.").format(update["name"])
+            return
+        update["release"], update["link"] = check.release, check.link
+        self._status = ""
+        QTimer.singleShot(0, self._download_update)
+
+    def _link_failed(self, message):
+        self._status, self._update_link_error = "", message
+        self.updateLinkRequested.emit()
+
+    @Slot()
+    def cancelAppImageUpdate(self):
+        update, self._appimage_update = self._appimage_update, None
+        if update and update.get("prepared") is not None:
+            from multipak.appimage_updates import discard
+
+            discard(self.store, update["id"])
+        self._status = ""
+        self.changed.emit()
+
+    def _download_update(self):
+        if self.busy or self._appimage_update is None:
+            return
+        from multipak.appimage_updates import download, running
+
+        update = self._appimage_update
+        identifier, release, link = update["id"], update["release"], update["link"]
+
+        def operation(engine):
+            tx = next(item for item in self.store.transactions() if item.id == identifier)
+            if running(self.store, tx):
+                return "running"
+            return download(engine, identifier, release, link=link)
+
+        self._status, self._logs, self._error = (
+            tr("Downloading {0}…").format(update["name"]),
+            "",
+            False,
+        )
+        self._run(operation, self._downloaded, self._download_failed)
+
+    def _downloaded(self, result):
+        if result == "running":
+            self._status = ""
+            self.updateClosingRequested.emit()
+            return
+        self._appimage_update["prepared"] = result
+        self._status = ""
+        if result.packages:
+            self.updateDependenciesRequested.emit()
+        else:
+            QTimer.singleShot(0, self.confirmAppImageUpdate)
+
+    def _download_failed(self, message):
+        from multipak.appimage_updates import LinkMismatch
+
+        update = self._appimage_update
+        if update and update["link"] and message == str(LinkMismatch()):
+            # The link led to another application: ask for it again.
+            self._status, self._update_link_error = "", message
+            update["link"], update["release"] = "", None
+            self.updateLinkRequested.emit()
+            return
+        self._appimage_update = None
+        self._status, self._error = tr("Could not complete: ") + message, True
+
+    @Slot()
+    def closeUpdatedApplication(self):
+        """Close the running application, then continue the update."""
+        if self.busy or self._appimage_update is None:
+            return
+        from multipak.appimage_updates import close
+
+        identifier, name = self._appimage_update["id"], self._appimage_update["name"]
+
+        def operation(engine):
+            tx = next(item for item in self.store.transactions() if item.id == identifier)
+            return close(self.store, tx)
+
+        self._status, self._logs, self._error = tr("Closing {0}…").format(name), "", False
+        self._run(operation, self._closed_application)
+
+    def _closed_application(self, closed):
+        if not closed:
+            self._status = tr("{0} did not close. Close it and try again.").format(
+                self._update_name()
+            )
+            self.updateClosingRequested.emit()
+            return
+        self._status = ""
+        if self._appimage_update["prepared"] is None:
+            QTimer.singleShot(0, self._download_update)
+        else:
+            QTimer.singleShot(0, self.confirmAppImageUpdate)
+
+    @Slot()
+    def confirmAppImageUpdate(self):
+        update = self._appimage_update
+        if self.busy or update is None or update["prepared"] is None:
+            return
+        from multipak.appimage_updates import install, running
+
+        prepared = update["prepared"]
+
+        def operation(engine):
+            tx = next(
+                item for item in self.store.transactions() if item.id == prepared.transaction_id
+            )
+            # It may have been opened again while the new version was downloading.
+            if running(self.store, tx):
+                return "running"
+            return install(engine, prepared)
+
+        self._status = tr("Updating {0}… Please wait.").format(update["name"])
+        self._logs, self._error = "", False
+        self._run(operation, self._appimage_updated, self._appimage_update_failed)
+
+    def _appimage_updated(self, result):
+        if result == "running":
+            self._status = ""
+            self.updateClosingRequested.emit()
+            return
+        from multipak.appimage_updates import Check
+
+        name = self._update_name()
+        self._appimage_update = None
+        self._items = [result if tx.id == result.id else tx for tx in self._items]
+        self._replace_check(result.id, Check("current", result.appimage_update_source))
+        self._progress = 100
+        self._status = "\n\n".join([tr("{0} was updated.").format(name), *result.warnings])
+        self._error = bool(result.appimage_missing)
+
+    def _appimage_update_failed(self, message):
+        update, self._appimage_update = self._appimage_update, None
+        if update is not None:
+            from multipak.appimage_updates import discard
+
+            discard(self.store, update["id"])
+        self._status, self._error = tr("Could not complete: ") + message, True
+
     def _loaded_environments(self, items):
         self._items = items
         self._status = "" if items else tr("No MultiPak containers are available to update.")
@@ -700,6 +965,8 @@ class Manager(QObject):
 
     @Slot()
     def refresh(self):
+        # Reloading the AppImage list consults the servers again.
+        self._force_check = self._mode == "appimages"
         self.openList(self._mode)
 
     @Slot()
@@ -772,6 +1039,13 @@ class Manager(QObject):
 
     @Slot()
     def updateSelected(self):
+        if self.canAct and self._mode == "appimages":
+            if self.preview:
+                self._status = tr("This is a preview. No update was started.")
+                self.changed.emit()
+                return
+            self._start_appimage_update()
+            return
         if not self.canAct or self._mode != "update":
             return
         self._logs, self._error = "", False
@@ -922,7 +1196,7 @@ def create_preview_manager(app):
 def main():
     parser = argparse.ArgumentParser(description=tr("Application Manager — MultiPak"))
     parser.add_argument("--preview", action="store_true")
-    parser.add_argument("--page", choices=("home", "remove", "update"), default="home")
+    parser.add_argument("--page", choices=("home", "remove", "update", "appimages"), default="home")
     parser.add_argument("--screenshot", type=Path)
     args = parser.parse_args()
     if args.screenshot and not args.preview:

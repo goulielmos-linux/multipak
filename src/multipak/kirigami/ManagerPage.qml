@@ -159,6 +159,15 @@ Kirigami.ScrollablePage {
                 }
             }
             ManagerActionCard {
+                title: qsTr("Update AppImages")
+                description: qsTr("Choose an AppImage to update.")
+                iconName: "system-software-update"
+                buttonName: "managerAppImageUpdateButton"
+                onActivated: manager.openList("appimages")
+                Layout.fillWidth: true
+            }
+
+            ManagerActionCard {
                 title: qsTr("MultiPak settings")
                 description: qsTr("Configure file types and the interface language.")
                 iconName: "configure"
@@ -171,7 +180,8 @@ Kirigami.ScrollablePage {
 
         Kirigami.Heading {
             visible: manager.mode !== "home"
-            text: manager.mode === "remove" ? qsTr("Uninstall applications") : qsTr("Update applications")
+            text: manager.mode === "remove" ? qsTr("Uninstall applications")
+                : manager.mode === "appimages" ? qsTr("Update AppImages") : qsTr("Update applications")
             level: 2
             wrapMode: Text.WordWrap
             Layout.fillWidth: true
@@ -180,6 +190,13 @@ Kirigami.ScrollablePage {
         Controls.Label {
             visible: manager.mode === "update"
             text: qsTr("Choose a container to update everything installed in it, including applications and their dependencies. Your system itself is not changed.")
+            wrapMode: Text.WordWrap
+            Layout.fillWidth: true
+        }
+
+        Controls.Label {
+            visible: manager.mode === "appimages"
+            text: qsTr("Choose an AppImage to update. Your system itself is not changed.")
             wrapMode: Text.WordWrap
             Layout.fillWidth: true
         }
@@ -215,7 +232,7 @@ Kirigami.ScrollablePage {
                             spacing: Kirigami.Units.largeSpacing
                             Kirigami.Icon {
                                 objectName: "managerApplicationIcon" + index
-                                source: manager.mode === "remove"
+                                source: manager.mode === "remove" || manager.mode === "appimages"
                                     ? modelData.icon : Qt.resolvedUrl("assets/container.svg")
                                 Layout.preferredWidth: Kirigami.Units.iconSizes.medium
                                 Layout.preferredHeight: Kirigami.Units.iconSizes.medium
@@ -247,6 +264,8 @@ Kirigami.ScrollablePage {
                                     visible: modelData.note.length > 0
                                     text: modelData.note
                                     color: Kirigami.Theme.neutralTextColor
+                                    textFormat: Text.PlainText
+                                    wrapMode: Text.Wrap
                                     Layout.fillWidth: true
                                 }
                             }

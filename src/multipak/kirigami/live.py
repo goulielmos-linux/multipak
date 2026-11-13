@@ -447,6 +447,8 @@ class LiveInstaller(Welcome):
         )
         if tx.warnings:
             self._result_note += "\n\n" + "\n".join(tx.warnings)
+        # Installed, but something it needs is still missing: shown as a warning.
+        self._result_warning = bool(tx.appimage_missing)
         self._set_state("success")
         if self._close_pending:
             self.closeRequested.emit()

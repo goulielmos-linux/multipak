@@ -36,6 +36,8 @@ Application Manager, available from the application launcher.
 - Create a standard or custom container, or reuse a compatible existing one.
 - Add AppImages to the application launcher while preserving the original download.
 - Uninstall applications and update Distrobox containers.
+- Update AppImages from the Application Manager, using the address the AppImage
+  indicates, its project page or a link you enter.
 - Show download progress when Podman or the package manager reports it.
 - Search Bazaar, GNOME Software or KDE Discover for a Flatpak alternative before
   installing a non-native package.

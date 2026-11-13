@@ -2,8 +2,10 @@
 
 import json
 import re
+import shutil
 import threading
 import uuid
+import zipfile
 from dataclasses import replace
 from pathlib import Path
 
@@ -26,6 +28,9 @@ STILL_RUNNING = 124
 CHECK_ROUNDS = 3
 # Package names and RPM capabilities such as libfoo.so.1()(64bit) or python3dist(foo).
 PACKAGE_SPEC = re.compile(r"[A-Za-z0-9][A-Za-z0-9._+()-]{0,199}")
+# The capability MultiPak requests for a Python module: python3dist(<project name>).
+PYTHON_DISTRIBUTION = re.compile(r"python3dist\(([a-z0-9][a-z0-9._-]{0,99})\)")
+MAX_WHEEL = 512 * 1024 * 1024
 
 
 def _enter(name, *arguments):
@@ -296,11 +301,27 @@ def repair(engine, transaction_id, *, on_system=False):
         return tx
 
 
-def install_packages(engine, container, specs):
-    """Install what can be found; return the specs no package provides."""
+def install_packages(engine, container, specs, from_pypi=None):
+    """Install what can be found; return the specs no package provides.
+
+    Python modules Fedora does not package are looked up on PyPI. from_pypi, when
+    given, receives the names installed from there."""
     specs = [spec for spec in dict.fromkeys(specs) if PACKAGE_SPEC.fullmatch(spec)]
     if not specs:
         return []
+    missing = _install_fedora_packages(engine, container, specs)
+    remaining = []
+    for spec in missing:
+        match = PYTHON_DISTRIBUTION.fullmatch(spec)
+        if match and install_from_pypi(engine, container, match[1]):
+            if from_pypi is not None:
+                from_pypi.append(match[1])
+        else:
+            remaining.append(spec)
+    return remaining
+
+
+def _install_fedora_packages(engine, container, specs):
     verify_name(engine.runner, container)
     progress = PackageProgress(engine.progress, install_label=tr("Installing the dependencies…"))
     # A guessed name that no package provides must not stop the others.
@@ -327,6 +348,113 @@ def install_packages(engine, container, specs):
         for line in output.splitlines()
         if line.startswith("no package provides ")
     ]
+
+
+def _normalized(name):
+    """Python project and module names compare without case and separators."""
+    return re.sub(r"[-_.]+", "_", name).lower()
+
+
+def wheel_modules(path):
+    """Top-level modules a wheel installs, read from its file list. Nothing in it runs."""
+    with zipfile.ZipFile(path) as wheel:
+        names = wheel.namelist()
+    modules = set()
+    for name in names:
+        first, _, rest = name.partition("/")
+        if not first or first.endswith((".dist-info", ".data")):
+            continue
+        if rest:
+            modules.add(first)
+        elif first.endswith(".py"):
+            modules.add(first[:-3])
+        elif first.endswith(".so"):
+            modules.add(first.split(".", 1)[0])
+    return modules
+
+
+def _pip(container, *arguments, root=False):
+    command = ("sudo", "-n", "python3") if root else ("python3",)
+    return _enter(
+        container.name,
+        *command,
+        "-m",
+        "pip",
+        # General options go first: everything after "--" names packages.
+        "--disable-pip-version-check",
+        "--no-input",
+        *arguments,
+    )
+
+
+def install_from_pypi(engine, container, project):
+    """Install a Python module Fedora does not package from PyPI, in the container only.
+
+    Only ready-made wheels are used: building a package from source would run its code.
+    The wheel is downloaded first and installed only if it contains the module the
+    application imports, so a project that merely has a similar name is never used.
+    Returns whether it was installed."""
+    runner = engine.runner
+    directory = engine.store.root / "pypi" / uuid.uuid4().hex
+    try:
+        verify_name(runner, container)
+        engine.progress(-1, tr("Installing {0} from PyPI…").format(project))
+        try:
+            runner.run(_pip(container, "--version"), timeout=60)
+        except CommandError:
+            # Fedora ships pip separately from Python.
+            _install_fedora_packages(engine, container, ["python3-pip"])
+        directory.mkdir(parents=True, mode=0o700)
+        runner.run(
+            _pip(
+                container,
+                "download",
+                "--no-deps",
+                "--only-binary=:all:",
+                "--dest",
+                str(directory),
+                "--",
+                project,
+            ),
+            timeout=600,
+        )
+        wheels = [
+            path
+            for path in directory.iterdir()
+            if path.suffix == ".whl" and path.is_file() and not path.is_symlink()
+        ]
+        if len(wheels) != 1 or wheels[0].stat().st_size > MAX_WHEEL:
+            raise ValueError(
+                tr("PyPI did not provide a ready-made package for {0}.").format(project)
+            )
+        modules = {_normalized(module) for module in wheel_modules(wheels[0])}
+        if _normalized(project) not in modules:
+            raise ValueError(
+                tr(
+                    "The package {0} on PyPI does not contain the module the application uses."
+                ).format(project)
+            )
+        # Installed for the container's administrator, in /usr/local: Fedora keeps its own
+        # packages in /usr, and the host system never sees either.
+        runner.run(
+            _pip(
+                container,
+                "install",
+                "--only-binary=:all:",
+                "--root-user-action=ignore",
+                "--break-system-packages",
+                "--",
+                str(wheels[0]),
+                root=True,
+            ),
+            timeout=1200,
+        )
+        return True
+    except (CommandError, OSError, ValueError, zipfile.BadZipFile) as error:
+        engine._log(tr("Could not install {0} from PyPI: {1}").format(project, error))
+        return False
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
 
 
 def _cleanup_runner(runner):
@@ -406,12 +534,14 @@ def isolated_check(engine, container, appdir: Path, transaction_id: str):
     return (), "exited" if code == 0 else "unknown"
 
 
-def verify_and_complete(engine, container, appdir: Path, transaction_id: str, packages=None):
+def verify_and_complete(
+    engine, container, appdir: Path, transaction_id: str, packages=None, missing=None
+):
     """Repeat the isolated check while it finds installable components. Returns warnings.
 
     packages, when given, receives what the check installed, so a repair can install
-    the same components in a new container."""
-    warnings, installed, unresolved = [], [], []
+    the same components in a new container; missing receives what it could not install."""
+    warnings, installed, unresolved, from_pypi = [], [], [], []
     outcome = "unknown"
     for _ in range(CHECK_ROUNDS):
         reported, outcome = isolated_check(engine, container, appdir, transaction_id)
@@ -425,19 +555,26 @@ def verify_and_complete(engine, container, appdir: Path, transaction_id: str, pa
         if not installable:
             break
         engine.progress(-1, tr("Installing the dependencies found by the check…"))
-        missing = install_packages(engine, container, [item.package for item in installable])
-        unresolved.extend(item for item in installable if item.package in missing)
-        installed.extend(item.package for item in installable if item.package not in missing)
+        absent = install_packages(
+            engine, container, [item.package for item in installable], from_pypi
+        )
+        unresolved.extend(item for item in installable if item.package in absent)
+        installed.extend(item.package for item in installable if item.package not in absent)
     if packages is not None:
         packages.extend(item for item in installed if item not in packages)
     if installed:
         warnings.append(
             tr("The check installed additional dependencies: {0}.").format(", ".join(installed))
         )
+    if from_pypi:
+        warnings.append(pypi_note(from_pypi))
     if unresolved:
+        labels = [item.label for item in _unique(unresolved)]
+        if missing is not None:
+            missing.extend(label for label in labels if label not in missing)
         warnings.append(
             tr("These dependencies could not be installed automatically: {0}.").format(
-                ", ".join(item.label for item in _unique(unresolved))
+                ", ".join(labels)
             )
         )
     elif outcome == "unknown":
@@ -449,6 +586,12 @@ def verify_and_complete(engine, container, appdir: Path, transaction_id: str, pa
             )
         )
     return warnings
+
+
+def pypi_note(projects):
+    return tr("These dependencies were installed from PyPI, the Python package index: {0}.").format(
+        ", ".join(projects)
+    )
 
 
 def _unique(items):

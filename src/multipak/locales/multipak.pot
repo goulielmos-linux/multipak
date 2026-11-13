@@ -21,6 +21,9 @@ msgstr ""
 msgid " — stable version"
 msgstr ""
 
+msgid "%1 needs to be closed.\n\nIf MultiPak closes it for you, unsaved work in it may be lost."
+msgstr ""
+
 msgid "%1 needs to be repaired."
 msgstr ""
 
@@ -162,6 +165,9 @@ msgstr ""
 msgid "Changes operating system files. This can cause dependency conflicts or prevent applications from working after an update."
 msgstr ""
 
+msgid "Checking for updates to {0}…"
+msgstr ""
+
 msgid "Checking package repositories — {0}%"
 msgstr ""
 
@@ -175,6 +181,12 @@ msgid "Checking the container image…"
 msgstr ""
 
 msgid "Checking the container…"
+msgstr ""
+
+msgid "Checking the dependencies of the new version…"
+msgstr ""
+
+msgid "Checking the new version…"
 msgstr ""
 
 msgid "Checking…"
@@ -198,6 +210,12 @@ msgstr ""
 msgid "Choose a valid name for the new environment."
 msgstr ""
 
+msgid "Choose an AppImage to update."
+msgstr ""
+
+msgid "Choose an AppImage to update. Your system itself is not changed."
+msgstr ""
+
 msgid "Choose an RPM, DEB, prebuilt Arch Linux package or AppImage."
 msgstr ""
 
@@ -214,6 +232,12 @@ msgid "Cleaning up the installation…"
 msgstr ""
 
 msgid "Close"
+msgstr ""
+
+msgid "Close it for me"
+msgstr ""
+
+msgid "Closing {0}…"
 msgstr ""
 
 msgid "Configure file types and the interface language."
@@ -285,6 +309,15 @@ msgstr ""
 msgid "Copying the package to the existing container…"
 msgstr ""
 
+msgid "Could not check for updates now. Showing the last result."
+msgstr ""
+
+msgid "Could not check for updates to {0}: {1}"
+msgstr ""
+
+msgid "Could not check for updates: {0}"
+msgstr ""
+
 msgid "Could not check the AppImage dependencies: {0}"
 msgstr ""
 
@@ -298,6 +331,9 @@ msgid "Could not complete the operation"
 msgstr ""
 
 msgid "Could not complete: "
+msgstr ""
+
+msgid "Could not connect: {0}"
 msgstr ""
 
 msgid "Could not find 7-Zip or bsdtar to read the type 1 AppImage."
@@ -316,6 +352,9 @@ msgid "Could not identify the host's user directories."
 msgstr ""
 
 msgid "Could not identify the image version."
+msgstr ""
+
+msgid "Could not install {0} from PyPI: {1}"
 msgstr ""
 
 msgid "Could not load Kirigami. Use the compatible PySide6 and Kirigami supplied by the system."
@@ -372,6 +411,9 @@ msgstr ""
 msgid "Could not remove the old MultiPak. You can remove it from a terminal and then try again:\n\nflatpak uninstall io.github.multipak.manager"
 msgstr ""
 
+msgid "Could not restore the shortcut: {0}"
+msgstr ""
+
 msgid "Could not retrieve the list of layered system packages."
 msgstr ""
 
@@ -379,6 +421,9 @@ msgid "Could not save the image."
 msgstr ""
 
 msgid "Could not save the language preference: {0}"
+msgstr ""
+
+msgid "Could not save the update check: {0}"
 msgstr ""
 
 msgid "Could not save the update reminder."
@@ -504,10 +549,16 @@ msgstr ""
 msgid "Downloading {0} — {1}%"
 msgstr ""
 
+msgid "Downloading {0}…"
+msgstr ""
+
 msgid "English is used if no translation is available."
 msgstr ""
 
 msgid "Enter a name for the new container."
+msgstr ""
+
+msgid "Enter an address that starts with https://."
 msgstr ""
 
 msgid "Execution environment and graphics system."
@@ -547,6 +598,9 @@ msgid "Foundation of the graphical interface."
 msgstr ""
 
 msgid "GNU C Library {0} or newer"
+msgstr ""
+
+msgid "GitHub limits how often it can be consulted. Try again later."
 msgstr ""
 
 msgid "Hide alternative method"
@@ -655,6 +709,9 @@ msgid "Installing the dependencies in the container…"
 msgstr ""
 
 msgid "Installing the dependencies…"
+msgstr ""
+
+msgid "Installing {0} from PyPI…"
 msgstr ""
 
 msgid "Installs the application safely and automatically."
@@ -786,6 +843,9 @@ msgstr ""
 msgid "MultiPak Installation Wizard"
 msgstr ""
 
+msgid "MultiPak cannot look for updates at this address."
+msgstr ""
+
 msgid "MultiPak could not determine which RPM-based distribution this package was built for, so it will use the latest Fedora version as the default environment: {0}.\n\nIf the application does not work after installation, it may have been built for a different Fedora version or another distribution, such as Nobara, Rocky Linux, AlmaLinux or openSUSE. Uninstall it through Application Manager — MultiPak and look for a package built for your chosen distribution."
 msgstr ""
 
@@ -814,6 +874,12 @@ msgid "MultiPak will install the dependencies of {0} in the container {1}."
 msgstr ""
 
 msgid "Native installation"
+msgstr ""
+
+msgid "No AppImage for this computer was found at this address."
+msgstr ""
+
+msgid "No AppImages are available to update."
 msgstr ""
 
 msgid "No MultiPak containers are available to update."
@@ -910,6 +976,9 @@ msgid "Preparing to uninstall the system package…"
 msgstr ""
 
 msgid "Preview: {0} × {1} px"
+msgstr ""
+
+msgid "PyPI did not provide a ready-made package for {0}."
 msgstr ""
 
 msgid "Python 3 interpreter"
@@ -1110,10 +1179,19 @@ msgstr ""
 msgid "The Release field in the package metadata indicates that it was built for Fedora {0}."
 msgstr ""
 
+msgid "The address was not found."
+msgstr ""
+
 msgid "The app store is open. Search for “{0}”. The search term has been copied to your clipboard."
 msgstr ""
 
 msgid "The application directory must not be a symbolic link."
+msgstr ""
+
+msgid "The application does not indicate its update address."
+msgstr ""
+
+msgid "The application does not indicate its update address. Enter it below:"
 msgstr ""
 
 msgid "The application entry point is unavailable."
@@ -1206,6 +1284,21 @@ msgstr ""
 msgid "The disk is full. Free up disk space, then try again."
 msgstr ""
 
+msgid "The download was redirected to an insecure address."
+msgstr ""
+
+msgid "The downloaded AppImage is unavailable."
+msgstr ""
+
+msgid "The downloaded file is a different application. It was not installed."
+msgstr ""
+
+msgid "The downloaded file is damaged. Try again."
+msgstr ""
+
+msgid "The downloaded file is not a valid AppImage: {0}"
+msgstr ""
+
 msgid "The environment directory must not be a symbolic link."
 msgstr ""
 
@@ -1245,6 +1338,9 @@ msgstr ""
 msgid "The file is not a valid type 1 or type 2 AppImage."
 msgstr ""
 
+msgid "The file is too large."
+msgstr ""
+
 msgid "The filename suggests that this package was built for {0}, but its internal metadata does not confirm this. MultiPak used the filename to suggest this version."
 msgstr ""
 
@@ -1255,6 +1351,9 @@ msgid "The internal file exceeds the read limit."
 msgstr ""
 
 msgid "The isolated check could not be completed: {0}"
+msgstr ""
+
+msgid "The link does not match this application. Enter it again."
 msgstr ""
 
 msgid "The managed AppImage copy and its shortcuts will be removed. Personal data will be preserved."
@@ -1282,6 +1381,9 @@ msgid "The name will be assigned during setup"
 msgstr ""
 
 msgid "The new image still exists; cleanup is incomplete."
+msgstr ""
+
+msgid "The new version requires new dependencies."
 msgstr ""
 
 msgid "The operation ended without a result."
@@ -1317,6 +1419,9 @@ msgstr ""
 msgid "The package still exists in the shared environment."
 msgstr ""
 
+msgid "The package {0} on PyPI does not contain the module the application uses."
+msgstr ""
+
 msgid "The package's internal metadata indicates that it was built for {0}, so MultiPak recommends this version."
 msgstr ""
 
@@ -1327,6 +1432,15 @@ msgid "The selected environment is no longer a Distrobox; the operation was bloc
 msgstr ""
 
 msgid "The selected environment no longer exists."
+msgstr ""
+
+msgid "The server answered with error {0}."
+msgstr ""
+
+msgid "The server's answer could not be read."
+msgstr ""
+
+msgid "The server's answer is too large."
 msgstr ""
 
 msgid "The shortcut {0} was skipped because its desktop file is invalid."
@@ -1341,6 +1455,9 @@ msgstr ""
 msgid "The temporary local copy of the package could not be removed."
 msgstr ""
 
+msgid "The update information could not be read."
+msgstr ""
+
 msgid "The welcome component did not create a Qt Quick window."
 msgstr ""
 
@@ -1351,6 +1468,9 @@ msgid "There is not enough free space to copy the package."
 msgstr ""
 
 msgid "These dependencies could not be installed automatically: {0}."
+msgstr ""
+
+msgid "These dependencies were installed from PyPI, the Python package index: {0}."
 msgstr ""
 
 msgid "This AppImage does not contain a recognized type 2 SquashFS payload."
@@ -1458,16 +1578,31 @@ msgstr ""
 msgid "Unsupported package type."
 msgstr ""
 
+msgid "Up to date"
+msgstr ""
+
 msgid "Update"
 msgstr ""
 
+msgid "Update AppImages"
+msgstr ""
+
 msgid "Update MultiPak to continue installing applications."
+msgstr ""
+
+msgid "Update address"
+msgstr ""
+
+msgid "Update application"
 msgstr ""
 
 msgid "Update applications"
 msgstr ""
 
 msgid "Update available"
+msgstr ""
+
+msgid "Update available: {0}"
 msgstr ""
 
 msgid "Update complete. All applications and packages in the container are up to date."
@@ -1560,13 +1695,22 @@ msgstr ""
 msgid "rpm-ostree will remove the package and recalculate the required dependencies. A restart will be needed to finish. Your personal data will be preserved."
 msgstr ""
 
+msgid "{0} did not close. Close it and try again."
+msgstr ""
+
 msgid "{0} exited with code {1}.\n{2}"
+msgstr ""
+
+msgid "{0} is up to date."
 msgstr ""
 
 msgid "{0} was deleted."
 msgstr ""
 
 msgid "{0} was repaired."
+msgstr ""
+
+msgid "{0} was updated."
 msgstr ""
 
 msgid "{0} will be installed the next time you start your computer."

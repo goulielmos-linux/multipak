@@ -23,6 +23,20 @@
   container MultiPak created.
 - Offer to remove the AppImage container after its last application is uninstalled,
   and include it in the container update list.
+- When Fedora does not package a Python module an AppImage needs, install it in the
+  AppImage container from PyPI. Only ready-made wheels are used, and only after the
+  downloaded wheel is found to contain the module the application imports.
+- Show the completion screen with a warning when a dependency could not be installed,
+  and name dependencies as Python modules and libraries instead of package capabilities.
+- Update AppImages from the Application Manager. MultiPak looks for new versions at the
+  address saved for the application, in the update information embedded in the
+  AppImage, or on the project page in its AppStream metadata once a published file
+  matches the installed copy. When none of these exists, the user can enter the address.
+  Versions are compared by file, not by version number, and results are kept for six
+  hours unless the list is reloaded.
+- Before an update, ask to close the application if it is running, and confirm new
+  dependencies the new version needs. The downloaded file must be the same application;
+  the previous copy is restored if the update fails.
 
 ### MultiPak updates
 

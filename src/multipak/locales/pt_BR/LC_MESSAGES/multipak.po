@@ -1592,3 +1592,147 @@ msgstr "{0} foi excluído."
 
 msgid "{0} was repaired."
 msgstr "{0} foi reparado."
+
+msgid "%1 needs to be closed.\n\nIf MultiPak closes it for you, unsaved work in it may be lost."
+msgstr "%1 precisa ser fechado.\n\nSe o MultiPak fechá-lo para você, o trabalho não salvo nele pode ser perdido."
+
+msgid "Checking for updates to {0}…"
+msgstr "Procurando atualizações de {0}…"
+
+msgid "Checking the dependencies of the new version…"
+msgstr "Verificando as dependências da nova versão…"
+
+msgid "Checking the new version…"
+msgstr "Verificando a nova versão…"
+
+msgid "Choose an AppImage to update."
+msgstr "Escolha um AppImage para atualizar."
+
+msgid "Choose an AppImage to update. Your system itself is not changed."
+msgstr "Escolha um AppImage para atualizar. O sistema em si não é alterado."
+
+msgid "Close it for me"
+msgstr "Feche para mim"
+
+msgid "Closing {0}…"
+msgstr "Fechando {0}…"
+
+msgid "Could not check for updates now. Showing the last result."
+msgstr "Não foi possível procurar atualizações agora. Mostrando o último resultado."
+
+msgid "Could not check for updates to {0}: {1}"
+msgstr "Não foi possível procurar atualizações de {0}: {1}"
+
+msgid "Could not check for updates: {0}"
+msgstr "Não foi possível procurar atualizações: {0}"
+
+msgid "Could not connect: {0}"
+msgstr "Não foi possível conectar: {0}"
+
+msgid "Could not install {0} from PyPI: {1}"
+msgstr "Não foi possível instalar {0} pelo PyPI: {1}"
+
+msgid "Could not restore the shortcut: {0}"
+msgstr "Não foi possível restaurar o atalho: {0}"
+
+msgid "Could not save the update check: {0}"
+msgstr "Não foi possível salvar a verificação de atualizações: {0}"
+
+msgid "Downloading {0}…"
+msgstr "Baixando {0}…"
+
+msgid "Enter an address that starts with https://."
+msgstr "Insira um endereço que comece com https://."
+
+msgid "GitHub limits how often it can be consulted. Try again later."
+msgstr "O GitHub limita a frequência das consultas. Tente novamente mais tarde."
+
+msgid "Installing {0} from PyPI…"
+msgstr "Instalando {0} pelo PyPI…"
+
+msgid "MultiPak cannot look for updates at this address."
+msgstr "O MultiPak não consegue procurar atualizações neste endereço."
+
+msgid "No AppImage for this computer was found at this address."
+msgstr "Nenhum AppImage para este computador foi encontrado neste endereço."
+
+msgid "No AppImages are available to update."
+msgstr "Nenhum AppImage disponível para atualização."
+
+msgid "PyPI did not provide a ready-made package for {0}."
+msgstr "O PyPI não oferece um pacote pronto de {0}."
+
+msgid "The address was not found."
+msgstr "O endereço não foi encontrado."
+
+msgid "The application does not indicate its update address."
+msgstr "O aplicativo não indica o endereço de atualização."
+
+msgid "The application does not indicate its update address. Enter it below:"
+msgstr "O aplicativo não indica o endereço de atualização. Insira-o abaixo:"
+
+msgid "The download was redirected to an insecure address."
+msgstr "O download foi redirecionado para um endereço inseguro."
+
+msgid "The downloaded AppImage is unavailable."
+msgstr "O AppImage baixado não está disponível."
+
+msgid "The downloaded file is a different application. It was not installed."
+msgstr "O arquivo baixado é de outro aplicativo. Ele não foi instalado."
+
+msgid "The downloaded file is damaged. Try again."
+msgstr "O arquivo baixado está danificado. Tente novamente."
+
+msgid "The downloaded file is not a valid AppImage: {0}"
+msgstr "O arquivo baixado não é um AppImage válido: {0}"
+
+msgid "The file is too large."
+msgstr "O arquivo é grande demais."
+
+msgid "The link does not match this application. Enter it again."
+msgstr "O link não corresponde a este aplicativo. Insira-o novamente."
+
+msgid "The new version requires new dependencies."
+msgstr "A nova versão exige dependências novas."
+
+msgid "The package {0} on PyPI does not contain the module the application uses."
+msgstr "O pacote {0} no PyPI não contém o módulo que o aplicativo usa."
+
+msgid "The server answered with error {0}."
+msgstr "O servidor respondeu com o erro {0}."
+
+msgid "The server's answer could not be read."
+msgstr "Não foi possível ler a resposta do servidor."
+
+msgid "The server's answer is too large."
+msgstr "A resposta do servidor é grande demais."
+
+msgid "The update information could not be read."
+msgstr "Não foi possível ler as informações de atualização."
+
+msgid "These dependencies were installed from PyPI, the Python package index: {0}."
+msgstr "Estas dependências foram instaladas pelo PyPI, o repositório de pacotes do Python: {0}."
+
+msgid "Up to date"
+msgstr "Atualizado"
+
+msgid "Update AppImages"
+msgstr "Atualizar AppImages"
+
+msgid "Update address"
+msgstr "Endereço de atualização"
+
+msgid "Update application"
+msgstr "Atualizar aplicativo"
+
+msgid "Update available: {0}"
+msgstr "Atualização disponível: {0}"
+
+msgid "{0} did not close. Close it and try again."
+msgstr "{0} não foi fechado. Feche-o e tente novamente."
+
+msgid "{0} is up to date."
+msgstr "{0} está atualizado."
+
+msgid "{0} was updated."
+msgstr "{0} foi atualizado."
