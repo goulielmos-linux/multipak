@@ -59,14 +59,28 @@ class ExistingEnvironment:
     owned: bool = True
 
     @property
+    def default_names(self) -> tuple[str, ...]:
+        """The default names MultiPak gives a container with these contents."""
+        if self.family == "arch":
+            # 1.0.0 Alpha 1 used MultiPak-Arch-rolling.
+            return ("MultiPak-Arch-Linux", "MultiPak-Arch-rolling")
+        return (f"MultiPak-{self.family.title()}-{self.version}",)
+
+    @property
     def multipak_number(self) -> int | None:
-        # A MultiPak-like name alone never makes a container MultiPak's.
+        """1 for the default name, 2+ for C2-, C3-...; None if not MultiPak's container.
+
+        It must carry MultiPak's owner label and still have the name MultiPak gave it:
+        a renamed container, or one named for other contents, is no longer MultiPak's.
+        """
         if self.custom_named or not self.owned:
             return None
-        match = re.fullmatch(r"C([0-9]+)-MultiPak-.+", self.name)
-        if match:
-            return int(match[1]) if int(match[1]) >= 2 else None
-        return 1 if self.name.startswith("MultiPak-") else None
+        match = re.fullmatch(r"(?:C([0-9]+)-)?(.+)", self.name)
+        if match is None or match[2] not in self.default_names:
+            return None
+        if match[1] is None:
+            return 1
+        return int(match[1]) if int(match[1]) >= 2 else None
 
     @property
     def multipak_managed(self) -> bool:

@@ -279,6 +279,9 @@ msgstr ""
 msgid "Could not check the AppImage dependencies: {0}"
 msgstr ""
 
+msgid "Could not check the containers: {0}"
+msgstr ""
+
 msgid "Could not check whether the container can be removed: {0}"
 msgstr ""
 

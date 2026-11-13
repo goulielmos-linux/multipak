@@ -280,3 +280,51 @@ def remove_container(engine, container, *, remove_home=False):
             (engine.store.applications / f"{container.name}.desktop").unlink()
         # Other files in the environment directory are outside this confirmation.
         _record_path(engine.store, container.name).unlink()
+
+
+def forget_abandoned(engine):
+    """Forget applications whose container was renamed or deleted.
+
+    A renamed container is no longer MultiPak's, and a deleted one took its applications
+    with it. Their shortcuts, which call the old name, and MultiPak's records are removed.
+    Nothing inside any container is touched, and nothing is forgotten when Podman cannot
+    be queried. Returns the forgotten transactions.
+    """
+    candidates = [
+        tx
+        for tx in engine.store.transactions()
+        if tx.method == "distrobox"
+        and tx.status in ("installed", "cleanup_failed")
+        and re.fullmatch(r"[0-9a-f]{64}", tx.container_id or "")
+    ]
+    if not candidates:
+        return []
+    try:
+        rows = json.loads(
+            engine.runner.run(["podman", "ps", "--all", "--format", "json"], timeout=30)
+        )
+    except (CommandError, OSError, TimeoutError, ValueError) as error:
+        engine._log(tr("Could not check the containers: {0}").format(error))
+        return []
+    if not isinstance(rows, list):
+        return []
+    names = {
+        str(row.get("Id", "")).removeprefix("sha256:"): set(row.get("Names") or [])
+        for row in rows
+        if isinstance(row, dict)
+    }
+    forgotten = []
+    with engine.store.lock():
+        for tx in candidates:
+            current = names.get(tx.container_id)
+            if current is not None and tx.container in current:
+                continue
+            for name in tx.launchers:
+                try:
+                    path = engine.store.launcher(tx, name)
+                except ValueError:
+                    continue
+                path.unlink(missing_ok=True)
+            engine.store.remove_directory(tx)
+            forgotten.append(tx)
+    return forgotten

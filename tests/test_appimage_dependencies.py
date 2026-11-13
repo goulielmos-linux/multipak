@@ -244,7 +244,15 @@ def test_container_is_created_once_and_then_reused(store):
                 appimage_container.APPIMAGE_LABEL: "1",
                 "manager": "distrobox",
             }
-            return json.dumps([{"Id": container_id, "Config": {"Labels": labels}}])
+            return json.dumps(
+                [
+                    {
+                        "Id": container_id,
+                        "Name": appimage_container.CONTAINER_NAME,
+                        "Config": {"Labels": labels},
+                    }
+                ]
+            )
         return ""
 
     runner = Recorder(responses)
@@ -758,3 +766,105 @@ def test_squashfs_listing_reports_types_and_sizes(tmp_path):
         "usr/lib/liba.so.1": ("-", 1048576),
         "lib": ("l", 9),
     }
+
+
+def test_a_renamed_appimage_container_is_abandoned_and_replaced(store):
+    old = ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32)
+    _save_record(store, old)
+    state = {}
+
+    def responses(argv):
+        if argv[:3] == ["podman", "container", "exists"]:
+            return ""
+        if argv[:2] == ["podman", "ps"]:
+            return json.dumps([{"Names": ["Meus AppImages"]}])  # The renamed one.
+        if argv[:2] == ["distrobox", "create"]:
+            flags = argv[argv.index("--additional-flags") + 1]
+            state["owner"] = flags.split("--label=io.github.multipak.transaction=")[1].split()[0]
+            state["name"] = argv[argv.index("--name") + 1]
+        if argv[:2] == ["podman", "inspect"]:
+            if argv[2] == "c" * 64:
+                labels = {
+                    "io.github.multipak.transaction": "a" * 32,
+                    appimage_container.APPIMAGE_LABEL: "1",
+                }
+                return json.dumps(
+                    [{"Id": "c" * 64, "Name": "Meus AppImages", "Config": {"Labels": labels}}]
+                )
+            labels = {"io.github.multipak.transaction": state.get("owner", "")}
+            return json.dumps([{"Id": "d" * 64, "Config": {"Labels": labels}}])
+        return ""
+
+    engine = engine_for(store, Recorder(responses))
+    record = appimage_container.ensure_container(engine)
+    # The renamed container is left alone; a new one takes the free default name.
+    assert state["name"] == record.name == appimage_container.CONTAINER_NAME
+    assert record.container_id == "d" * 64
+    assert appimage_container.find_record(store) == record
+
+
+def test_a_renamed_package_container_is_no_longer_multipak_s():
+    from multipak.environment_choices import default_environment
+    from multipak.models import Environment, ExistingEnvironment
+
+    profile = Environment("fedora-45", "Fedora 45", "rpm", "img:45")
+    renamed = ExistingEnvironment("Meu Fedora", "a" * 64, "fedora", "45", managed_home=True)
+    kept_prefix = ExistingEnvironment("MultiPak-Fedora-45-velho", "b" * 64, "fedora", "45")
+    wrong_version = ExistingEnvironment("MultiPak-Fedora-45", "c" * 64, "fedora", "44")
+    alpha_arch = ExistingEnvironment("MultiPak-Arch-rolling", "d" * 64, "arch", "")
+    assert renamed.multipak_number is None and kept_prefix.multipak_number is None
+    assert wrong_version.multipak_number is None
+    assert alpha_arch.multipak_number == 1  # Name given by 1.0.0 Alpha 1.
+    assert default_environment([renamed, kept_prefix, wrong_version], profile) is None
+
+
+def forget_setup(store, rows):
+    def installed(identifier, container, container_id):
+        tx = Transaction(
+            identifier * 32,
+            container,
+            "image",
+            "app-" + identifier,
+            "1.0",
+            "rpm",
+            "",
+            status="installed",
+            container_id=container_id,
+            launchers=[f"multipak-{identifier * 32}-app.desktop"],
+        )
+        store.save(tx)
+        store.launcher(tx, tx.launchers[0]).write_text("[Desktop Entry]\n")
+        return tx
+
+    kept = installed("1", "MultiPak-Fedora-45", "a" * 64)
+    renamed = installed("2", "MultiPak-Ubuntu-24.04", "b" * 64)
+    deleted = installed("3", "meu-fedora", "c" * 64)
+    engine = engine_for(store, Recorder(lambda argv: json.dumps(rows)))
+    return engine, kept, renamed, deleted
+
+
+def test_applications_of_renamed_or_deleted_containers_are_forgotten(store):
+    rows = [
+        {"Id": "a" * 64, "Names": ["MultiPak-Fedora-45"]},
+        {"Id": "b" * 64, "Names": ["Meu Ubuntu"]},  # Renamed; "c" was deleted.
+    ]
+    engine, kept, renamed, deleted = forget_setup(store, rows)
+    forgotten = containers.forget_abandoned(engine)
+    assert {tx.id for tx in forgotten} == {renamed.id, deleted.id}
+    assert [tx.id for tx in store.transactions()] == [kept.id]
+    assert store.launcher(kept, kept.launchers[0]).exists()
+    assert not list(store.applications.glob(f"multipak-{renamed.id}-*"))
+    # Nothing ran inside any container.
+    assert all(argv[:2] == ["podman", "ps"] for argv in engine.runner.calls)
+
+
+def test_nothing_is_forgotten_when_podman_cannot_be_queried(store):
+    engine, *_ = forget_setup(store, [])
+
+    def failing(argv, **options):
+        raise CommandError(argv, 125, "podman unavailable")
+
+    engine.runner.run = failing
+    engine._log = lambda text: None
+    assert containers.forget_abandoned(engine) == []
+    assert len(store.transactions()) == 3

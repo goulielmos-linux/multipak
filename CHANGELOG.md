@@ -36,6 +36,11 @@
 - When a default name such as MultiPak-Fedora-45 is taken by another container, create
   the container with the lowest free name (C2-, C3-...) instead of stopping, and keep
   using it afterwards. The same applies to the AppImage container.
+- A container that is renamed after MultiPak created it, including one with a custom
+  name, is no longer treated as MultiPak's. A new one is created when needed.
+- Forget the applications of a renamed or deleted container: they leave the uninstall
+  list and their shortcuts, which no longer work, are removed. Nothing inside the
+  container is changed.
 - Do not update a container recorded by MultiPak if another container has taken its
   name.
 

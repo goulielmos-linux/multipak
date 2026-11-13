@@ -330,6 +330,10 @@ class Manager(QObject):
         )
 
     def _load_removals(self, engine):
+        from multipak.containers import forget_abandoned
+
+        # Applications of a renamed or deleted container are no longer offered.
+        forget_abandoned(engine)
         transactions = self.store.transactions()
         system = [
             tx
@@ -442,11 +446,21 @@ class Manager(QObject):
 
             def operation(engine):
                 from multipak.appimage_container import update_entry
+                from multipak.containers import _read_record
+
+                def custom_and_unchanged(env):
+                    # A custom-named container stays MultiPak's only under the name
+                    # MultiPak recorded when it created it.
+                    try:
+                        record = _read_record(self.store, env.name)
+                    except (OSError, TypeError, ValueError):
+                        return False
+                    return record is not None and record.container_id == env.container_id
 
                 environments = [
                     env
                     for env in self.discoverer(engine.runner)
-                    if env.multipak_managed or env.custom_named
+                    if env.multipak_managed or (env.custom_named and custom_and_unchanged(env))
                 ]
                 # The AppImage container is private to MultiPak and not offered for
                 # package installations, but its packages still need updates.

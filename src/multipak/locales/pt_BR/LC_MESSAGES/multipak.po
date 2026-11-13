@@ -1511,3 +1511,6 @@ msgstr "A verificação roda sem acesso aos seus arquivos ou à rede."
 
 msgid "View the full list of required dependencies"
 msgstr "Ver a lista completa de dependências exigidas"
+
+msgid "Could not check the containers: {0}"
+msgstr "Não foi possível verificar os contêineres: {0}"

@@ -79,9 +79,12 @@ def ensure_container(engine):
     runner = engine.runner
     engine.preflight()
     record = find_record(engine.store)
-    if record is not None and _owned(runner, record) is not None:
-        verify_name(runner, record)
-        return record
+    if record is not None:
+        data = _owned(runner, record)
+        if data is not None and (data.get("Name") or "").removeprefix("/") == record.name:
+            return record
+        # Removed or renamed: a renamed container is no longer MultiPak's. A new one is
+        # created and the old record is dropped once it exists.
     rows = json.loads(runner.run(["podman", "ps", "--all", "--format", "json"], timeout=30))
     # A container MultiPak did not create may use the default name: take the lowest
     # free C2-, C3-... name instead, without asking.
