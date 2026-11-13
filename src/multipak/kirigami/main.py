@@ -97,6 +97,7 @@ class Welcome(QObject):
         self.method = "appimage" if self.kind == "APPIMAGE" else "container"
         self.mode = "standard"
         self.existing = ()
+        self.container_names = ()
         self._dependency_report = None
         self._appimage_container = False
         self._appimage_verify = True
@@ -111,9 +112,10 @@ class Welcome(QObject):
     def _configuration_changed(self):
         self._advanced_confirmed = False
 
-    def configure(self, profiles, existing, suggested):
+    def configure(self, profiles, existing, suggested, container_names=()):
         self.profiles, self.existing = tuple(profiles), tuple(existing)
-        self._configuration.reset(self.profiles, self.existing, suggested)
+        self.container_names = tuple(container_names)
+        self._configuration.reset(self.profiles, self.existing, suggested, self.container_names)
         self._selection = self._configuration.standard_selection()
         self.environment = suggested
 
@@ -192,20 +194,21 @@ class Welcome(QObject):
             "verify": self._appimage_verify,
         }
 
-    def set_appimage_environment(self, title, exists):
+    def set_appimage_environment(self, title, exists, name=""):
         self._appimage_environment = title
         self._appimage_container_exists = bool(exists)
+        self._appimage_container_name = name
         self.dataChanged.emit()
 
     @Property(str, notify=dataChanged)
     def appImageEnvironmentTitle(self):
         return self._appimage_environment or "Fedora"
 
-    @Property(str, constant=True)
+    @Property(str, notify=dataChanged)
     def appImageContainerName(self):
         from multipak.appimage_container import CONTAINER_NAME
 
-        return CONTAINER_NAME
+        return getattr(self, "_appimage_container_name", "") or CONTAINER_NAME
 
     @Property(bool, notify=dataChanged)
     def appImageContainerExists(self):
@@ -378,7 +381,11 @@ class Welcome(QObject):
 
     @Property(str, notify=dataChanged)
     def containerName(self):
-        return self._selection.container_name(self.existing) if self._selection else ""
+        return (
+            self._selection.container_name(self.existing, self.container_names)
+            if self._selection
+            else ""
+        )
 
     @Property(bool, notify=dataChanged)
     def containerExists(self):

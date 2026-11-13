@@ -44,6 +44,14 @@ def read_os_release(runner: Runner, container: str) -> dict[str, str]:
         return parse_os_release(path.read_text(encoding="utf-8"))
 
 
+def container_names(runner: Runner) -> tuple[str, ...]:
+    """Every container name in use, created by Distrobox or not."""
+    if not host.which("podman"):
+        return ()
+    rows = json.loads(runner.run(["podman", "ps", "--all", "--format", "json"], timeout=30))
+    return tuple(name for row in rows for name in row.get("Names") or [])
+
+
 def discover(
     runner: Runner, profiles: tuple[Environment, ...] = ENVIRONMENTS
 ) -> list[ExistingEnvironment]:
@@ -98,6 +106,7 @@ def discover(
                     image_names.get(image_id, ()),
                     labels.get(SHARED_LABEL) == "1",
                     custom_named=labels.get(CUSTOM_LABEL) == "1",
+                    owned=OWNER_LABEL in labels,
                 )
             )
         except Cancelled:

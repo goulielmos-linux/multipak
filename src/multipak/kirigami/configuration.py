@@ -8,6 +8,7 @@ from multipak.catalog import release_tag
 from multipak.environment_choices import (
     container_base,
     default_environment,
+    free_container_name,
 )
 from multipak.localization import mark, tr
 from multipak.models import (
@@ -34,7 +35,7 @@ class InstallationSelection:
     custom_name: str = ""
     manual: bool = False
 
-    def container_name(self, environments):
+    def container_name(self, environments, occupied=()):
         if self.existing:
             return self.existing.name
         if self.custom_name:
@@ -42,7 +43,8 @@ class InstallationSelection:
         version = self.environment.resolved_version or self.environment.id.partition("-")[2]
         if version in ("latest", "stable"):
             return tr("The name will be assigned during setup")
-        return container_base(self.environment)
+        names = {item.name for item in environments} | set(occupied)
+        return free_container_name(container_base(self.environment), names)
 
 
 class Configuration(QObject):
@@ -64,7 +66,8 @@ class Configuration(QObject):
         self._existing_name = ""
         self._name = ""
 
-    def reset(self, profiles, existing, suggested):
+    def reset(self, profiles, existing, suggested, occupied=()):
+        self.occupied = tuple(occupied)
         candidates = tuple(item for item in profiles if item.kind == suggested.kind)
         if suggested not in candidates:
             candidates = (suggested, *candidates)
@@ -268,7 +271,7 @@ class Configuration(QObject):
         if not self.valid:
             return ""
         selection = self.selection()
-        name = selection.container_name(self.existing)
+        name = selection.container_name(self.existing, getattr(self, "occupied", ()))
         if name == tr("The name will be assigned during setup"):
             return tr("A new container will be created and named during setup.")
         action = tr("reused") if selection.existing else tr("created")

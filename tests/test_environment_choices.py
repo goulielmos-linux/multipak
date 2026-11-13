@@ -21,13 +21,19 @@ def test_new_container_names_fill_numbering_gaps(names, expected):
     assert next_container_name(BASE, names, new=True) == expected
 
 
-def test_only_the_base_container_is_the_default():
+def test_multipak_s_own_container_is_the_default():
     profile = Environment("fedora-45", "Fedora 45", "rpm", "quay.io/fedora/fedora-toolbox:45")
     secondary = ExistingEnvironment("C2-" + BASE, "second", "fedora", "45", managed_home=True)
     personal = ExistingEnvironment("Meu Fedora", "personal", "fedora", "45")
     default = ExistingEnvironment(BASE, "default", "fedora", "45", managed_home=True)
-    assert default_environment([personal, secondary], profile) is None
+    foreign = ExistingEnvironment(BASE, "foreign", "fedora", "45", owned=False)
+    # C2- is MultiPak's own when someone else had taken the default name.
+    assert default_environment([personal, secondary], profile) == secondary
     assert default_environment([personal, secondary, default], profile) == default
+    # A container with MultiPak's name that MultiPak did not create is never used.
+    assert default_environment([foreign], profile) is None
+    assert default_environment([foreign, secondary], profile) == secondary
+    assert foreign.multipak_number is None
     assert secondary.multipak_number == 2
     assert (
         ExistingEnvironment(BASE, "custom", "fedora", "45", custom_named=True).multipak_number

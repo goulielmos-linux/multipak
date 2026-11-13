@@ -27,9 +27,6 @@ msgstr ""
 msgid "<a href='dependencies'>View full list</a>"
 msgstr ""
 
-msgid "A container named {0} already exists and was not created by MultiPak."
-msgstr ""
-
 msgid "A container with that name already exists. Choose another name."
 msgstr ""
 
@@ -1135,9 +1132,6 @@ msgid "The container, other applications and personal data will be preserved."
 msgstr ""
 
 msgid "The copy is incomplete or has changed. Cancel and reopen the package."
-msgstr ""
-
-msgid "The default container already exists. Reopen the package to reuse it."
 msgstr ""
 
 msgid "The disk is full. Free up disk space, then try again."

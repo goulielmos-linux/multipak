@@ -14,7 +14,7 @@ from multipak.distrobox_setup import (
     install_distrobox,
     reboot_after_distrobox,
 )
-from multipak.environments import discover
+from multipak.environments import container_names, discover
 from multipak.file_associations import FileAssociations
 from multipak.localization import tr
 from multipak.metadata import inspect_package
@@ -42,17 +42,20 @@ def inspect_installation(engine, path):
         report = appimage_dependencies(engine, package)
         if report is None or not report.required:
             return PackageInspection(package, dependencies=report)
-        existing, profiles = appimage_environment(engine)
-        return PackageInspection(package, existing, profiles, dependencies=report)
+        existing, profiles, name = appimage_environment(engine)
+        return PackageInspection(
+            package, existing, profiles, dependencies=report, container_names=(name,)
+        )
     profiles = load_catalog(engine.runner, engine.store.root / "image-catalog.json")
     try:
         existing = tuple(discover(engine.runner, profiles))
+        names = container_names(engine.runner)
     except Cancelled:
         raise
     except (OSError, RuntimeError, ValueError, TimeoutError) as error:
         engine._log(tr("Could not query existing environments: {0}").format(error))
-        existing = ()
-    return PackageInspection(package, existing, profiles)
+        existing, names = (), ()
+    return PackageInspection(package, existing, profiles, container_names=names)
 
 
 def appimage_dependencies(engine, package):
@@ -77,6 +80,7 @@ def appimage_environment(engine):
     Both only describe the installation on screen; failures are logged, never raised.
     """
     from multipak.appimage_container import CONTAINER_NAME, update_entry
+    from multipak.environment_choices import free_container_name
 
     profiles = ()
     try:
@@ -88,14 +92,25 @@ def appimage_environment(engine):
     existing = ()
     try:
         entry = update_entry(engine.store)
-        if entry is not None and entry.name == CONTAINER_NAME:
+        if entry is not None:
             engine.runner.run(["podman", "container", "exists", entry.container_id], timeout=30)
             existing = (entry,)
     except Cancelled:
         raise
     except Exception:
         existing = ()  # Missing or unreadable: it will be created.
-    return existing, profiles
+    if not existing:
+        # Shown as the name it will get: the default one or the lowest free C2-, C3-...
+        try:
+            names = container_names(engine.runner)
+        except Cancelled:
+            raise
+        except Exception:
+            names = ()
+        existing = ()
+        planned = free_container_name(CONTAINER_NAME, names)
+        return (), profiles, planned
+    return existing, profiles, existing[0].name
 
 
 class LiveInstaller(Welcome):
@@ -224,6 +239,7 @@ class LiveInstaller(Welcome):
         if self.isAppImage:
             from multipak.appimage_container import CONTAINER_NAME
 
+            planned = (inspection.container_names or (CONTAINER_NAME,))[0]
             self.method, self.mode = "appimage", "standard"
             self.environment, self._selection = None, None
             self.set_dependency_report(inspection.dependencies)
@@ -237,7 +253,8 @@ class LiveInstaller(Welcome):
             )
             self.set_appimage_environment(
                 tr(fedora.title) if fedora is not None else "Fedora",
-                any(item.name == CONTAINER_NAME for item in inspection.existing),
+                bool(inspection.existing),
+                planned,
             )
             self._set_state("ready")
             return
@@ -250,7 +267,7 @@ class LiveInstaller(Welcome):
         self.environment = (
             package_environment(self.package.distro_hint, list(self.profiles)) or self.profiles[0]
         )
-        self.configure(self.profiles, self.existing, self.environment)
+        self.configure(self.profiles, self.existing, self.environment, inspection.container_names)
         self.strength, explanation = suggestion_details(
             self.package, self.environment, self.environment.title
         )

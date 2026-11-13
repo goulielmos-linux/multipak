@@ -527,10 +527,24 @@ def test_default_container_is_rechecked_before_creating_another(fake_engine, deb
     reuse_debian(engine)
     engine.runner.container["Name"] = "MultiPak-Debian-13"
     engine.runner.container["Config"]["Labels"][SHARED_LABEL] = "1"
+    engine.runner.container["Config"]["Labels"]["io.github.multipak.transaction"] = "a" * 32
     tx = engine.install(package_for(deb, engine), DEBIAN)
     assert tx.container == "MultiPak-Debian-13"
     assert not tx.container_created
     assert not any(call[:2] == ["distrobox", "create"] for call in engine.runner.calls)
+
+
+def test_a_default_name_taken_by_another_container_gets_the_lowest_free_number(fake_engine, deb):
+    from multipak.environments import SHARED_LABEL
+
+    engine = fake_engine
+    reuse_debian(engine)
+    # Same name as MultiPak's default, but created by someone else: not MultiPak's.
+    engine.runner.container["Name"] = "MultiPak-Debian-13"
+    engine.runner.container["Config"]["Labels"][SHARED_LABEL] = "1"
+    tx = engine.install(package_for(deb, engine), DEBIAN)
+    assert tx.container == "C2-MultiPak-Debian-13"
+    assert tx.container_created
 
 
 def test_custom_named_container_keeps_kontainer_default_icon(fake_engine, deb):

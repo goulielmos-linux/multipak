@@ -20,7 +20,7 @@
   cannot confirm that the application starts, and always remove the copy, even after
   cancelling.
 - Open and update the AppImage container only while its name still leads to the
-  recorded container.
+  container MultiPak created.
 - Offer to remove the AppImage container after its last application is uninstalled,
   and include it in the container update list.
 
@@ -30,6 +30,12 @@
 
 ### Containers
 
+- Only containers that MultiPak created are treated as its own. A container that
+  someone else created with a MultiPak name is no longer reused, listed or updated as
+  MultiPak's.
+- When a default name such as MultiPak-Fedora-45 is taken by another container, create
+  the container with the lowest free name (C2-, C3-...) instead of stopping, and keep
+  using it afterwards. The same applies to the AppImage container.
 - Do not update a container recorded by MultiPak if another container has taken its
   name.
 

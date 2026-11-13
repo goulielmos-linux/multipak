@@ -264,10 +264,8 @@ class Engine:
             base = container_base(environment, resolved_version=version)
             rows = json.loads(self.runner.run(["podman", "ps", "--all", "--format", "json"]))
             names = {name for row in rows for name in row.get("Names", [])}
-            if base in names and not self.tx.force_new_environment:
-                raise RuntimeError(
-                    tr("The default container already exists. Reopen the package to reuse it.")
-                )
+            # MultiPak's own container would have been reused. If another container uses
+            # the default name, the lowest free C2-, C3-... name is used instead.
             name = next_container_name(base, names, new=self.tx.force_new_environment)
             self.tx.container = name
             self.tx.environment_id = f"{family}-{version}"

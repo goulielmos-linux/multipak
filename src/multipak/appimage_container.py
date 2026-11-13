@@ -10,12 +10,13 @@ from multipak.localization import tr
 
 from .appimage_dependencies import Dependency, startup_failures
 from .container_progress import ImageProgress, PackageProgress
-from .containers import ManagedContainer, _read_record, _save_record
+from .containers import ManagedContainer, _read_record, _record_path, _save_record
+from .environment_choices import APPIMAGE_CONTAINER as CONTAINER_NAME
+from .environment_choices import free_container_name
 from .environments import OWNER_LABEL
 from .models import ENVIRONMENTS, ExistingEnvironment
 from .process import CommandError, Runner
 
-CONTAINER_NAME = "MultiPak-AppImages"
 APPIMAGE_LABEL = "io.github.multipak.appimage-container"
 IMAGE = next(item.image for item in ENVIRONMENTS if item.id == "fedora-latest")
 CHECK_SECONDS = 15
@@ -77,17 +78,16 @@ def ensure_container(engine):
     """Reuse MultiPak's AppImage container or create it. Returns its ManagedContainer."""
     runner = engine.runner
     engine.preflight()
-    record = _read_record(engine.store, CONTAINER_NAME)
+    record = find_record(engine.store)
     if record is not None and _owned(runner, record) is not None:
         verify_name(runner, record)
         return record
     rows = json.loads(runner.run(["podman", "ps", "--all", "--format", "json"], timeout=30))
-    if any(CONTAINER_NAME in (row.get("Names") or []) for row in rows):
-        raise RuntimeError(
-            tr("A container named {0} already exists and was not created by MultiPak.").format(
-                CONTAINER_NAME
-            )
-        )
+    # A container MultiPak did not create may use the default name: take the lowest
+    # free C2-, C3-... name instead, without asking.
+    name = free_container_name(
+        CONTAINER_NAME, {item for row in rows for item in row.get("Names") or []}
+    )
     engine.progress(-1, tr("Fetching the container image…"))
     ImageProgress(engine.progress).run(
         runner, ["podman", "pull", "--policy=missing", IMAGE], terminal_output=True
@@ -101,7 +101,7 @@ def ensure_container(engine):
             "create",
             "--yes",
             "--name",
-            CONTAINER_NAME,
+            name,
             "--image",
             IMAGE,
             "--no-entry",
@@ -112,14 +112,18 @@ def ensure_container(engine):
             " --label=org.opencontainers.image.description=MultiPak",
         ]
     )
-    data = _inspect(runner, CONTAINER_NAME) or {}
+    data = _inspect(runner, name) or {}
     labels = (data.get("Config") or {}).get("Labels") or {}
     if labels.get(OWNER_LABEL) != owner or not re.fullmatch(r"[0-9a-f]{64}", data.get("Id", "")):
         raise RuntimeError(tr("The container was not created."))
-    record = ManagedContainer(CONTAINER_NAME, data["Id"], owner, False)
+    # A record for an older container that no longer exists is replaced.
+    for stale in _record_names(engine.store):
+        if stale != name:
+            _record_path(engine.store, stale).unlink(missing_ok=True)
+    record = ManagedContainer(name, data["Id"], owner, False)
     _save_record(engine.store, record)
     engine.progress(-1, tr("Initializing the container…"))
-    PackageProgress(engine.progress).run(runner, _enter(CONTAINER_NAME, "true"))
+    PackageProgress(engine.progress).run(runner, _enter(name, "true"))
     return record
 
 
@@ -288,10 +292,32 @@ def launch_command(container_name, entry: Path, arguments, environment):
     return _enter(container_name, "env", *assignments, str(entry), *arguments)
 
 
+def _record_names(store):
+    """Names of recorded AppImage containers: the default one or C2-, C3-..."""
+    directory = store.root / "environments"
+    if not directory.is_dir():
+        return []
+    pattern = re.compile(r"(?:C[0-9]+-)?" + re.escape(CONTAINER_NAME))
+    return sorted(
+        path.name
+        for path in directory.iterdir()
+        if pattern.fullmatch(path.name) and (path / "container.json").is_file()
+    )
+
+
+def find_record(store):
+    """MultiPak's AppImage container record, whatever free name it was given."""
+    for name in _record_names(store):
+        record = _read_record(store, name)
+        if record is not None and record.owner_id:
+            return record
+    return None
+
+
 def update_entry(store):
     """The AppImage container as a row for the manager's update list."""
     try:
-        record = _read_record(store, CONTAINER_NAME)
+        record = find_record(store)
     except (OSError, TypeError, ValueError):
         return None
     if record is None:

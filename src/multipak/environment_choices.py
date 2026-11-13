@@ -26,14 +26,26 @@ def next_container_name(base: str, names, *, new: bool = False) -> str:
     return f"C{number}-{base}"
 
 
+# The shared AppImage container is never the default container for packages.
+APPIMAGE_CONTAINER = "MultiPak-AppImages"
+
+
 def default_environment(environments, profile: Environment) -> ExistingEnvironment | None:
+    """MultiPak's own container for this distribution and version, if it has one.
+
+    Its name is the default one, or C2-, C3-... when someone else had taken that name.
+    """
     candidates = [
         item
         for item in environments
-        if item.matches(profile) and item.multipak_managed and item.multipak_number == 1
+        if item.matches(profile) and item.multipak_managed and item.name != APPIMAGE_CONTAINER
     ]
-    base = container_base(profile)
-    return next(iter(sorted(candidates, key=lambda item: (item.name != base, item.name))), None)
+    return next(iter(sorted(candidates, key=lambda item: (item.multipak_number, item.name))), None)
+
+
+def free_container_name(base: str, names) -> str:
+    """The default name, or C2-, C3-... when another container already uses it."""
+    return next_container_name(base, names)
 
 
 def display_container_name(name: str) -> str:

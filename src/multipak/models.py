@@ -55,10 +55,13 @@ class ExistingEnvironment:
     managed_home: bool = False
     compatible_profiles: tuple[str, ...] = ()
     custom_named: bool = False
+    # Carries MultiPak's owner label: MultiPak created it. Only these are MultiPak's.
+    owned: bool = True
 
     @property
     def multipak_number(self) -> int | None:
-        if self.custom_named:
+        # A MultiPak-like name alone never makes a container MultiPak's.
+        if self.custom_named or not self.owned:
             return None
         match = re.fullmatch(r"C([0-9]+)-MultiPak-.+", self.name)
         if match:
@@ -102,6 +105,8 @@ class PackageInspection:
     environments: tuple[Environment, ...] = ()
     # appimage_dependencies.DependencyReport for AppImages; None when not checked.
     dependencies: object = None
+    # Every container name in use, Distrobox or not, so new names never collide.
+    container_names: tuple[str, ...] = ()
 
 
 # Offline fallback only. The installed Distrobox catalog and registry metadata supply live versions.

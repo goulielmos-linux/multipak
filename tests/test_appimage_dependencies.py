@@ -257,15 +257,29 @@ def test_container_is_created_once_and_then_reused(store):
     assert sum(argv[:2] == ["distrobox", "create"] for argv in runner.calls) == creates
 
 
-def test_a_foreign_container_with_the_same_name_is_never_used(store):
+def test_a_taken_default_name_moves_the_appimage_container_to_the_lowest_free_one(store):
+    taken = [appimage_container.CONTAINER_NAME, "C2-MultiPak-AppImages", "C4-MultiPak-AppImages"]
+    state = {}
+
     def responses(argv):
         if argv[:2] == ["podman", "ps"]:
-            return json.dumps([{"Names": [appimage_container.CONTAINER_NAME]}])
+            return json.dumps([{"Names": [name]} for name in taken])
+        if argv[:2] == ["distrobox", "create"]:
+            flags = argv[argv.index("--additional-flags") + 1]
+            state["owner"] = flags.split("--label=io.github.multipak.transaction=")[1].split()[0]
+            state["name"] = argv[argv.index("--name") + 1]
+        if argv[:2] == ["podman", "inspect"]:
+            labels = {"io.github.multipak.transaction": state.get("owner", "")}
+            return json.dumps([{"Id": "d" * 64, "Config": {"Labels": labels}}])
         return ""
 
     engine = engine_for(store, Recorder(responses))
-    with pytest.raises(RuntimeError, match="not created by MultiPak"):
-        appimage_container.ensure_container(engine)
+    record = appimage_container.ensure_container(engine)
+    # No question asked: the lowest free number is used (C3 here, since C4 is taken).
+    assert state["name"] == record.name == "C3-MultiPak-AppImages"
+    # Later installations find it again under that name.
+    assert appimage_container.find_record(store) == record
+    assert appimage_container.update_entry(store).name == "C3-MultiPak-AppImages"
 
 
 def test_isolated_check_has_no_network_files_or_privileges_and_always_cleans_up(store, tmp_path):

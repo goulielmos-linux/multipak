@@ -126,7 +126,14 @@ def test_arch_is_discovered_without_version_id_and_reused_by_configuration(fake_
         "Name": "MultiPak-Arch-rolling",
         "Id": "container123",
         "Image": "image123",
-        "Config": {"Labels": {"manager": "distrobox"}},
+        # Created by MultiPak: shared and labeled as its own.
+        "Config": {
+            "Labels": {
+                "manager": "distrobox",
+                "io.github.multipak.transaction": "a" * 32,
+                "io.github.multipak.shared-environment": "1",
+            }
+        },
     }
     found = discover(runner, (ARCH,))
     assert len(found) == 1
