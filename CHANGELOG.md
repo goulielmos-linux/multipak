@@ -1,5 +1,25 @@
 # Changelog
 
+## Unreleased
+
+### Android
+
+- Install Android applications through Waydroid: `.apk` files and `.apkm`, `.apks`
+  and `.xapk` bundles. MultiPak reads the package's Android version requirements and
+  architecture and recommends an Android version.
+- Create separate Android containers, each with its own system images, applications,
+  data, network and shortcuts, using a bundled adapted Waydroid runtime. The system
+  Waydroid installation remains available as a separate option.
+- Optionally set up ARM translation for applications built only for ARM (Android 13
+  on x86_64).
+- Add Android containers to the Application Manager: create, open, stop, update and
+  remove them. Uninstall Android applications while keeping their data, and offer to
+  remove a container after its last application.
+- Show the adapted Waydroid runtime and LXC versions in About, with an explanation of
+  the Waydroid adaptations.
+- Associate Android package files with MultiPak. The new file type starts selected
+  without changing existing choices.
+
 ## 1.0.2
 
 - Fix an error that prevented the Flatpak from opening signed RPM packages,

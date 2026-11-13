@@ -23,6 +23,7 @@ from PySide6.QtQml import QQmlEngine, QQmlExpression  # noqa: E402
 from PySide6.QtTest import QTest  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
+from multipak.android_progress import AndroidProgress  # noqa: E402
 from multipak.distrobox_setup import DistroboxMissing, DistroboxRequirement  # noqa: E402
 from multipak.metadata import inspect_package  # noqa: E402
 from multipak.models import (  # noqa: E402
@@ -732,6 +733,38 @@ class LiveTests(unittest.TestCase):
             self.assertFalse(self.config["calls"])
             self.click("systemCancelButton")
             self.assertFalse(self.window.isVisible())
+
+    def test_android_download_progress_is_visible_without_opening_details(self):
+        self.install()
+        stream = AndroidProgress(self.bridge.worker.progress.emit)
+        stream.feed("Downloading https://example.org/system/android.zip\n")
+        stream.feed("\r[Downloading] 297.5 MB/850 MB    1.25 MB/s(approx.) ")
+        QTest.qWait(200)
+        self.assertEqual(self.page.objectName(), "operationPage")
+        label = self.page.findChild(QObject, "operationStatus")
+        self.assertIn("35%", label.property("text"))
+        self.assertIn("297.5 MB", label.property("text"))
+        self.assertIn("850 MB", label.property("text"))
+        self.assertIn("1.25 MB/s", label.property("text"))
+        bar = self.page.findChild(QObject, "installationProgress")
+        self.assertEqual(bar.property("value"), 35)
+        self.assertFalse(bar.property("indeterminate"))
+        self.assertFalse(self.page.findChild(QObject, "operationLogView").property("visible"))
+        if directory := os.environ.get("MULTIPAK_CHECK_OUTPUT"):
+            output = Path(directory)
+            output.mkdir(parents=True, exist_ok=True)
+            self.assertTrue(self.window.grabWindow().save(str(output / "android-download.png")))
+        stream.feed("\nValidating system image\nExtracting to /images\n")
+        QTest.qWait(100)
+        self.assertTrue(bar.property("indeterminate"))
+        stream.feed("Downloading https://example.org/vendor/vendor.zip\n")
+        stream.feed("\r[Downloading] 10 MB/100 MB    0 kB/s(approx.) ")
+        QTest.qWait(100)
+        self.assertEqual(bar.property("value"), 10)
+        self.assertIn("0 kB/s", label.property("text"))
+        self.click("operationCancelButton")
+        self.wait(lambda: self.bridge.state == "cancelled")
+        self.assertEqual(self.config["calls"][-1][0], "cleanup")
 
 
 if __name__ == "__main__":

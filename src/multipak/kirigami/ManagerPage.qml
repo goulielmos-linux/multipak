@@ -132,6 +132,14 @@ Kirigami.ScrollablePage {
                 }
             }
             ManagerActionCard {
+                title: qsTr("Android containers")
+                description: qsTr("Create and manage separate Android containers.")
+                iconName: "phone"
+                buttonName: "managerAndroidEnvironmentsButton"
+                onActivated: manager.openAndroidEnvironments()
+                Layout.fillWidth: true
+            }
+            ManagerActionCard {
                 title: qsTr("MultiPak settings")
                 description: qsTr("Configure file types and the interface language.")
                 iconName: "configure"

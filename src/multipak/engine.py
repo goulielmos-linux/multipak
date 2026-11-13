@@ -40,6 +40,26 @@ from .store import Store
 
 
 class Engine:
+    def install_android(
+        self,
+        package: Package,
+        *,
+        allow_translation=False,
+        instance_id="",
+        android_profile="",
+        android_label="",
+    ) -> Transaction:
+        from . import android
+
+        return android.install(
+            self,
+            package,
+            allow_translation=allow_translation,
+            instance_id=instance_id,
+            android_profile=android_profile,
+            android_label=android_label,
+        )
+
     def install_appimage(self, package: Package) -> Transaction:
         from . import appimage
 
@@ -429,6 +449,10 @@ class Engine:
 
     def retry(self, tx: Transaction) -> Transaction:
         """Resume creation, initialization or package work using the retained local snapshot."""
+        if tx.method == "waydroid" and tx.package_kind == "apk":
+            from . import android
+
+            return android.retry(self, tx)
         if tx.method == "appimage" and tx.package_kind == "appimage":
             from . import appimage
 
@@ -714,6 +738,10 @@ class Engine:
 
     def cleanup(self, tx: Transaction, *, preserve_environment: bool = False) -> None:
         """Destroy only owned resources. Preserve the journal if any deletion fails."""
+        if tx.method == "waydroid" and tx.package_kind == "apk":
+            from . import android
+
+            return android.cleanup(self, tx)
         if tx.method == "appimage" and tx.package_kind == "appimage":
             from . import appimage
 

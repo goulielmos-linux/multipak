@@ -7,7 +7,7 @@ from typing import Literal
 
 from multipak.localization import mark
 
-PackageKind = Literal["rpm", "deb", "arch", "appimage"]
+PackageKind = Literal["rpm", "deb", "arch", "appimage", "apk"]
 
 
 def valid_environment_name(name: str) -> bool:
@@ -16,6 +16,22 @@ def valid_environment_name(name: str) -> bool:
 
 def reserved_environment_name(name: str) -> bool:
     return bool(re.match(r"^(?:C[0-9]+-)?MultiPak", name, re.I))
+
+
+@dataclass(frozen=True)
+class AndroidPart:
+    member: str
+    split_id: str
+    size: int
+    sha256: str
+    kind: str = "feature"
+    target: str = ""
+    qualifier: str = ""
+    abis: tuple[str, ...] = ()
+    dependencies: tuple[str, ...] = ()
+    required_types: tuple[str, ...] = ()
+    split_types: tuple[str, ...] = ()
+    min_sdk: int = 1
 
 
 @dataclass(frozen=True)
@@ -33,6 +49,13 @@ class Package:
     icon_data: bytes = b""
     icon_extension: str = ""
     appimage_type: int = 0
+    android_version_code: int = 0
+    android_target_sdk: int = 0
+    android_bundle_format: str = ""
+    android_expansions: tuple[AndroidPart, ...] = ()
+    android_variants: tuple[dict, ...] = ()
+    android_min_sdk: int = 1
+    android_parts: tuple[AndroidPart, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -96,10 +119,20 @@ class ExistingEnvironment:
 
 
 @dataclass(frozen=True)
+class AndroidPlan:
+    initialized: bool = False
+    translation: str = "native"
+    bridge: str = ""
+    explanation: str = ""
+
+
+@dataclass(frozen=True)
 class PackageInspection:
     package: Package
     existing: tuple[ExistingEnvironment, ...] = ()
     environments: tuple[Environment, ...] = ()
+    android: AndroidPlan | None = None
+    android_environments: tuple[dict, ...] = ()
 
 
 # Offline fallback only. The installed Distrobox catalog and registry metadata supply live versions.
@@ -164,6 +197,12 @@ class Transaction:
     force_new_environment: bool = False
     preserve_environment_on_cleanup: bool = False
     appimage_mode: str = "direct"
+    android_package_id: str = ""
+    android_package_owned: bool = False
+    android_translation_allowed: bool = False
+    android_instance_id: str = ""
+    android_profile: str = ""
+    android_environment_label: str = ""
 
     def to_dict(self) -> dict:
         return asdict(self)

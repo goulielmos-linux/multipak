@@ -12,6 +12,9 @@ msgstr ""
 msgid " Before installation, the container packages will be updated by Pacman."
 msgstr ""
 
+msgid " Since the suggested Android version is older, some features may behave differently."
+msgstr ""
+
 msgid " The filename indicates Fedora {0}, unlike the internal metadata; the internal metadata took priority."
 msgstr ""
 
@@ -24,6 +27,9 @@ msgstr ""
 msgid "<a href='dependencies'>View full list</a>"
 msgstr ""
 
+msgid "<a href='translation'>ARM translation layer</a>"
+msgstr ""
+
 msgid "A container with that name already exists. Choose another name."
 msgstr ""
 
@@ -34,6 +40,9 @@ msgid "A new container will be created and named during setup."
 msgstr ""
 
 msgid "A new version of MultiPak is available."
+msgstr ""
+
+msgid "A part of this bundle requires a newer Android version."
 msgstr ""
 
 msgid "A system change is pending. Restart your computer before installing Distrobox."
@@ -51,10 +60,19 @@ msgstr ""
 msgid "A system operation or deployment is pending. Complete it and restart before trying again."
 msgstr ""
 
+msgid "APKS asset delivery bundles are not supported yet."
+msgstr ""
+
+msgid "ARM translation layer"
+msgstr ""
+
 msgid "About the Application Installer — MultiPak"
 msgstr ""
 
 msgid "About the Application Manager — MultiPak"
+msgstr ""
+
+msgid "About the Waydroid adaptations"
 msgstr ""
 
 msgid "About the recommended environment"
@@ -64,6 +82,9 @@ msgid "Adding application shortcuts…"
 msgstr ""
 
 msgid "Adding the application to the application launcher…"
+msgstr ""
+
+msgid "Adding the application to the launcher…"
 msgstr ""
 
 msgid "Additional dependencies:"
@@ -78,7 +99,91 @@ msgstr ""
 msgid "Also delete the container's home folder, including its data and settings."
 msgstr ""
 
+msgid "Also delete this environment's Android data"
+msgstr ""
+
+msgid "An existing Android native bridge was preserved."
+msgstr ""
+
 msgid "An older MultiPak with a different Flatpak ID is still installed. It must be removed to avoid duplicate shortcuts and packages opening in the old version."
+msgstr ""
+
+msgid "Android (.apk, .apkm, .apks, .xapk)"
+msgstr ""
+
+msgid "Android (version not recognized by MultiPak)"
+msgstr ""
+
+msgid "Android application settings — MultiPak"
+msgstr ""
+
+msgid "Android application uninstalled. Its data and the Android environment were preserved."
+msgstr ""
+
+msgid "Android applications require a Wayland desktop session."
+msgstr ""
+
+msgid "Android container and its saved data removed."
+msgstr ""
+
+msgid "Android container removed. Its saved data was preserved."
+msgstr ""
+
+msgid "Android container updated."
+msgstr ""
+
+msgid "Android containers"
+msgstr ""
+
+msgid "Android could not copy the additional OBB data. Existing files were preserved. {0}"
+msgstr ""
+
+msgid "Android could not install the bundle: {0}"
+msgstr ""
+
+msgid "Android did not become ready. Check the Waydroid graphics and system configuration. {0}"
+msgstr ""
+
+msgid "Android did not become ready: {0}"
+msgstr ""
+
+msgid "Android did not confirm that the application was reopened."
+msgstr ""
+
+msgid "Android did not confirm the ARM translation layer after updating."
+msgstr ""
+
+msgid "Android did not confirm the input preferences."
+msgstr ""
+
+msgid "Android did not confirm the selected system version."
+msgstr ""
+
+msgid "Android environment creation was not confirmed."
+msgstr ""
+
+msgid "Android environment removal was not confirmed."
+msgstr ""
+
+msgid "Android is still starting…"
+msgstr ""
+
+msgid "Android returned an unrecognized state. Refresh to try again."
+msgstr ""
+
+msgid "Android session stopped before it became ready: {0}"
+msgstr ""
+
+msgid "Android startup diagnostics:"
+msgstr ""
+
+msgid "Android version"
+msgstr ""
+
+msgid "Android — Waydroid"
+msgstr ""
+
+msgid "Android: {0}"
 msgstr ""
 
 msgid "Another application uses this container. It will be kept."
@@ -117,6 +222,12 @@ msgstr ""
 msgid "Application: <b>%1</b> (%2)"
 msgstr ""
 
+msgid "Apply"
+msgstr ""
+
+msgid "Applying preferences…"
+msgstr ""
+
 msgid "Arch Linux packages (.pkg.tar, .pkg.tar.zst, .pkg.tar.xz, .pkg.tar.gz and .pkg.tar.bz2)"
 msgstr ""
 
@@ -129,6 +240,9 @@ msgstr ""
 msgid "Authors"
 msgstr ""
 
+msgid "Automatic ARM translation setup currently supports Android 13 on x86_64."
+msgstr ""
+
 msgid "Back"
 msgstr ""
 
@@ -136,6 +250,9 @@ msgid "Backend"
 msgstr ""
 
 msgid "Before continuing with the installation, check whether it is already available in your system's app store."
+msgstr ""
+
+msgid "CPU: %1    RAM: %2"
 msgstr ""
 
 msgid "Cancel"
@@ -148,6 +265,9 @@ msgid "Cancelling installation"
 msgstr ""
 
 msgid "Changes operating system files. This can cause dependency conflicts or prevent applications from working after an update."
+msgstr ""
+
+msgid "Checking Android after the update…"
 msgstr ""
 
 msgid "Checking package repositories — {0}%"
@@ -165,6 +285,9 @@ msgstr ""
 msgid "Choose a MultiPak container to update."
 msgstr ""
 
+msgid "Choose a complete APK or open the APKM bundle containing all its parts."
+msgstr ""
+
 msgid "Choose a container to update everything installed in it, including applications and their dependencies. Your system itself is not changed."
 msgstr ""
 
@@ -180,7 +303,13 @@ msgstr ""
 msgid "Choose a valid name for the new environment."
 msgstr ""
 
+msgid "Choose an Android version compatible with this application and enter an environment name."
+msgstr ""
+
 msgid "Choose an RPM, DEB, prebuilt Arch Linux package or AppImage."
+msgstr ""
+
+msgid "Choose another Android version"
 msgstr ""
 
 msgid "Choose another distribution or version"
@@ -202,6 +331,18 @@ msgid "Configure file types and the interface language."
 msgstr ""
 
 msgid "Configuring the container…"
+msgstr ""
+
+msgid "Connecting to the ARM translation download…"
+msgstr ""
+
+msgid "Connecting to the Android components download…"
+msgstr ""
+
+msgid "Connecting to the Android download…"
+msgstr ""
+
+msgid "Connecting to the Android system download…"
 msgstr ""
 
 msgid "Connecting to the container image download…"
@@ -240,6 +381,12 @@ msgstr ""
 msgid "Container removed. Its home folder was preserved."
 msgstr ""
 
+msgid "Container {0} will be created for this installation."
+msgstr ""
+
+msgid "Container {0} will be reused for this installation."
+msgstr ""
+
 msgid "Container {0} will be {1} for this installation."
 msgstr ""
 
@@ -255,6 +402,9 @@ msgstr ""
 msgid "Copy information"
 msgstr ""
 
+msgid "Copying additional Android application data…"
+msgstr ""
+
 msgid "Copying the AppImage…"
 msgstr ""
 
@@ -262,6 +412,9 @@ msgid "Copying the package to the container…"
 msgstr ""
 
 msgid "Copying the package to the existing container…"
+msgstr ""
+
+msgid "Could not change the Android preferences: {0}"
 msgstr ""
 
 msgid "Could not check whether the container can be removed: {0}"
@@ -273,10 +426,19 @@ msgstr ""
 msgid "Could not complete: "
 msgstr ""
 
+msgid "Could not determine the Android container's state."
+msgstr ""
+
 msgid "Could not find 7-Zip or bsdtar to read the type 1 AppImage."
 msgstr ""
 
 msgid "Could not find unsquashfs to read the type 2 AppImage."
+msgstr ""
+
+msgid "Could not identify the Android display density."
+msgstr ""
+
+msgid "Could not identify the Android version."
 msgstr ""
 
 msgid "Could not identify the active deployment."
@@ -292,6 +454,9 @@ msgid "Could not identify the image version."
 msgstr ""
 
 msgid "Could not load Kirigami. Use the compatible PySide6 and Kirigami supplied by the system."
+msgstr ""
+
+msgid "Could not load the Android settings window."
 msgstr ""
 
 msgid "Could not load the Kirigami manager."
@@ -324,6 +489,12 @@ msgstr ""
 msgid "Could not query the system status."
 msgstr ""
 
+msgid "Could not read the Android APK: {0}"
+msgstr ""
+
+msgid "Could not read the Android package: {0}"
+msgstr ""
+
 msgid "Could not refresh the list: "
 msgstr ""
 
@@ -337,6 +508,9 @@ msgid "Could not remove the folder {0}."
 msgstr ""
 
 msgid "Could not remove the old MultiPak. You can remove it from a terminal and then try again:\n\nflatpak uninstall io.github.multipak.manager"
+msgstr ""
+
+msgid "Could not restart Android: {0}"
 msgstr ""
 
 msgid "Could not retrieve the list of layered system packages."
@@ -369,7 +543,31 @@ msgstr ""
 msgid "Could not verify the package status in the environment."
 msgstr ""
 
+msgid "Create"
+msgstr ""
+
+msgid "Create Android container"
+msgstr ""
+
+msgid "Create a container to keep your Android applications together."
+msgstr ""
+
 msgid "Create a custom container"
+msgstr ""
+
+msgid "Create a new Android environment"
+msgstr ""
+
+msgid "Create a new custom container"
+msgstr ""
+
+msgid "Create and manage separate Android containers."
+msgstr ""
+
+msgid "Create container"
+msgstr ""
+
+msgid "Creating the Android container…"
 msgstr ""
 
 msgid "Creating the Distrobox container…"
@@ -441,6 +639,18 @@ msgstr ""
 msgid "Distrobox was not found."
 msgstr ""
 
+msgid "Downloading Android"
+msgstr ""
+
+msgid "Downloading Android components"
+msgstr ""
+
+msgid "Downloading Android system"
+msgstr ""
+
+msgid "Downloading and preparing Android…"
+msgstr ""
+
 msgid "Downloading components and installing the application…"
 msgstr ""
 
@@ -453,6 +663,9 @@ msgstr ""
 msgid "Downloading container packages…"
 msgstr ""
 
+msgid "Downloading the ARM translation layer…"
+msgstr ""
+
 msgid "Downloading {0} — {1}%"
 msgstr ""
 
@@ -462,10 +675,22 @@ msgstr ""
 msgid "Enter a name for the new container."
 msgstr ""
 
+msgid "Enter a valid Android environment name."
+msgstr ""
+
 msgid "Execution environment and graphics system."
 msgstr ""
 
+msgid "Existing Android"
+msgstr ""
+
 msgid "Existing compatible container"
+msgstr ""
+
+msgid "Extracting the Android components…"
+msgstr ""
+
+msgid "Extracting the Android system…"
 msgstr ""
 
 msgid "Extracting the application so it can run…"
@@ -510,6 +735,12 @@ msgstr ""
 msgid "I understand the risks and want to continue."
 msgstr ""
 
+msgid "Identification confidence:"
+msgstr ""
+
+msgid "Identification confidence: {0}.\n\n{1}"
+msgstr ""
+
 msgid "Initializing the container…"
 msgstr ""
 
@@ -523,6 +754,9 @@ msgid "Install Distrobox on the system to continue."
 msgstr ""
 
 msgid "Install Distrobox on your system to install applications in containers."
+msgstr ""
+
+msgid "Install Waydroid on your system before preparing an Android environment."
 msgstr ""
 
 msgid "Install a variety of packages safely and easily."
@@ -585,6 +819,12 @@ msgstr ""
 msgid "Installing packages — {0}%"
 msgstr ""
 
+msgid "Installing the ARM translation layer and restarting Android…"
+msgstr ""
+
+msgid "Installing the Android application…"
+msgstr ""
+
 msgid "Installing the application…"
 msgstr ""
 
@@ -601,6 +841,9 @@ msgid "Invalid .PKGINFO file."
 msgstr ""
 
 msgid "Invalid .PKGINFO metadata."
+msgstr ""
+
+msgid "Invalid Android environment ID."
 msgstr ""
 
 msgid "Invalid AppImage launch method."
@@ -684,6 +927,9 @@ msgstr ""
 msgid "List of dependencies declared by the package"
 msgstr ""
 
+msgid "Loading Android environments…"
+msgstr ""
+
 msgid "Loading package information…"
 msgstr ""
 
@@ -706,6 +952,9 @@ msgid "Medium"
 msgstr ""
 
 msgid "Missing or duplicate Arch metadata: {0}."
+msgstr ""
+
+msgid "More options"
 msgstr ""
 
 msgid "MultiPak Application Manager"
@@ -732,7 +981,13 @@ msgstr ""
 msgid "MultiPak settings"
 msgstr ""
 
+msgid "MultiPak uses an adapted version of Waydroid to create and manage separate Android containers.\n\nEach container has its own:\n• System images\n• Applications and data\n• Network\n• Desktop shortcuts\n\nThe original system Waydroid environment remains available as a separate option."
+msgstr ""
+
 msgid "Native installation"
+msgstr ""
+
+msgid "No Android containers yet"
 msgstr ""
 
 msgid "No MultiPak containers are available to update."
@@ -765,13 +1020,28 @@ msgstr ""
 msgid "Not installed"
 msgstr ""
 
+msgid "Not prepared"
+msgstr ""
+
 msgid "Not provided"
+msgstr ""
+
+msgid "Only this application will close and open again. Unsaved progress may be lost. Apply any pending changes first. The system may ask for authorization."
+msgstr ""
+
+msgid "Open Android"
 msgstr ""
 
 msgid "Open the package without --page or --screenshot; these options are for previews only."
 msgstr ""
 
+msgid "Opening Android…"
+msgstr ""
+
 msgid "Opening the app store…"
+msgstr ""
+
+msgid "Operation completed."
 msgstr ""
 
 msgid "Operation timed out: {0}"
@@ -786,7 +1056,13 @@ msgstr ""
 msgid "Package operations must use sudo only inside the environment."
 msgstr ""
 
+msgid "Preferences applied."
+msgstr ""
+
 msgid "Preferences saved."
+msgstr ""
+
+msgid "Preferences saved. Reopen the application to apply mouse input changes."
 msgstr ""
 
 msgid "Preparing Distrobox"
@@ -799,6 +1075,9 @@ msgid "Preparing a new system deployment…"
 msgstr ""
 
 msgid "Preparing installation…"
+msgstr ""
+
+msgid "Preparing the Android environment…"
 msgstr ""
 
 msgid "Preparing the AppImage…"
@@ -825,6 +1104,9 @@ msgstr ""
 msgid "Ready to install"
 msgstr ""
 
+msgid "Refresh"
+msgstr ""
+
 msgid "Reload list"
 msgstr ""
 
@@ -840,6 +1122,12 @@ msgstr ""
 msgid "Remove"
 msgstr ""
 
+msgid "Remove %1? All applications in this environment will become unavailable. Other Android environments will be preserved."
+msgstr ""
+
+msgid "Remove Android container?"
+msgstr ""
+
 msgid "Remove applications installed through MultiPak."
 msgstr ""
 
@@ -849,10 +1137,25 @@ msgstr ""
 msgid "Remove the old MultiPak"
 msgstr ""
 
+msgid "Remove…"
+msgstr ""
+
 msgid "Removing container {0}…"
 msgstr ""
 
+msgid "Removing the Android container…"
+msgstr ""
+
 msgid "Removing the components created by this installation…"
+msgstr ""
+
+msgid "Reopen application…"
+msgstr ""
+
+msgid "Reopen this application?"
+msgstr ""
+
+msgid "Reopening the application…"
 msgstr ""
 
 msgid "Requesting a system restart…"
@@ -862,6 +1165,9 @@ msgid "Resolving dependencies and downloading components…"
 msgstr ""
 
 msgid "Resolving dependencies and installing the application…"
+msgstr ""
+
+msgid "Resource usage for the entire Android container. CPU at 100% means one fully occupied core."
 msgstr ""
 
 msgid "Restart later"
@@ -894,7 +1200,13 @@ msgstr ""
 msgid "Run as a regular user with rootless Podman."
 msgstr ""
 
+msgid "Running"
+msgstr ""
+
 msgid "Save"
+msgstr ""
+
+msgid "Saved Android application data will be preserved unless you select the option below."
 msgstr ""
 
 msgid "Saving preferences…"
@@ -921,13 +1233,28 @@ msgstr ""
 msgid "Select a prebuilt Arch package, not a source package."
 msgstr ""
 
+msgid "Select a prepared MultiPak Android container to update."
+msgstr ""
+
 msgid "Select a regular file."
+msgstr ""
+
+msgid "Select an Android APK."
+msgstr ""
+
+msgid "Select an Android installation managed by MultiPak."
+msgstr ""
+
+msgid "Select an Android version."
 msgstr ""
 
 msgid "Select an AppImage."
 msgstr ""
 
 msgid "Select an RPM that MultiPak installed directly on your system."
+msgstr ""
+
+msgid "Select an application from a MultiPak Android container."
 msgstr ""
 
 msgid "Select an application to uninstall"
@@ -945,10 +1272,43 @@ msgstr ""
 msgid "Show details"
 msgstr ""
 
+msgid "Show the virtual keyboard"
+msgstr ""
+
 msgid "Some temporary environment files could not be removed."
 msgstr ""
 
+msgid "Start"
+msgstr ""
+
+msgid "Starting Android in the background requires systemd-run."
+msgstr ""
+
+msgid "Starting the Android container…"
+msgstr ""
+
+msgid "Starting the Android environment…"
+msgstr ""
+
+msgid "Status unavailable"
+msgstr ""
+
+msgid "Stop"
+msgstr ""
+
+msgid "Stopped"
+msgstr ""
+
+msgid "Stopping the Android container…"
+msgstr ""
+
 msgid "Suggested environment"
+msgstr ""
+
+msgid "Suspended"
+msgstr ""
+
+msgid "System authorization requires PolicyKit (pkexec)."
 msgstr ""
 
 msgid "System language"
@@ -958,6 +1318,48 @@ msgid "System package installation was not confirmed."
 msgstr ""
 
 msgid "The .PKGINFO metadata identifies this as an Arch-based package, but does not distinguish Arch Linux from its derivatives. The recommended environment is Arch Linux (rolling release)."
+msgstr ""
+
+msgid "The APKs in this bundle belong to different applications or versions."
+msgstr ""
+
+msgid "The ARM translation download exceeds the size limit."
+msgstr ""
+
+msgid "The ARM translation download failed its integrity check."
+msgstr ""
+
+msgid "The ARM translation download requires HTTPS."
+msgstr ""
+
+msgid "The ARM translation layer did not become active."
+msgstr ""
+
+msgid "The ARM translation layer lets this application run on this computer. MultiPak prepares this dependency automatically as part of the installation. An existing compatible layer is reused. Installing the layer restarts the selected Android environment."
+msgstr ""
+
+msgid "The ARM translation layer required by this application is already available in the Android container."
+msgstr ""
+
+msgid "The Android application was installed and added to the application launcher."
+msgstr ""
+
+msgid "The Android application will be removed. Its personal data, the Android environment and other applications will be preserved."
+msgstr ""
+
+msgid "The Android container has changed. Nothing was removed."
+msgstr ""
+
+msgid "The Android container is already up to date."
+msgstr ""
+
+msgid "The Android container is still in use. Nothing was removed."
+msgstr ""
+
+msgid "The Android environment no longer exists."
+msgstr ""
+
+msgid "The Android system in %1 will be updated. Its applications and saved data will be preserved. This does not update the applications or change the Android version. Open applications may close during the update. System authorization may be required."
 msgstr ""
 
 msgid "The AppImage copy has changed. Open the file again."
@@ -987,16 +1389,37 @@ msgstr ""
 msgid "The app store is open. Search for “{0}”. The search term has been copied to your clipboard."
 msgstr ""
 
+msgid "The application and its bundled data will be installed in an Android container using Waydroid, without changing the base system image.\n\nAny available shortcuts will appear in your application launcher."
+msgstr ""
+
 msgid "The application directory must not be a symbolic link."
 msgstr ""
 
 msgid "The application entry point is unavailable."
 msgstr ""
 
+msgid "The application requires {0} or later and was developed targeting {1}. MultiPak can use this same version to prepare the environment."
+msgstr ""
+
+msgid "The application requires {0} or later. MultiPak recommends {1} because it is the newest version it can prepare."
+msgstr ""
+
+msgid "The application shown above was prepared for Android smartphones and tablets. We recommend looking for a compatible Linux version in your system’s app store before continuing."
+msgstr ""
+
+msgid "The application was developed targeting {0}."
+msgstr ""
+
 msgid "The application was installed in the environment "
 msgstr ""
 
 msgid "The application was installed in the {0} environment."
+msgstr ""
+
+msgid "The application was reopened."
+msgstr ""
+
+msgid "The application, however, was developed targeting {0}."
 msgstr ""
 
 msgid "The command finished, but no pending deployment was found. Check rpm-ostree status in the system details."
@@ -1062,6 +1485,9 @@ msgstr ""
 msgid "The environment does not contain a valid os-release file, or the file is not a regular file."
 msgstr ""
 
+msgid "The existing ARM translation layer does not provide the architecture required by this application. It will be preserved."
+msgstr ""
+
 msgid "The existing environment does not match the selected distribution and version."
 msgstr ""
 
@@ -1071,7 +1497,7 @@ msgstr ""
 msgid "The extraction directory already exists."
 msgstr ""
 
-msgid "The file contents do not match a valid RPM, DEB, Arch or AppImage package. {0}"
+msgid "The file contents do not match a valid RPM, DEB, Arch, AppImage or Android APK package. {0}"
 msgstr ""
 
 msgid "The file does not contain Arch package .PKGINFO metadata."
@@ -1095,10 +1521,19 @@ msgstr ""
 msgid "The filename suggests that this package was built for {0}, but its internal metadata does not confirm this. MultiPak used the filename to suggest this version."
 msgstr ""
 
+msgid "The first preparation downloads the selected Android version and may request your system password."
+msgstr ""
+
+msgid "The images were updated, but Android could not restart."
+msgstr ""
+
 msgid "The installation directory must not be a symbolic link."
 msgstr ""
 
 msgid "The internal file exceeds the read limit."
+msgstr ""
+
+msgid "The last user-installed application was removed from %1. Would you like to remove this Android container to free up disk space?"
 msgstr ""
 
 msgid "The managed AppImage copy and its shortcuts will be removed. Personal data will be preserved."
@@ -1123,6 +1558,12 @@ msgid "The name exceeds the 63-character limit."
 msgstr ""
 
 msgid "The name will be assigned during setup"
+msgstr ""
+
+msgid "The named Android runtime is not installed."
+msgstr ""
+
+msgid "The named Android runtime was not prepared."
 msgstr ""
 
 msgid "The new image still exists; cleanup is incomplete."
@@ -1153,6 +1594,12 @@ msgid "The package does not contain control metadata."
 msgstr ""
 
 msgid "The package does not contain control.tar."
+msgstr ""
+
+msgid "The package does not say which Android version the developer configured it for."
+msgstr ""
+
+msgid "The package does not specify a useful minimum Android version. MultiPak recommends {0}, the newest Android version it can create, but cannot confirm the application's requirements."
 msgstr ""
 
 msgid "The package is no longer requested as a direct installation."
@@ -1191,10 +1638,31 @@ msgstr ""
 msgid "There is not enough free space to copy the package."
 msgstr ""
 
+msgid "This APK does not provide an application launcher."
+msgstr ""
+
+msgid "This APK requires {0}, but the Android environment supports {1}. A compatible ARM translation layer may be required."
+msgstr ""
+
+msgid "This APKS bundle has no variant compatible with the selected Android."
+msgstr ""
+
+msgid "This APKS bundle uses device targeting not supported yet."
+msgstr ""
+
+msgid "This Android bundle is missing required parts."
+msgstr ""
+
 msgid "This AppImage does not contain a recognized type 2 SquashFS payload."
 msgstr ""
 
 msgid "This AppImage installation is unavailable."
+msgstr ""
+
+msgid "This application has no compatible Android architecture."
+msgstr ""
+
+msgid "This application is already installed in Android. The existing installation was preserved."
 msgstr ""
 
 msgid "This application is in the package format used by Arch Linux and its derivatives."
@@ -1204,6 +1672,21 @@ msgid "This application is packaged in DEB format, used by distributions such as
 msgstr ""
 
 msgid "This application is packaged in RPM format, used by distributions such as Fedora and Red Hat Enterprise Linux."
+msgstr ""
+
+msgid "This application requires a newer Android version (API {0})."
+msgstr ""
+
+msgid "This application requires an ARM translation layer. Reopen the package and allow its installation in the review screen."
+msgstr ""
+
+msgid "This application requires {0} or later. The newest Android version MultiPak can create is {1}, which does not meet that requirement. Choose an existing container with a compatible Android version to continue."
+msgstr ""
+
+msgid "This bundle has no compatible Android architecture. An ARM translation layer may be required."
+msgstr ""
+
+msgid "This is a preview. No Android environment was changed."
 msgstr ""
 
 msgid "This is a preview. No application was opened."
@@ -1237,6 +1720,9 @@ msgid "This package is already installed in the selected environment. MultiPak w
 msgstr ""
 
 msgid "This preview does not start an installation."
+msgstr ""
+
+msgid "This processor is not supported by the ARM translation installer."
 msgstr ""
 
 msgid "This shortcut does not belong to this installation."
@@ -1281,10 +1767,16 @@ msgstr ""
 msgid "Unrecognized local package ID: "
 msgstr ""
 
+msgid "Unsupported Android split: {0}"
+msgstr ""
+
 msgid "Unsupported DEB metadata compression."
 msgstr ""
 
 msgid "Unsupported package type."
+msgstr ""
+
+msgid "Up to 64 characters. Spaces and accents are allowed."
 msgstr ""
 
 msgid "Update"
@@ -1302,6 +1794,15 @@ msgstr ""
 msgid "Update complete. All applications and packages in the container are up to date."
 msgstr ""
 
+msgid "Update container"
+msgstr ""
+
+msgid "Update container…"
+msgstr ""
+
+msgid "Updating the Android container…"
+msgstr ""
+
 msgid "Updating the Arch Linux environment…"
 msgstr ""
 
@@ -1314,6 +1815,9 @@ msgstr ""
 msgid "Use an existing container"
 msgstr ""
 
+msgid "Use arrow keys as swipe gestures"
+msgstr ""
+
 msgid "Use only as a last resort."
 msgstr ""
 
@@ -1321,6 +1825,18 @@ msgid "Use system management for rpm-ostree operations."
 msgstr ""
 
 msgid "Use the default MultiPak container"
+msgstr ""
+
+msgid "Use the mouse as touch input"
+msgstr ""
+
+msgid "Use the standard MultiPak container"
+msgstr ""
+
+msgid "Validating the Android components…"
+msgstr ""
+
+msgid "Validating the Android system…"
 msgstr ""
 
 msgid "Verifying the Distrobox installation…"
@@ -1356,7 +1872,31 @@ msgstr ""
 msgid "Wait for the operation to finish before closing the manager."
 msgstr ""
 
+msgid "Waiting for Android to finish starting…"
+msgstr ""
+
 msgid "Waiting for the current step to finish before cleaning up…"
+msgstr ""
+
+msgid "Waydroid (adapted)"
+msgstr ""
+
+msgid "Waydroid (existing environment)"
+msgstr ""
+
+msgid "Waydroid could not complete the operation: {0}"
+msgstr ""
+
+msgid "Waydroid did not confirm the ARM translation setup."
+msgstr ""
+
+msgid "Waydroid did not confirm the application change."
+msgstr ""
+
+msgid "Waydroid is not installed on this system."
+msgstr ""
+
+msgid "Waydroid returned an invalid application identifier."
 msgstr ""
 
 msgid "Welcome to the MultiPak Installation Wizard"
@@ -1383,8 +1923,14 @@ msgstr ""
 msgid "rpm-ostree will remove the package and recalculate the required dependencies. A restart will be needed to finish. Your personal data will be preserved."
 msgstr ""
 
+msgid "{0:.1f} MB downloaded"
+msgstr ""
+
 msgid "{0} exited with code {1}.\n{2}"
 msgstr ""
 
 msgid "{0} will be installed the next time you start your computer."
+msgstr ""
+
+msgid "{0} — {1}%\n{2} MB of {3} MB · {4} {5}"
 msgstr ""

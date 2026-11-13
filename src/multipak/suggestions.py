@@ -4,6 +4,98 @@ from multipak.localization import tr
 
 from .models import Environment, Package
 
+_ANDROID_RELEASES = (
+    "1.0",
+    "1.1",
+    "1.5",
+    "1.6",
+    "2.0",
+    "2.0.1",
+    "2.1",
+    "2.2",
+    "2.3",
+    "2.3.3",
+    "3.0",
+    "3.1",
+    "3.2",
+    "4.0",
+    "4.0.3",
+    "4.1",
+    "4.2",
+    "4.3",
+    "4.4",
+    "4.4W",
+    "5.0",
+    "5.1",
+    "6.0",
+    "7.0",
+    "7.1",
+    "8.0",
+    "8.1",
+    "9",
+    "10",
+    "11",
+    "12",
+    "12L",
+    "13",
+    "14",
+    "15",
+    "16",
+)
+
+
+def _android_release(sdk: int) -> str:
+    if 1 <= sdk <= len(_ANDROID_RELEASES):
+        return "Android " + _ANDROID_RELEASES[sdk - 1]
+    return tr("Android (version not recognized by MultiPak)")
+
+
+def android_suggestion_details(package: Package, title: str, sdk: int) -> tuple[str, str]:
+    minimum, target = package.android_min_sdk, package.android_target_sdk
+    matching_target = target == sdk and 1 < minimum <= sdk
+    strength = tr("High") if target == sdk else tr("Medium") if minimum > 1 else tr("Low")
+    if matching_target:
+        text = tr(
+            "The application requires {0} or later and was developed targeting {1}. "
+            "MultiPak can use this same version to prepare the environment."
+        ).format(_android_release(minimum), title)
+    elif minimum > sdk:
+        strength = tr("Low")
+        text = tr(
+            "This application requires {0} or later. The newest Android version MultiPak "
+            "can create is {1}, which does not meet that requirement. "
+            "Choose an existing container with a compatible Android version to continue."
+        ).format(_android_release(minimum), title)
+    elif minimum > 1:
+        text = tr(
+            "The application requires {0} or later. MultiPak recommends {1} "
+            "because it is the newest version it can prepare."
+        ).format(_android_release(minimum), title)
+    else:
+        text = tr(
+            "The package does not specify a useful minimum Android version. MultiPak "
+            "recommends {0}, the newest Android version it can create, but cannot confirm "
+            "the application's requirements."
+        ).format(title)
+    if target > 0 and not matching_target:
+        if target > sdk and minimum <= sdk:
+            text += " " + tr("The application, however, was developed targeting {0}.").format(
+                _android_release(target)
+            )
+            text += tr(
+                " Since the suggested Android version is older, "
+                "some features may behave differently."
+            )
+        else:
+            text += " " + tr("The application was developed targeting {0}.").format(
+                _android_release(target)
+            )
+    elif target <= 0:
+        text += "\n\n" + tr(
+            "The package does not say which Android version the developer configured it for."
+        )
+    return strength, tr("Identification confidence: {0}.\n\n{1}").format(strength, text)
+
 
 def suggestion_details(package: Package, environment: Environment, title: str) -> tuple[str, str]:
     family, _, version = environment.id.partition("-")

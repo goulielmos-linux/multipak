@@ -19,6 +19,15 @@ from .integration import DESKTOP_ID
 LEGACY_INSTALLER = host.LEGACY_APP_ID + ".installer.desktop"
 APPIMAGE_MIME = "application/x-multipak-appimage"
 FORMATS = {
+    "apk": (
+        mark("Android (.apk, .apkm, .apks, .xapk)"),
+        (
+            "application/vnd.android.package-archive",
+            "application/vnd.apkm",
+            "application/x-apks",
+            "application/xapk-package-archive",
+        ),
+    ),
     "rpm": ("RPM (.rpm)", ("application/x-rpm",)),
     "deb": ("DEB (.deb)", ("application/vnd.debian.binary-package", "application/x-deb")),
     "arch": (
@@ -38,7 +47,16 @@ FORMATS = {
         ),
     ),
 }
+# Choices saved before Android support cover exactly these formats.
+FORMATS_BEFORE_ANDROID = frozenset({"rpm", "deb", "arch", "appimage"})
 SECTIONS = ("Default Applications", "Added Associations", "Removed Associations")
+
+
+def _missing_new_formats(saved):
+    """Formats added since a complete earlier choice was saved, such as Android."""
+    if not isinstance(saved, dict) or not FORMATS_BEFORE_ANDROID <= set(saved):
+        return set()
+    return set(FORMATS) - set(saved)
 
 
 def _without_multipak(value):
@@ -137,6 +155,7 @@ class FileAssociations:
         self.state_path = self.config / "multipak/file-associations.json"
         self.xml_path = self.data / "mime/packages/io.github.multipak.appimage.xml"
         self.arch_xml_path = self.data / "mime/packages/io.github.multipak.packages.xml"
+        self.android_xml_path = self.data / "mime/packages/io.github.multipak.android.xml"
         self.reader = reader or _preferred_application
         self.refresher = refresher or self._refresh
 
@@ -151,8 +170,14 @@ class FileAssociations:
         if not host.is_flatpak():
             return False
         with self._locked():
-            if self._read_state().get("desktop_id") == DESKTOP_ID:
-                return False
+            state = self._read_state()
+            if state.get("desktop_id") == DESKTOP_ID:
+                saved = state.get("selected")
+                if not _missing_new_formats(saved):
+                    return False
+                # A format added by a newer MultiPak, such as Android, starts selected.
+                self._apply(self.load())
+                return True
             self._apply({key: True for key in FORMATS})
         return True
 
@@ -232,6 +257,10 @@ class FileAssociations:
             if saved.get(key) is False:
                 selected[key] = False
                 continue
+            if key in _missing_new_formats(saved):
+                # A format added after the last choice starts selected, as on first use.
+                selected[key] = True
+                continue
             selected[key] = self.reader(mime) == DESKTOP_ID
         return selected
 
@@ -310,9 +339,22 @@ class FileAssociations:
         config.write(output, space_around_delimiters=False)
         snapshots = {
             path: path.read_bytes() if path.exists() else None
-            for path in (self.path, self.state_path, self.xml_path, self.arch_xml_path)
+            for path in (
+                self.path,
+                self.state_path,
+                self.xml_path,
+                self.arch_xml_path,
+                self.android_xml_path,
+            )
         }
         try:
+            if selected["apk"]:
+                _atomic_write(
+                    self.android_xml_path,
+                    (Path(__file__).with_name("assets") / "multipak-android.xml").read_text(),
+                )
+            else:
+                self.android_xml_path.unlink(missing_ok=True)
             _atomic_write(
                 self.state_path,
                 json.dumps(

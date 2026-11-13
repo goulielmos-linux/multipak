@@ -1,4 +1,5 @@
-"""Build the deterministic privileged installation bundle for system RPM installation."""
+"""Build the deterministic privileged installation bundle: system RPM installation and the
+Android runtime."""
 
 import gzip
 import hashlib
@@ -9,7 +10,17 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "src/multipak"
-FILES = ["privileged_helper.py", "privileged_files.py", "system_install_helper.py"]
+FILES = [
+    "privileged_helper.py",
+    "privileged_files.py",
+    "system_install_helper.py",
+    "android_instances_helper.py",
+    "android_upgrade_helper.py",
+    "android_data_helper.py",
+    "android_translation_helper.py",
+    "android_initializer.py",
+    "assets/waydroid-runtime.tar.gz",
+]
 files = {name: (SOURCE / name).read_bytes() for name in FILES}
 files["multipak.policy"] = (ROOT / "packaging/polkit/io.github.multipak.manage.policy").read_bytes()
 buffer = io.BytesIO()

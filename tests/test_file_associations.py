@@ -373,3 +373,30 @@ def test_legacy_migration_rolls_back_associations_if_refresh_fails(settings, mon
         settings.migrate_legacy(removed=True)
     assert settings.path.read_text() == before
     assert not settings.state_path.exists()
+
+
+def test_android_default_is_added_without_changing_existing_format_choices(settings, monkeypatch):
+    monkeypatch.setattr("multipak.file_associations.host.is_flatpak", lambda: True)
+    settings.apply(selection(rpm=False, appimage=False, apk=False))
+    saved = json.loads(settings.state_path.read_text())
+    saved["selected"].pop("apk")  # A choice saved before Android support.
+    settings.state_path.write_text(json.dumps(saved))
+    assert settings.initialize_defaults() is True
+    assert settings.load() == selection(rpm=False, appimage=False)
+    assert settings.initialize_defaults() is False
+
+
+def test_apkm_mime_is_registered_and_an_android_opt_out_is_kept(settings, monkeypatch):
+    monkeypatch.setattr("multipak.file_associations.host.is_flatpak", lambda: True)
+    settings.apply(selection(apk=False))
+    assert settings.initialize_defaults() is False
+    assert settings.load() == selection(apk=False)
+    assert not settings.android_xml_path.exists()
+    settings.apply(selection())
+    xml = ElementTree.fromstring(settings.android_xml_path.read_bytes())
+    assert xml.find("{*}mime-type").attrib["type"] == "application/vnd.apkm"
+    assert xml.find(".//{*}glob").attrib["pattern"] == "*.apkm"
+    assert (
+        read_config(settings.path)["Default Applications"]["application/vnd.apkm"]
+        == DESKTOP_ID + ";"
+    )

@@ -27,6 +27,11 @@ HOST_TOOLS = frozenset(
         "update-mime-database",
         "kbuildsycoca6",
         "setsid",
+        "waydroid",
+        "multipak-waydroid",
+        "lxc-start",
+        "systemd-run",
+        "test",
         "pkexec",
         "cat",
     }

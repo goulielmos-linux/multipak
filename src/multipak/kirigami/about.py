@@ -29,6 +29,8 @@ AUTHORS = (("Goulielmos", "https://github.com/goulielmos-linux"),)
 BACKEND_PROBES = {
     "Distrobox": ("distrobox", "--version"),
     "Podman": ("podman", "--version"),
+    "Waydroid": ("multipak-waydroid", "--runtime-version"),
+    "LXC": ("lxc-start", "--version"),
 }
 
 
@@ -179,7 +181,7 @@ class AboutInfo(QObject):
         return [
             {
                 "id": name,
-                "name": name,
+                "name": tr("Waydroid (adapted)") if name == "Waydroid" else name,
                 "version": data["version"] or states.get(data["state"], ""),
                 "path": data["path"] or tr("Not found"),
             }
@@ -242,7 +244,16 @@ class AboutInfo(QObject):
             process.kill()
         output = bytes(probe["output"][:4096]).decode("utf-8", errors="replace")
         version_pattern = r"(\d+(?:\.\d+){1,3}(?:[-+~][\w.-]+)?)"
-        pattern = r"(?im)^\s*" + name + r"(?:\s+version)?\s*:?\s*" + version_pattern
+        if name == "Waydroid":
+            # Show the adapted runtime's upstream version, rather than the
+            # unrelated system Waydroid version or the MultiPak release number.
+            pattern = r"(?im)^\s*\S+-waydroid-" + version_pattern + r"\s*$"
+        elif name == "LXC":
+            pattern = (
+                r"(?im)^\s*(?:lxc(?:-start)?(?:\s+version)?\s*:?\s*)?" + version_pattern + r"\s*$"
+            )
+        else:
+            pattern = r"(?im)^\s*" + name + r"(?:\s+version)?\s*:?\s*" + version_pattern
         match = re.search(pattern, output)
         data = self._backends[name]
         data["version"] = match[1] if success and match else ""

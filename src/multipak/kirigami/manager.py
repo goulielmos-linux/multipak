@@ -21,6 +21,9 @@ from PySide6.QtQuick import QQuickWindow
 from PySide6.QtWidgets import QApplication, QStyleFactory
 
 from multipak import DISPLAY_VERSION, host
+from multipak.android_containers import ManagedAndroidContainer
+from multipak.android_containers import remove_container as remove_android_container
+from multipak.android_containers import uninstall_application as uninstall_android_application
 from multipak.containers import ManagedContainer, remove_container, uninstall_application
 from multipak.environments import discover
 from multipak.file_associations import FORMATS, FileAssociations
@@ -36,6 +39,7 @@ from multipak.updates import update_container
 from multipak.worker import Worker
 
 from .about import bind_about, license_text
+from .android_environments import AndroidEnvironments
 from .identity import configure_application
 from .languages import bind_languages
 from .legacy_migration import bind_legacy_migration
@@ -51,6 +55,7 @@ class Manager(QObject):
     associationSettingsRequested = Signal()
     associationsSaved = Signal()
     languageSettingsRequested = Signal()
+    androidEnvironmentsRequested = Signal()
     companionWarning = Signal(str)
 
     def __init__(
@@ -74,6 +79,10 @@ class Manager(QObject):
         self._associations = {}
         self._associations_ready = False
         self.worker = None
+        self._android = AndroidEnvironments(
+            store, self, worker_factory=worker_factory, preview=preview
+        )
+        self._android.changed.connect(self.changed)
         self._items = []
         self._mode = "home"
         self._selected = -1
@@ -96,6 +105,10 @@ class Manager(QObject):
         self._log_timer.setInterval(150)
         self._log_timer.timeout.connect(self._flush_logs)
 
+    @Property(QObject, constant=True)
+    def android(self):
+        return self._android
+
     @Slot()
     def openInstaller(self):
         if self.busy or not installation_allowed(self):
@@ -108,9 +121,8 @@ class Manager(QObject):
             tr("Install applications"),
             str(Path.home()),
             tr("Application packages") + " (*.rpm *.deb *.pkg.tar *.pkg.tar.zst "
-            "*.pkg.tar.xz *.pkg.tar.gz *.pkg.tar.bz2 *.AppImage *.appimage);;"
-            + tr("All files")
-            + " (*)",
+            "*.pkg.tar.xz *.pkg.tar.gz *.pkg.tar.bz2 *.AppImage *.appimage "
+            "*.apk *.apkm *.apks *.xapk);;" + tr("All files") + " (*)",
         )
         if not path:
             return
@@ -123,6 +135,12 @@ class Manager(QObject):
         if not (result[0] if isinstance(result, tuple) else result):
             self.companionWarning.emit(tr("Could not open the application installer."))
 
+    @Slot()
+    def openAndroidEnvironments(self):
+        if not self.busy:
+            self.androidEnvironmentsRequested.emit()
+            self._android.refresh()
+
     @Property(str, notify=changed)
     def mode(self):
         return self._mode
@@ -133,7 +151,7 @@ class Manager(QObject):
 
     @Property(bool, notify=changed)
     def busy(self):
-        return self.worker is not None
+        return self.worker is not None or self._android.busy
 
     @Property(bool, notify=changed)
     def canClose(self):
@@ -187,11 +205,20 @@ class Manager(QObject):
                 "The managed AppImage copy and its shortcuts will be removed. Personal "
                 "data will be preserved."
             )
+        if self._pending and self._pending.method == "waydroid":
+            return tr(
+                "The Android application will be removed. Its personal data, the Android "
+                "environment and other applications will be preserved."
+            )
         return tr("The container, other applications and personal data will be preserved.")
 
     @Property(str, notify=changed)
     def unusedContainerName(self):
         return self._unused_container.name if self._unused_container else ""
+
+    @Property(bool, notify=changed)
+    def unusedContainerIsAndroid(self):
+        return isinstance(self._unused_container, ManagedAndroidContainer)
 
     @Property(str, notify=changed)
     def containerRemovalError(self):
@@ -199,7 +226,9 @@ class Manager(QObject):
 
     @Property(bool, notify=changed)
     def canRemoveContainerHome(self):
-        return bool(self._unused_container and self._unused_container.managed_home)
+        return self.unusedContainerIsAndroid or bool(
+            self._unused_container and self._unused_container.managed_home
+        )
 
     @Property(bool, notify=changed)
     def removeContainerHome(self):
@@ -232,17 +261,28 @@ class Manager(QObject):
         self._status = tr("Removing container {0}…").format(container.name)
         self._error = False
         self._run(
-            lambda engine: remove_container(engine, container, remove_home=remove_home),
+            (lambda engine: remove_android_container(engine, container, delete_data=remove_home))
+            if isinstance(container, ManagedAndroidContainer)
+            else (lambda engine: remove_container(engine, container, remove_home=remove_home)),
             self._container_removed,
             self._container_removal_failed,
         )
 
     def _container_removed(self, _result):
+        android = self.unusedContainerIsAndroid
         self._unused_container, self._container_error = None, ""
         self._status = (
-            tr("Container and its home folder removed.")
-            if self._remove_container_home
-            else tr("Container removed. Its home folder was preserved.")
+            (
+                tr("Android container and its saved data removed.")
+                if self._remove_container_home
+                else tr("Android container removed. Its saved data was preserved.")
+            )
+            if android
+            else (
+                tr("Container and its home folder removed.")
+                if self._remove_container_home
+                else tr("Container removed. Its home folder was preserved.")
+            )
         )
         self._remove_container_home = False
         self._progress = 100
@@ -281,6 +321,12 @@ class Manager(QObject):
                         if tx.method == "system"
                         else tr("AppImage managed by MultiPak")
                         if tx.method == "appimage"
+                        else (
+                            tr("Android: {0}").format(tx.container)
+                            if tx.android_instance_id
+                            else tr("Android — Waydroid")
+                        )
+                        if tx.method == "waydroid"
                         else tr("Container: {0}").format(tx.container)
                     ),
                     "note": (
@@ -321,7 +367,7 @@ class Manager(QObject):
             (
                 tx
                 for tx in self.store.transactions()
-                if tx.method in ("distrobox", "appimage")
+                if tx.method in ("distrobox", "appimage", "waydroid")
                 and tx.status in ("installed", "cleanup_failed")
             ),
             key=lambda tx: (tx.package_name.casefold(), tx.container.casefold(), tx.id),
@@ -498,6 +544,8 @@ class Manager(QObject):
         self._run(
             (lambda engine: uninstall_system(engine, transaction))
             if transaction.method == "system"
+            else (lambda engine: uninstall_android_application(engine, transaction))
+            if transaction.method == "waydroid"
             else (lambda engine: uninstall_application(engine, transaction)),
             self._removed,
         )
@@ -529,10 +577,15 @@ class Manager(QObject):
             self._status = (
                 tr("AppImage uninstalled. Personal data was preserved.")
                 if self._removal_method == "appimage"
+                else tr(
+                    "Android application uninstalled. Its data and the Android environment "
+                    "were preserved."
+                )
+                if self._removal_method == "waydroid"
                 else tr("Application uninstalled. The container and personal data were preserved.")
             )
         self._selected = -1
-        if isinstance(result, ManagedContainer):
+        if isinstance(result, (ManagedContainer, ManagedAndroidContainer)):
             self._unused_container, self._container_error = result, ""
             self._remove_container_home = False
             self.changed.emit()
@@ -631,6 +684,7 @@ class Manager(QObject):
 
 def create_manager(app, controller):
     configure_application(app, manager=True)
+    app.aboutToQuit.connect(controller.android.stopStats)
     engine = QQmlApplicationEngine(app)
     languages = bind_languages(app, engine, controller, manager=True)
     bind_about(engine, languages)

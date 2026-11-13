@@ -92,12 +92,18 @@ def package_kind(path: Path) -> str:
         return "deb"
     if header.startswith(b"\x7fELF") and header[8:11] in (b"AI\x01", b"AI\x02"):
         return "appimage"
+    if header.startswith(b"PK\x03\x04"):
+        from .android_bundle import inspect_android
+
+        inspect_android(path)
+        return "apk"
     try:
         _arch_fields(path)
     except (tarfile.TarError, OSError, EOFError, ValueError) as error:
         raise ValueError(
             tr(
-                "The file contents do not match a valid RPM, DEB, Arch or AppImage package. {0}"
+                "The file contents do not match a valid RPM, DEB, Arch, AppImage "
+                "or Android APK package. {0}"
             ).format(error)
         ) from error
     return "arch"
@@ -187,6 +193,12 @@ def inspect_package(path: Path, runner: Runner) -> Package:
     path = path.expanduser().resolve(strict=True)
     if not path.is_file():
         raise ValueError(tr("Select a regular file."))
+    with path.open("rb") as stream:
+        android_archive = stream.read(4) == b"PK\x03\x04"
+    if android_archive:
+        from .android_bundle import inspect_android
+
+        return inspect_android(path)
     kind = package_kind(path)
     if kind == "appimage":
         from .appimage import inspect_appimage

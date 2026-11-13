@@ -611,6 +611,55 @@ class ManagerTests(unittest.TestCase):
         self.assertNotIn("completed", self.controller.status)
         self.assertTrue(self.controller.canClose)
 
+    def test_android_empty_container_dialog_keeps_data_and_can_be_declined(self):
+        from multipak.android_containers import ManagedAndroidContainer
+
+        self.build()
+        self.controller._removal_method = "waydroid"
+        self.controller._removed(ManagedAndroidContainer("Android test", "androida"))
+        QTest.qWait(100)
+        dialog = self.find("containerRemovalDialog", self.window)
+        self.assertTrue(dialog.property("opened"))
+        self.assertIn(
+            "last user-installed", self.find("containerRemovalText", dialog).property("text")
+        )
+        checkbox = self.find("removeContainerHomeCheckBox", dialog)
+        self.assertTrue(checkbox.property("visible"))
+        self.assertFalse(checkbox.property("checked"))
+        self.assertIn("Android data", checkbox.property("text"))
+        self.assertFalse(self.find("containerRemovalWarningIcon", dialog).property("visible"))
+        self.click("keepContainerButton", dialog)
+        self.assertIsNone(self.controller._unused_container)
+        self.assertFalse(self.controller.removeContainerHome)
+
+    def test_android_container_removal_failure_can_retry_without_losing_data_choice(self):
+        from multipak.android_containers import ManagedAndroidContainer
+
+        self.build()
+        self.controller._removal_method = "waydroid"
+        candidate = ManagedAndroidContainer("Android test", "androida")
+        self.controller._removed(candidate)
+        self.controller.setRemoveContainerHome(True)
+        calls = []
+
+        def remove(engine, container, *, delete_data):
+            calls.append((container, delete_data))
+            if len(calls) == 1:
+                raise RuntimeError("Another app was installed")
+
+        with patch("multipak.kirigami.manager.remove_android_container", remove):
+            dialog = self.find("containerRemovalDialog", self.window)
+            self.click("deleteContainerButton", dialog)
+            self.wait(lambda: not self.controller.busy)
+            self.assertTrue(dialog.property("opened"))
+            self.assertIn("Another app", self.controller.containerRemovalError)
+            self.assertTrue(self.controller.removeContainerHome)
+            self.click("deleteContainerButton", dialog)
+            self.wait(lambda: not self.controller.busy)
+        self.assertEqual(calls, [(candidate, True), (candidate, True)])
+        self.assertIn("saved data removed", self.controller.status)
+        self.assertIsNone(self.controller._unused_container)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

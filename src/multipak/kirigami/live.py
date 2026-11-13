@@ -6,6 +6,7 @@ from threading import Lock
 from PySide6.QtCore import Property, QProcess, Qt, QTimer, Signal, Slot
 from PySide6.QtWidgets import QApplication
 
+from multipak.android_translation import preview_plan
 from multipak.catalog import load_catalog, package_environment
 from multipak.distrobox_setup import (
     DistroboxMissing,
@@ -38,6 +39,19 @@ def inspect_installation(engine, path):
     except Exception as error:
         engine._log(tr("Could not update file associations: {0}").format(error))
     package = inspect_package(path, engine.runner)
+    if package.kind == "apk":
+        from multipak.android_instances import discover as discover_android
+        from multipak.android_instances import discover_system
+
+        environments = list(discover_android(engine.runner))
+        personal = discover_system(engine.runner)
+        if personal:
+            environments.append(personal)
+        return PackageInspection(
+            package,
+            android=preview_plan(package),
+            android_environments=tuple(environments),
+        )
     if package.kind == "appimage":
         return PackageInspection(package)
     profiles = load_catalog(engine.runner, engine.store.root / "image-catalog.json")
@@ -174,6 +188,14 @@ class LiveInstaller(Welcome):
         self.package = inspection.package
         self.name, self.version = self.package.name, self.package.version
         self.kind = self.package.kind.upper()
+        if self.isAndroid:
+            self._android_environments = inspection.android_environments
+            self.reset_android_default()
+            self.android_plan = inspection.android or preview_plan(self.package)
+            self.method, self.mode = "waydroid", "standard"
+            self.environment, self._selection = None, None
+            self._set_state("ready")
+            return
         if self.isAppImage:
             self.method, self.mode = "appimage", "standard"
             self.environment, self._selection = None, None
@@ -231,10 +253,32 @@ class LiveInstaller(Welcome):
         ):
             return
         package, selection = self.package, self._selection
+        if self.isAndroid:
+            from multipak.android_instances import identifier
+
+            personal = self.androidUsesPersonalEnvironment
+            if personal and self.mode != "advanced":
+                return
+            instance_id = "" if personal else self._android_environment or identifier()
+            android_profile = "" if personal else self._android_profile
+            android_label = "Waydroid" if personal else self.androidEnvironmentName
         self._logs = ""
         self.logsChanged.emit()
 
         def install(engine):
+            if package.kind == "apk":
+                if personal:
+                    from multipak.android import CONFIG, ROOTFS
+
+                    engine.runner.run(["test", "-s", CONFIG])
+                    engine.runner.run(["test", "-d", ROOTFS])
+                return engine.install_android(
+                    package,
+                    allow_translation=True,
+                    instance_id=instance_id,
+                    android_profile=android_profile,
+                    android_label=android_label,
+                )
             if package.kind == "appimage":
                 return engine.install_appimage(package)
             try:
@@ -348,7 +392,9 @@ class LiveInstaller(Welcome):
         self.transaction = None
         self._result_title = tr("Installation completed")
         self._result_message = (
-            tr("The AppImage was installed and added to the application launcher.")
+            tr("The Android application was installed and added to the application launcher.")
+            if tx.method == "waydroid"
+            else tr("The AppImage was installed and added to the application launcher.")
             if tx.method == "appimage"
             else tr("The application was installed in the {0} environment.").format(
                 self.environment.title
@@ -356,7 +402,7 @@ class LiveInstaller(Welcome):
         )
         self._result_note = (
             tr("You can now open it from the application launcher.")
-            if tx.launchers
+            if tx.launchers or tx.method == "waydroid"
             else tr(
                 "This package does not include an application shortcut. You can "
                 "run it from a terminal inside the container."
@@ -447,6 +493,9 @@ class LiveInstaller(Welcome):
                 if not installation_allowed(self):
                     return
                 tx = self.transaction
+                if tx.method == "waydroid":
+                    tx.android_translation_allowed = True
+                    self.store.save(tx)
                 self._run(lambda engine: engine.retry(tx), self._installed, "install")
         elif self.package is None or self._mode == "inspect":
             self.inspect()

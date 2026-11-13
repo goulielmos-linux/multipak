@@ -23,5 +23,24 @@ Source archives and checksums are listed in the Flatpak manifest:
 - Lua: https://www.lua.org/
 - popt: https://github.com/rpm-software-management/popt
 
+Android APK bundle inspection and split classification in
+src/multipak/android_bundle.py are adapted from App Manager's ApkFile.java:
+https://github.com/MuntashirAkon/AppManager/blob/master/app/src/main/java/io/github/muntashirakon/AppManager/apk/ApkFile.java
+App Manager contributors. SPDX-License-Identifier: GPL-3.0-or-later.
+The GPL version 3 license text is included in LICENSE.
+
+ARM native-bridge overlay layout and configuration properties in
+src/multipak/android_translation_helper.py follow Waydroid Extras Script:
+https://github.com/casualsnek/waydroid_script/blob/48dbfaf34a6ddbe78688c530f9ba1c26522aafb2/stuff/ndk.py
+Waydroid Extras Script contributors. SPDX-License-Identifier: GPL-3.0-or-later.
+Proprietary native-bridge binaries are not included in MultiPak.
+
+The named Android runtime bundles modified Waydroid 1.6.3 source.
+https://github.com/waydroid/waydroid/tree/5b7e2e71be3f6bfaaaab3b461251dacaf1ce4991
+Waydroid contributors. SPDX-License-Identifier: GPL-3.0-or-later.
+Upstream license texts and the modification notice are retained in
+vendor/waydroid and in src/multipak/assets/waydroid-runtime.tar.gz.
+See vendor/waydroid/MULTIPAK-NOTICE for the modified file list.
+
 Interface icons from the KDE Breeze icon theme are distributed under the
 LGPL-3.0-or-later. See src/multipak/kirigami/assets/breeze/COPYING-ICONS.

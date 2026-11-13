@@ -49,6 +49,8 @@ Kirigami.Page {
             Controls.Label {
                 objectName: "warningLabel"
                 text: {
+                    if (welcome.isAndroid)
+                        return qsTr("The application shown above was prepared for Android smartphones and tablets. We recommend looking for a compatible Linux version in your system’s app store before continuing.")
                     let formatNote = ""
                     switch (welcome.isAppImage ? "" : welcome.packaging) {
                     case "DEB":

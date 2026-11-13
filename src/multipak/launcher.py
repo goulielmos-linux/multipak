@@ -29,5 +29,9 @@ def manager_main():
     _launch(["--manager", *sys.argv[1:]])
 
 
+def android_settings_main():
+    _launch(["--android-settings", *sys.argv[1:]])
+
+
 if __name__ == "__main__":
     main()

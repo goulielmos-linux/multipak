@@ -44,11 +44,16 @@ Kirigami.ApplicationWindow {
         if (!manager.canClose) {
             close.accepted = false;
             manager.requestClose();
+        } else {
+            manager.android.stopStats();
         }
     }
 
     Connections {
         target: manager
+        function onAndroidEnvironmentsRequested() {
+            if (currentPage.objectName !== "androidEnvironmentsPage") pageStack.push(androidEnvironmentsPage);
+        }
         function onConfirmationRequested() { removalDialog.open(); }
         function onContainerRemovalRequested() { containerRemovalDialog.open(); }
         function onCompanionWarning(message) {
@@ -62,6 +67,14 @@ Kirigami.ApplicationWindow {
         function onAssociationSettingsRequested() {
             languages.reset();
             if (currentPage.objectName !== "managerSettingsPage") pageStack.push(associationPage);
+        }
+    }
+
+    Component {
+        id: androidEnvironmentsPage
+        AndroidEnvironmentsPage {
+            onAboutRequested: aboutDialog.open()
+            onReturnRequested: root.pageStack.pop()
         }
     }
 
@@ -161,12 +174,15 @@ Kirigami.ApplicationWindow {
         onShown: keepContainerButton.forceActiveFocus()
         Controls.Label {
             objectName: "containerRemovalText"
-            text: qsTr("Container %1 has no applications registered in the Application Manager. Would you like to remove it to free up disk space?").arg(manager.unusedContainerName)
+            text: manager.unusedContainerIsAndroid
+                ? qsTr("The last user-installed application was removed from %1. Would you like to remove this Android container to free up disk space?").arg(manager.unusedContainerName)
+                : qsTr("Container %1 has no applications registered in the Application Manager. Would you like to remove it to free up disk space?").arg(manager.unusedContainerName)
             textFormat: Text.PlainText
             wrapMode: Text.WordWrap
             Layout.fillWidth: true
         }
         RowLayout {
+            visible: !manager.unusedContainerIsAndroid
             spacing: Kirigami.Units.largeSpacing
             Layout.fillWidth: true
             Kirigami.Icon {
@@ -185,7 +201,9 @@ Kirigami.ApplicationWindow {
             }
         }
         Controls.Label {
-            text: manager.canRemoveContainerHome
+            text: manager.unusedContainerIsAndroid
+                ? qsTr("Saved Android application data will be preserved unless you select the option below.")
+                : manager.canRemoveContainerHome
                 ? qsTr("The container's home folder will be kept unless you select the option below. Files in other folders inside the container will be deleted.")
                 : qsTr("The container's home folder will be kept. Files in other folders inside the container will be deleted.")
             wrapMode: Text.WordWrap
@@ -196,7 +214,9 @@ Kirigami.ApplicationWindow {
             objectName: "removeContainerHomeCheckBox"
             visible: manager.canRemoveContainerHome
             checked: manager.removeContainerHome
-            text: qsTr("Also delete the container's home folder, including its data and settings.")
+            text: manager.unusedContainerIsAndroid
+                ? qsTr("Also delete this environment's Android data")
+                : qsTr("Also delete the container's home folder, including its data and settings.")
             onToggled: manager.setRemoveContainerHome(checked)
             Layout.fillWidth: true
             contentItem: Controls.Label {

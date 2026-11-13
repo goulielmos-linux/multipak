@@ -61,6 +61,10 @@ def main():
         PREFIX / "share/mime/packages" / f"{APP_ID}.packages.xml",
     )
     install(
+        ROOT / "src/multipak/assets/multipak-android.xml",
+        PREFIX / "share/mime/packages" / f"{APP_ID}.android.xml",
+    )
+    install(
         ROOT / "packaging" / f"{APP_ID}.metainfo.xml",
         PREFIX / "share/metainfo" / f"{APP_ID}.metainfo.xml",
     )

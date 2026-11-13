@@ -92,8 +92,15 @@ class Store:
 
     def launcher(self, tx: Transaction, name: str) -> Path:
         expected = f"multipak-{tx.id}-"
+        android_launcher = (
+            tx.method == "waydroid"
+            and re.fullmatch(r"[a-z][a-z0-9]{0,10}", tx.android_instance_id)
+            and re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)+", tx.android_package_id)
+            and name
+            == f"multipak-waydroid.{tx.android_instance_id}.{tx.android_package_id}.desktop"
+        )
         if (
-            not name.startswith(expected)
+            not (name.startswith(expected) or android_launcher)
             or Path(name).name != name
             or not name.endswith(".desktop")
         ):

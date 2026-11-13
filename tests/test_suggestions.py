@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from multipak.models import Environment, Package
-from multipak.suggestions import suggestion_details
+from multipak.suggestions import android_suggestion_details, suggestion_details
 
 
 @pytest.mark.parametrize("name", ["strawberry", "google-chrome-stable", "another-application"])
@@ -82,3 +82,51 @@ def test_filename_conflict_is_explained_and_internal_metadata_wins():
     assert strength == "High"
     assert "filename indicates Fedora 44" in text
     assert "internal metadata took priority" in text
+
+
+def test_android_recommendation_explains_minimum_and_target_as_android_versions():
+    package = Package(
+        Path("app.apk"),
+        "apk",
+        "app",
+        "1",
+        "x86",
+        android_min_sdk=23,
+        android_target_sdk=36,
+    )
+    strength, text = android_suggestion_details(package, "Android 13", 33)
+    assert strength == "Medium"
+    assert text.startswith("Identification confidence: Medium.\n\n")
+    assert "requires Android 6.0 or later" in text
+    assert "recommends Android 13" in text
+    assert "developed targeting Android 16" in text
+    assert "some features may behave differently" in text
+    assert "API" not in text and "SDK" not in text
+
+
+@pytest.mark.parametrize("minimum,target", [(1, 0), (23, 0), (34, 36), (99, 100), (23, 33)])
+def test_android_recommendation_handles_missing_newer_and_matching_versions(minimum, target):
+    package = Package(
+        Path("app.apk"),
+        "apk",
+        "app",
+        "1",
+        "x86",
+        android_min_sdk=minimum,
+        android_target_sdk=target,
+    )
+    strength, text = android_suggestion_details(package, "Android 13", 33)
+    if minimum > 33:
+        assert strength == "Low"
+        assert "does not meet that requirement" in text
+        assert "recommends Android 13" not in text
+    elif target == 33:
+        assert strength == "High"
+        assert "can use this same version to prepare the environment" in text
+        assert "some features may behave differently" not in text
+    if minimum == 1:
+        assert strength == "Low" and "cannot confirm" in text
+    if target == 0:
+        assert "does not say which Android version" in text
+    assert "API" not in text and "SDK" not in text
+    assert "99" not in text and "100" not in text

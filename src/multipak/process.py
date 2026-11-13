@@ -11,6 +11,7 @@ import threading
 import time
 from collections.abc import Callable
 from contextlib import contextmanager
+from pathlib import Path
 from termios import tcsetwinsize
 
 from multipak.localization import tr
@@ -78,6 +79,7 @@ class Runner:
         binary: bool = False,
         output_limit: int = 4 * 1024 * 1024,
         on_output: Callable[[str], None] | None = None,
+        cancel_file: Path | None = None,
         terminal_output: bool = False,
     ) -> str | bytes:
         if binary and terminal_output:
@@ -163,6 +165,14 @@ class Runner:
                     # Output closed, but the process kept running.
                     raise TimeoutError(tr("Operation timed out: {0}").format(argv[0])) from exc
             finally:
+                if cancel_file is not None:
+                    # A privileged supervisor watches this file. Let it terminate
+                    # its own child: an unprivileged GUI cannot signal root processes.
+                    cancel_file.unlink(missing_ok=True)
+                    try:
+                        proc.wait(timeout=8)
+                    except subprocess.TimeoutExpired:
+                        pass
                 # Also terminates descendants holding the pipe open after their parent exits.
                 # Interrupt the host launcher; its supervisor also cleans up
                 # descendants when the watched bus connection disappears.

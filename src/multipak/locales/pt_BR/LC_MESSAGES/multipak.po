@@ -1403,3 +1403,552 @@ msgstr "Remover a versão anterior do MultiPak"
 
 msgid "Could not update the old AppImage shortcuts. Try again or close this window."
 msgstr "Não foi possível atualizar os atalhos antigos de AppImage. Tente novamente ou feche esta janela."
+
+msgid " Since the suggested Android version is older, some features may behave differently."
+msgstr " Como a versão sugerida é anterior, alguns recursos podem funcionar de forma diferente."
+
+msgid "<a href='translation'>ARM translation layer</a>"
+msgstr "<a href='translation'>Camada de tradução ARM</a>"
+
+msgid "A part of this bundle requires a newer Android version."
+msgstr "Uma parte deste conjunto exige uma versão mais recente do Android."
+
+msgid "APKS asset delivery bundles are not supported yet."
+msgstr "Conjuntos APKS com entrega de recursos adicionais ainda não são suportados."
+
+msgid "ARM translation layer"
+msgstr "Camada de tradução ARM"
+
+msgid "About the Waydroid adaptations"
+msgstr "Sobre as adaptações do Waydroid"
+
+msgid "Adding the application to the launcher…"
+msgstr "Adicionando o aplicativo ao lançador…"
+
+msgid "Also delete this environment's Android data"
+msgstr "Excluir também os dados Android deste ambiente"
+
+msgid "An existing Android native bridge was preserved."
+msgstr "A camada de tradução existente no Android foi preservada."
+
+msgid "Android (.apk, .apkm, .apks, .xapk)"
+msgstr "Android (.apk, .apkm, .apks, .xapk)"
+
+msgid "Android (version not recognized by MultiPak)"
+msgstr "Android (versão não reconhecida pelo MultiPak)"
+
+msgid "Android application settings — MultiPak"
+msgstr "Configurar aplicativo Android — MultiPak"
+
+msgid "Android application uninstalled. Its data and the Android environment were preserved."
+msgstr "Aplicativo Android desinstalado. Seus dados e o ambiente Android foram preservados."
+
+msgid "Android applications require a Wayland desktop session."
+msgstr "Os aplicativos Android exigem uma sessão de desktop Wayland."
+
+msgid "Android container and its saved data removed."
+msgstr "Contêiner Android e seus dados salvos removidos."
+
+msgid "Android container removed. Its saved data was preserved."
+msgstr "Contêiner Android removido. Seus dados salvos foram preservados."
+
+msgid "Android container updated."
+msgstr "Contêiner Android atualizado."
+
+msgid "Android containers"
+msgstr "Contêineres Android"
+
+msgid "Android could not copy the additional OBB data. Existing files were preserved. {0}"
+msgstr "O Android não conseguiu copiar os dados OBB adicionais. Os arquivos existentes foram preservados. {0}"
+
+msgid "Android could not install the bundle: {0}"
+msgstr "O Android não conseguiu instalar o conjunto: {0}"
+
+msgid "Android did not become ready. Check the Waydroid graphics and system configuration. {0}"
+msgstr "O Android não ficou pronto. Verifique a configuração gráfica e do sistema do Waydroid. {0}"
+
+msgid "Android did not become ready: {0}"
+msgstr "O Android não ficou pronto: {0}"
+
+msgid "Android did not confirm that the application was reopened."
+msgstr "O Android não confirmou a reabertura do aplicativo."
+
+msgid "Android did not confirm the ARM translation layer after updating."
+msgstr "O Android não confirmou a camada de tradução ARM após a atualização."
+
+msgid "Android did not confirm the input preferences."
+msgstr "O Android não confirmou as preferências de entrada."
+
+msgid "Android did not confirm the selected system version."
+msgstr "O Android não confirmou a versão selecionada do sistema."
+
+msgid "Android environment creation was not confirmed."
+msgstr "A criação do ambiente Android não foi confirmada."
+
+msgid "Android environment removal was not confirmed."
+msgstr "A remoção do ambiente Android não foi confirmada."
+
+msgid "Android is still starting…"
+msgstr "O Android ainda está iniciando…"
+
+msgid "Android returned an unrecognized state. Refresh to try again."
+msgstr "O Android retornou um estado desconhecido. Atualize a lista para tentar novamente."
+
+msgid "Android session stopped before it became ready: {0}"
+msgstr "A sessão Android parou antes de ficar pronta: {0}"
+
+msgid "Android startup diagnostics:"
+msgstr "Detalhes técnicos da inicialização do Android:"
+
+msgid "Android version"
+msgstr "Versão do Android"
+
+msgid "Android — Waydroid"
+msgstr "Android — Waydroid"
+
+msgid "Android: {0}"
+msgstr "Android: {0}"
+
+msgid "Apply"
+msgstr "Aplicar"
+
+msgid "Applying preferences…"
+msgstr "Aplicando preferências…"
+
+msgid "Automatic ARM translation setup currently supports Android 13 on x86_64."
+msgstr "A instalação automática da camada ARM oferece suporte ao Android 13 em x86_64."
+
+msgid "CPU: %1    RAM: %2"
+msgstr "CPU: %1    RAM: %2"
+
+msgid "Checking Android after the update…"
+msgstr "Verificando o Android após a atualização…"
+
+msgid "Choose a complete APK or open the APKM bundle containing all its parts."
+msgstr "Escolha um APK completo ou abra o conjunto APKM que contém todas as suas partes."
+
+msgid "Choose an Android version compatible with this application and enter an environment name."
+msgstr "Escolha uma versão do Android compatível com este aplicativo e informe um nome para o ambiente."
+
+msgid "Choose another Android version"
+msgstr "Escolher outra versão do Android"
+
+msgid "Connecting to the ARM translation download…"
+msgstr "Conectando ao download da camada de tradução ARM…"
+
+msgid "Connecting to the Android components download…"
+msgstr "Conectando para baixar os componentes do Android…"
+
+msgid "Connecting to the Android download…"
+msgstr "Conectando para baixar o Android…"
+
+msgid "Connecting to the Android system download…"
+msgstr "Conectando para baixar o sistema Android…"
+
+msgid "Container {0} will be created for this installation."
+msgstr "O contêiner {0} será criado para esta instalação."
+
+msgid "Container {0} will be reused for this installation."
+msgstr "O contêiner {0} será reutilizado para esta instalação."
+
+msgid "Copying additional Android application data…"
+msgstr "Copiando dados adicionais do aplicativo Android…"
+
+msgid "Could not change the Android preferences: {0}"
+msgstr "Não foi possível ajustar as preferências do Android: {0}"
+
+msgid "Could not determine the Android container's state."
+msgstr "Não foi possível determinar o estado do contêiner Android."
+
+msgid "Could not identify the Android display density."
+msgstr "Não foi possível identificar a densidade de tela do Android."
+
+msgid "Could not identify the Android version."
+msgstr "Não foi possível identificar a versão do Android."
+
+msgid "Could not load the Android settings window."
+msgstr "Não foi possível abrir a janela de configurações do Android."
+
+msgid "Could not read the Android APK: {0}"
+msgstr "Não foi possível ler o APK Android: {0}"
+
+msgid "Could not read the Android package: {0}"
+msgstr "Não foi possível ler o pacote Android: {0}"
+
+msgid "Could not restart Android: {0}"
+msgstr "Não foi possível reiniciar o Android: {0}"
+
+msgid "Create"
+msgstr "Criar"
+
+msgid "Create Android container"
+msgstr "Criar contêiner Android"
+
+msgid "Create a container to keep your Android applications together."
+msgstr "Crie um contêiner para reunir seus aplicativos Android."
+
+msgid "Create a new Android environment"
+msgstr "Criar um novo ambiente Android"
+
+msgid "Create a new custom container"
+msgstr "Criar um novo contêiner personalizado"
+
+msgid "Create and manage separate Android containers."
+msgstr "Crie e gerencie contêineres Android separados."
+
+msgid "Create container"
+msgstr "Criar contêiner"
+
+msgid "Creating the Android container…"
+msgstr "Criando o contêiner Android…"
+
+msgid "Downloading Android"
+msgstr "Baixando o Android"
+
+msgid "Downloading Android components"
+msgstr "Baixando os componentes do Android"
+
+msgid "Downloading Android system"
+msgstr "Baixando o sistema Android"
+
+msgid "Downloading and preparing Android…"
+msgstr "Baixando e preparando o Android…"
+
+msgid "Downloading the ARM translation layer…"
+msgstr "Baixando a camada de tradução ARM…"
+
+msgid "Enter a valid Android environment name."
+msgstr "Informe um nome válido para o ambiente Android."
+
+msgid "Existing Android"
+msgstr "Android existente"
+
+msgid "Extracting the Android components…"
+msgstr "Descompactando os componentes do Android…"
+
+msgid "Extracting the Android system…"
+msgstr "Descompactando o sistema Android…"
+
+msgid "Identification confidence:"
+msgstr "Confiança da identificação:"
+
+msgid "Identification confidence: {0}.\n\n{1}"
+msgstr "Confiança da identificação: {0}.\n\n{1}"
+
+msgid "Install Waydroid on your system before preparing an Android environment."
+msgstr "Instale o Waydroid no sistema antes de preparar um ambiente Android."
+
+msgid "Installing the ARM translation layer and restarting Android…"
+msgstr "Instalando a camada de tradução ARM e reiniciando o Android…"
+
+msgid "Installing the Android application…"
+msgstr "Instalando o aplicativo Android…"
+
+msgid "Invalid Android environment ID."
+msgstr "Identificador de ambiente Android inválido."
+
+msgid "Loading Android environments…"
+msgstr "Carregando ambientes Android…"
+
+msgid "More options"
+msgstr "Mais opções"
+
+msgid "MultiPak uses an adapted version of Waydroid to create and manage separate Android containers.\n\nEach container has its own:\n• System images\n• Applications and data\n• Network\n• Desktop shortcuts\n\nThe original system Waydroid environment remains available as a separate option."
+msgstr "O MultiPak usa uma versão adaptada do Waydroid para criar e gerenciar contêineres Android separados.\n\nCada contêiner tem:\n• Imagens do sistema\n• Aplicativos e dados\n• Rede\n• Atalhos no lançador\n\nO ambiente original do Waydroid instalado no sistema continua disponível como uma opção separada."
+
+msgid "No Android containers yet"
+msgstr "Nenhum contêiner Android criado"
+
+msgid "Not prepared"
+msgstr "Não preparado"
+
+msgid "Only this application will close and open again. Unsaved progress may be lost. Apply any pending changes first. The system may ask for authorization."
+msgstr "Somente este aplicativo será fechado e aberto novamente. O progresso não salvo pode ser perdido. Aplique as alterações pendentes antes de continuar. O sistema pode solicitar autorização."
+
+msgid "Open Android"
+msgstr "Abrir Android"
+
+msgid "Opening Android…"
+msgstr "Abrindo o Android…"
+
+msgid "Operation completed."
+msgstr "Operação concluída."
+
+msgid "Preferences applied."
+msgstr "Preferências aplicadas."
+
+msgid "Preferences saved. Reopen the application to apply mouse input changes."
+msgstr "Preferências salvas. Reabra o aplicativo para aplicar as alterações do mouse."
+
+msgid "Preparing the Android environment…"
+msgstr "Preparando o ambiente Android…"
+
+msgid "Refresh"
+msgstr "Atualizar lista"
+
+msgid "Remove %1? All applications in this environment will become unavailable. Other Android environments will be preserved."
+msgstr "Remover %1? Todos os aplicativos deste ambiente deixarão de estar disponíveis. Os outros ambientes Android serão preservados."
+
+msgid "Remove Android container?"
+msgstr "Remover contêiner Android?"
+
+msgid "Remove…"
+msgstr "Remover…"
+
+msgid "Removing the Android container…"
+msgstr "Removendo o contêiner Android…"
+
+msgid "Reopen application…"
+msgstr "Reabrir aplicativo…"
+
+msgid "Reopen this application?"
+msgstr "Reabrir este aplicativo?"
+
+msgid "Reopening the application…"
+msgstr "Reabrindo o aplicativo…"
+
+msgid "Resource usage for the entire Android container. CPU at 100% means one fully occupied core."
+msgstr "Uso de recursos de todo o contêiner Android. CPU em 100% significa um núcleo totalmente ocupado."
+
+msgid "Running"
+msgstr "Em execução"
+
+msgid "Saved Android application data will be preserved unless you select the option below."
+msgstr "Os dados salvos dos aplicativos Android serão preservados, a menos que você selecione a opção abaixo."
+
+msgid "Select a prepared MultiPak Android container to update."
+msgstr "Selecione um contêiner Android do MultiPak já preparado para atualizar."
+
+msgid "Select an Android APK."
+msgstr "Selecione um APK Android."
+
+msgid "Select an Android installation managed by MultiPak."
+msgstr "Selecione uma instalação Android gerenciada pelo MultiPak."
+
+msgid "Select an Android version."
+msgstr "Selecione uma versão do Android."
+
+msgid "Select an application from a MultiPak Android container."
+msgstr "Selecione um aplicativo de um contêiner Android do MultiPak."
+
+msgid "Show the virtual keyboard"
+msgstr "Mostrar teclado virtual"
+
+msgid "Start"
+msgstr "Iniciar"
+
+msgid "Starting Android in the background requires systemd-run."
+msgstr "Iniciar o Android em segundo plano exige o systemd-run."
+
+msgid "Starting the Android container…"
+msgstr "Iniciando o contêiner Android…"
+
+msgid "Starting the Android environment…"
+msgstr "Iniciando o ambiente Android…"
+
+msgid "Status unavailable"
+msgstr "Estado indisponível"
+
+msgid "Stop"
+msgstr "Parar"
+
+msgid "Stopped"
+msgstr "Parado"
+
+msgid "Stopping the Android container…"
+msgstr "Parando o contêiner Android…"
+
+msgid "Suspended"
+msgstr "Suspenso"
+
+msgid "System authorization requires PolicyKit (pkexec)."
+msgstr "A autorização do sistema exige o PolicyKit (pkexec)."
+
+msgid "The APKs in this bundle belong to different applications or versions."
+msgstr "Os APKs deste conjunto pertencem a aplicativos ou versões diferentes."
+
+msgid "The ARM translation download exceeds the size limit."
+msgstr "O download da camada ARM excede o limite de tamanho."
+
+msgid "The ARM translation download failed its integrity check."
+msgstr "O arquivo da camada ARM não passou na verificação de integridade."
+
+msgid "The ARM translation download requires HTTPS."
+msgstr "O download da camada ARM exige HTTPS."
+
+msgid "The ARM translation layer did not become active."
+msgstr "A camada de tradução ARM não foi ativada."
+
+msgid "The ARM translation layer lets this application run on this computer. MultiPak prepares this dependency automatically as part of the installation. An existing compatible layer is reused. Installing the layer restarts the selected Android environment."
+msgstr "A camada de tradução ARM permite executar este aplicativo neste computador. O MultiPak prepara essa dependência automaticamente durante a instalação. Uma camada compatível já existente é reutilizada. A instalação da camada reinicia o ambiente Android selecionado."
+
+msgid "The ARM translation layer required by this application is already available in the Android container."
+msgstr "A camada de tradução ARM exigida por este aplicativo já está disponível no contêiner Android."
+
+msgid "The Android application was installed and added to the application launcher."
+msgstr "O aplicativo Android foi instalado e adicionado ao lançador de aplicativos."
+
+msgid "The Android application will be removed. Its personal data, the Android environment and other applications will be preserved."
+msgstr "O aplicativo Android será removido. Seus dados pessoais, o ambiente Android e os outros aplicativos serão preservados."
+
+msgid "The Android container has changed. Nothing was removed."
+msgstr "O contêiner Android foi alterado. Nada foi removido."
+
+msgid "The Android container is already up to date."
+msgstr "O contêiner Android já está atualizado."
+
+msgid "The Android container is still in use. Nothing was removed."
+msgstr "O contêiner Android ainda está em uso. Nada foi removido."
+
+msgid "The Android environment no longer exists."
+msgstr "O ambiente Android não existe mais."
+
+msgid "The Android system in %1 will be updated. Its applications and saved data will be preserved. This does not update the applications or change the Android version. Open applications may close during the update. System authorization may be required."
+msgstr "O sistema Android de %1 será atualizado. Os aplicativos e dados salvos serão preservados. Esta ação não atualiza os aplicativos nem muda a versão do Android. Os aplicativos abertos podem fechar durante a atualização. O sistema pode solicitar autorização."
+
+msgid "The application and its bundled data will be installed in an Android container using Waydroid, without changing the base system image.\n\nAny available shortcuts will appear in your application launcher."
+msgstr "O aplicativo e os dados incluídos no pacote serão instalados dentro de um contêiner Android via Waydroid, sem alterar a imagem-base do sistema.\n\nAtalhos disponíveis aparecerão no lançador de aplicativos."
+
+msgid "The application requires {0} or later and was developed targeting {1}. MultiPak can use this same version to prepare the environment."
+msgstr "O aplicativo exige {0} ou superior e foi desenvolvido tendo o {1} como alvo. O MultiPak consegue usar essa mesma versão para preparar o ambiente."
+
+msgid "The application requires {0} or later. MultiPak recommends {1} because it is the newest version it can prepare."
+msgstr "O aplicativo exige {0} ou superior. O MultiPak sugere o {1} por ser a versão mais recente que ele consegue preparar."
+
+msgid "The application shown above was prepared for Android smartphones and tablets. We recommend looking for a compatible Linux version in your system’s app store before continuing."
+msgstr "O aplicativo acima foi preparado para smartphones e tablets Android. Recomendamos procurar uma versão Linux compatível na loja de aplicativos do sistema antes de continuar."
+
+msgid "The application was developed targeting {0}."
+msgstr "O aplicativo foi desenvolvido tendo o {0} como alvo."
+
+msgid "The application was reopened."
+msgstr "O aplicativo foi reaberto."
+
+msgid "The application, however, was developed targeting {0}."
+msgstr "O aplicativo, no entanto, foi desenvolvido tendo o {0} como alvo."
+
+msgid "The existing ARM translation layer does not provide the architecture required by this application. It will be preserved."
+msgstr "A camada de tradução ARM existente não oferece a arquitetura exigida por este aplicativo. Ela será preservada."
+
+msgid "The file contents do not match a valid RPM, DEB, Arch, AppImage or Android APK package. {0}"
+msgstr "O conteúdo do arquivo não corresponde a um pacote RPM, DEB, Arch, AppImage ou APK Android válido. {0}"
+
+msgid "The first preparation downloads the selected Android version and may request your system password."
+msgstr "A primeira preparação baixa a versão do Android selecionada e pode solicitar a senha do sistema."
+
+msgid "The images were updated, but Android could not restart."
+msgstr "As imagens foram atualizadas, mas não foi possível reiniciar o Android."
+
+msgid "The last user-installed application was removed from %1. Would you like to remove this Android container to free up disk space?"
+msgstr "O último aplicativo instalado pelo usuário foi removido de %1. Deseja remover este contêiner Android para liberar espaço em disco?"
+
+msgid "The named Android runtime is not installed."
+msgstr "O suporte a ambientes Android separados não está instalado."
+
+msgid "The named Android runtime was not prepared."
+msgstr "O suporte a ambientes Android separados não foi preparado."
+
+msgid "The package does not say which Android version the developer configured it for."
+msgstr "O pacote não informa para qual versão do Android o desenvolvedor configurou o aplicativo."
+
+msgid "The package does not specify a useful minimum Android version. MultiPak recommends {0}, the newest Android version it can create, but cannot confirm the application's requirements."
+msgstr "O pacote não informa uma versão mínima específica do Android. O MultiPak sugere o {0}, a versão mais recente que ele pode preparar, mas não consegue confirmar os requisitos do aplicativo."
+
+msgid "This APK does not provide an application launcher."
+msgstr "Este APK não oferece um atalho para abrir o aplicativo."
+
+msgid "This APK requires {0}, but the Android environment supports {1}. A compatible ARM translation layer may be required."
+msgstr "Este APK exige {0}, mas o ambiente Android suporta {1}. Pode ser necessária uma camada de tradução ARM compatível."
+
+msgid "This APKS bundle has no variant compatible with the selected Android."
+msgstr "Este conjunto APKS não contém uma variante compatível com o Android selecionado."
+
+msgid "This APKS bundle uses device targeting not supported yet."
+msgstr "Este conjunto APKS usa critérios de seleção de dispositivo ainda não suportados."
+
+msgid "This Android bundle is missing required parts."
+msgstr "Faltam partes obrigatórias neste conjunto Android."
+
+msgid "This application has no compatible Android architecture."
+msgstr "Este aplicativo não possui uma arquitetura compatível com o Android disponível."
+
+msgid "This application is already installed in Android. The existing installation was preserved."
+msgstr "Este aplicativo já está instalado no Android. A instalação existente foi preservada."
+
+msgid "This application requires a newer Android version (API {0})."
+msgstr "Este aplicativo exige uma versão mais recente do Android (API {0})."
+
+msgid "This application requires an ARM translation layer. Reopen the package and allow its installation in the review screen."
+msgstr "Este aplicativo exige uma camada de tradução ARM. Abra o pacote novamente e autorize a instalação na tela de confirmação."
+
+msgid "This application requires {0} or later. The newest Android version MultiPak can create is {1}, which does not meet that requirement. Choose an existing container with a compatible Android version to continue."
+msgstr "Este aplicativo exige {0} ou superior. A versão mais recente do Android que o MultiPak pode preparar é o {1}, que não atende a esse requisito. Para continuar, escolha um contêiner existente com uma versão compatível do Android."
+
+msgid "This bundle has no compatible Android architecture. An ARM translation layer may be required."
+msgstr "Este conjunto não possui uma arquitetura compatível com o ambiente Android. Pode ser necessária uma camada de tradução ARM."
+
+msgid "This is a preview. No Android environment was changed."
+msgstr "Esta é uma prévia. Nenhum ambiente Android foi alterado."
+
+msgid "This processor is not supported by the ARM translation installer."
+msgstr "Este processador não é compatível com o instalador da camada de tradução ARM."
+
+msgid "Unsupported Android split: {0}"
+msgstr "Parte Android não suportada: {0}"
+
+msgid "Up to 64 characters. Spaces and accents are allowed."
+msgstr "Até 64 caracteres. Espaços e acentos são permitidos."
+
+msgid "Update container"
+msgstr "Atualizar contêiner"
+
+msgid "Update container…"
+msgstr "Atualizar contêiner…"
+
+msgid "Updating the Android container…"
+msgstr "Atualizando o contêiner Android…"
+
+msgid "Use arrow keys as swipe gestures"
+msgstr "Usar as setas como gestos"
+
+msgid "Use the mouse as touch input"
+msgstr "Usar o mouse como toque"
+
+msgid "Use the standard MultiPak container"
+msgstr "Usar o contêiner padrão do MultiPak"
+
+msgid "Validating the Android components…"
+msgstr "Verificando os componentes do Android…"
+
+msgid "Validating the Android system…"
+msgstr "Verificando o sistema Android…"
+
+msgid "Waiting for Android to finish starting…"
+msgstr "Aguardando o Android terminar de iniciar…"
+
+msgid "Waydroid (adapted)"
+msgstr "Waydroid (adaptado)"
+
+msgid "Waydroid (existing environment)"
+msgstr "Waydroid (ambiente existente)"
+
+msgid "Waydroid could not complete the operation: {0}"
+msgstr "O Waydroid não conseguiu concluir a operação: {0}"
+
+msgid "Waydroid did not confirm the ARM translation setup."
+msgstr "O Waydroid não confirmou a instalação da camada de tradução ARM."
+
+msgid "Waydroid did not confirm the application change."
+msgstr "O Waydroid não confirmou a alteração no aplicativo."
+
+msgid "Waydroid is not installed on this system."
+msgstr "O Waydroid não está instalado neste sistema."
+
+msgid "Waydroid returned an invalid application identifier."
+msgstr "O Waydroid retornou um identificador de aplicativo inválido."
+
+msgid "{0:.1f} MB downloaded"
+msgstr "{0:.1f} MB baixados"
+
+msgid "{0} — {1}%\n{2} MB of {3} MB · {4} {5}"
+msgstr "{0} — {1}%\n{2} MB de {3} MB · {4} {5}"

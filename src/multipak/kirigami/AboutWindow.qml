@@ -194,7 +194,20 @@ InformationWindow {
                             spacing: Kirigami.Units.smallSpacing
                             RowLayout {
                                 Controls.Label { text: backend.modelData.name }
-
+                                Controls.ToolButton {
+                                    objectName: "aboutBackendInfoButton_" + backend.modelData.id
+                                    visible: backend.modelData.id === "Waydroid"
+                                    text: qsTr("About the Waydroid adaptations")
+                                    icon.source: BreezeIcons.source("help-about", Kirigami.Theme.backgroundColor)
+                                    icon.width: Kirigami.Units.iconSizes.small
+                                    icon.height: Kirigami.Units.iconSizes.small
+                                    padding: Kirigami.Units.smallSpacing
+                                    display: Controls.AbstractButton.IconOnly
+                                    Accessible.name: text
+                                    Controls.ToolTip.visible: hovered
+                                    Controls.ToolTip.text: text
+                                    onClicked: waydroidDialog.open()
+                                }
                             }
                             Controls.Label {
                                 text: backend.modelData.path
@@ -208,6 +221,20 @@ InformationWindow {
                     }
                 }
             }
+        }
+    }
+
+    InformationWindow {
+        id: waydroidDialog
+        objectName: "aboutWaydroidDialog"
+        transientParent: about
+        title: qsTr("About the Waydroid adaptations")
+        Controls.Label {
+            objectName: "aboutWaydroidExplanation"
+            text: qsTr("MultiPak uses an adapted version of Waydroid to create and manage separate Android containers.\n\nEach container has its own:\n• System images\n• Applications and data\n• Network\n• Desktop shortcuts\n\nThe original system Waydroid environment remains available as a separate option.")
+            textFormat: Text.PlainText
+            wrapMode: Text.WordWrap
+            Layout.fillWidth: true
         }
     }
 

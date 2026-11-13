@@ -15,10 +15,12 @@ from PySide6.QtQuick import QQuickWindow
 from PySide6.QtWidgets import QApplication, QStyleFactory
 
 from multipak import DISPLAY_VERSION
+from multipak.android_instances import valid_label
+from multipak.android_translation import preview_plan
 from multipak.catalog import package_environment  # noqa: E402
 from multipak.localization import tr
 from multipak.models import Environment, Package  # noqa: E402
-from multipak.suggestions import suggestion_details  # noqa: E402
+from multipak.suggestions import android_suggestion_details, suggestion_details  # noqa: E402
 
 from .about import bind_about
 from .configuration import Configuration
@@ -86,15 +88,22 @@ class Welcome(QObject):
         )
         self.strength, explanation = (
             ("", "")
-            if self.kind == "APPIMAGE"
+            if self.kind in ("APPIMAGE", "APK")
             else suggestion_details(package, self.environment, self.environment.title)
         )
         self.explanation = explanation
         self.is_live = False
         self.worker = None
         self.transaction = None
+        self.android_plan = preview_plan(package) if self.kind == "APK" else None
+        self._android_environments = ()
+        self._android_profile = "android-13"
+        self._android_environment = ""
+        self._android_label = "MultiPak-Android-13"
+        self._android_use_suggested = True
+        self._android_container_mode = "standard"
         self.choice = ""
-        self.method = "appimage" if self.kind == "APPIMAGE" else "container"
+        self.method = {"APPIMAGE": "appimage", "APK": "waydroid"}.get(self.kind, "container")
         self.mode = "standard"
         self.existing = ()
         self._configuration = Configuration(self)
@@ -121,6 +130,13 @@ class Welcome(QObject):
         return bool(self._selection and self._selection.manual)
 
     def installation_allowed(self):
+        if self.isAndroid:
+            return (
+                self.method == "waydroid"
+                and self.package is not None
+                and self.androidSelectionValid
+                and self.androidTranslationState != "unsupported"
+            )
         if self.isAppImage:
             return self.method == "appimage" and self.package is not None
         return (
@@ -162,11 +178,278 @@ class Welcome(QObject):
 
     @Property(str, notify=dataChanged)
     def packaging(self):
-        return {"ARCH": "Arch Linux", "APPIMAGE": "AppImage"}.get(self.kind, self.kind)
+        if self.isAndroidBundle:
+            extension = self.package.path.suffix.removeprefix(".").upper()
+            return "Android " + (
+                extension
+                if extension in ("APKM", "APKS", "XAPK")
+                else self.package.android_bundle_format or "APKM"
+            )
+        return {"ARCH": "Arch Linux", "APPIMAGE": "AppImage", "APK": "Android APK"}.get(
+            self.kind, self.kind
+        )
 
     @Property(bool, notify=dataChanged)
     def isAppImage(self):
         return self.kind == "APPIMAGE"
+
+    @Property(bool, notify=dataChanged)
+    def isAndroid(self):
+        return self.kind == "APK"
+
+    @Property(int, notify=dataChanged)
+    def packagePartCount(self):
+        return len(self.package.android_parts) if self.package else 0
+
+    @Property(bool, notify=dataChanged)
+    def isAndroidBundle(self):
+        return self.isAndroid and self.package is not None and bool(self.package.android_parts)
+
+    @Property("QVariantList", constant=True)
+    def androidProfiles(self):
+        from multipak.android_instances import PROFILES
+
+        return [{"id": p[0], "label": p[1], "sdk": p[3]} for p in PROFILES]
+
+    @Property("QVariantList", notify=dataChanged)
+    def androidEnvironments(self):
+        return [{"id": "", "label": tr("Create a new Android environment")}] + [
+            {"id": e["id"], "label": e["label"]}
+            for e in self._android_environments
+            if (e.get("personal") and self.mode == "advanced")
+            or (not e.get("personal") and e["profile"] == self._android_profile)
+        ]
+
+    @Property(str, notify=dataChanged)
+    def androidSuggestedVersion(self):
+        return max(self.androidProfiles, key=lambda p: p["sdk"])["label"]
+
+    @Property(str, notify=dataChanged)
+    def androidSelectedVersion(self):
+        if self.androidUsesPersonalEnvironment:
+            return self.androidExistingVersion
+        return next(
+            (p["label"] for p in self.androidProfiles if p["id"] == self._android_profile), ""
+        )
+
+    @Property(bool, notify=dataChanged)
+    def androidUseSuggested(self):
+        return self._android_use_suggested
+
+    @Property(str, notify=dataChanged)
+    def androidContainerMode(self):
+        return self._android_container_mode
+
+    @Property("QVariantList", notify=dataChanged)
+    def androidExistingEnvironments(self):
+        return self.androidEnvironments[1:]
+
+    @Property(str, notify=dataChanged)
+    def androidContainerDescription(self):
+        if not self.androidEnvironmentName.strip():
+            return ""
+        if self.androidEnvironmentExists:
+            return tr("Container {0} will be reused for this installation.").format(
+                self.androidEnvironmentName
+            )
+        return tr("Container {0} will be created for this installation.").format(
+            self.androidEnvironmentName
+        )
+
+    @Property(str, notify=dataChanged)
+    def androidConfidence(self):
+        return self._android_suggestion()[0]
+
+    def _android_suggestion(self):
+        profile = max(self.androidProfiles, key=lambda p: p["sdk"])
+        return android_suggestion_details(self.package, profile["label"], profile["sdk"])
+
+    @Property(str, notify=dataChanged)
+    def androidConfidenceExplanation(self):
+        return self._android_suggestion()[1]
+
+    @Slot(bool)
+    def chooseAndroidSuggested(self, suggested):
+        if self.mode != "advanced":
+            return
+        self._android_use_suggested = suggested
+        if suggested:
+            self.chooseAndroidProfile(max(self.androidProfiles, key=lambda p: p["sdk"])["id"])
+        self.dataChanged.emit()
+
+    @Slot(str)
+    def chooseAndroidContainerMode(self, mode):
+        if self.mode != "advanced" or mode not in ("standard", "custom", "existing"):
+            return
+        custom_label = self._android_label if self._android_container_mode == "custom" else ""
+        self._android_container_mode = mode
+        self._android_environment = ""
+        version = next(p["label"] for p in self.androidProfiles if p["id"] == self._android_profile)
+        self._android_label = "MultiPak-" + version.replace(" ", "-")
+        if mode == "standard":
+            self._android_environment = next(
+                (
+                    e["id"]
+                    for e in self._android_environments
+                    if not e.get("personal")
+                    and e["profile"] == self._android_profile
+                    and e["label"] == self._android_label
+                ),
+                "",
+            )
+        elif mode == "custom":
+            self._android_label = custom_label
+        elif self.androidExistingEnvironments:
+            self._android_environment = self.androidExistingEnvironments[0]["id"]
+        self.dataChanged.emit()
+
+    @Property(str, notify=dataChanged)
+    def androidProfile(self):
+        return self._android_profile
+
+    @Property(str, notify=dataChanged)
+    def androidEnvironment(self):
+        return self._android_environment
+
+    @Property(str, notify=dataChanged)
+    def androidEnvironmentName(self):
+        return next(
+            (
+                e["label"]
+                for e in self._android_environments
+                if e["id"] == self._android_environment
+            ),
+            self._android_label,
+        )
+
+    @Property(str, notify=dataChanged)
+    def androidNewEnvironmentName(self):
+        return self._android_label
+
+    @Property(bool, notify=dataChanged)
+    def androidUsesPersonalEnvironment(self):
+        return self._android_environment == "system-waydroid"
+
+    @Property(str, notify=dataChanged)
+    def androidExistingVersion(self):
+        return next(
+            (
+                e.get("version", "")
+                for e in self._android_environments
+                if e["id"] == self._android_environment
+            ),
+            "",
+        )
+
+    def android_target_sdk(self):
+        if self.androidUsesPersonalEnvironment:
+            return next(
+                (
+                    e.get("sdk", 0)
+                    for e in self._android_environments
+                    if e["id"] == self._android_environment
+                ),
+                0,
+            )
+        return next((p["sdk"] for p in self.androidProfiles if p["id"] == self._android_profile), 0)
+
+    @Property(bool, notify=dataChanged)
+    def androidSelectionValid(self):
+        sdk = self.android_target_sdk()
+        return bool(
+            self.package
+            and (not sdk or self.package.android_min_sdk <= sdk)
+            and valid_label(self.androidEnvironmentName)
+            and (not self.androidUsesPersonalEnvironment or self.mode == "advanced")
+            and (self._android_container_mode != "existing" or bool(self._android_environment))
+        )
+
+    def reset_android_default(self):
+        self._android_use_suggested = True
+        self._android_container_mode = "standard"
+        profile = max(self.androidProfiles, key=lambda p: p["sdk"])
+        self._android_profile = profile["id"]
+        self._android_label = "MultiPak-" + profile["label"].replace(" ", "-")
+        self._android_environment = next(
+            (
+                e["id"]
+                for e in self._android_environments
+                if not e.get("personal")
+                and e["profile"] == profile["id"]
+                and e["label"] == self._android_label
+            ),
+            "",
+        )
+
+    @Slot()
+    def confirmAndroidConfiguration(self):
+        if self.isAndroid and self.mode == "advanced" and self.androidSelectionValid:
+            self.environmentChosen.emit()
+
+    @Slot(str)
+    def chooseAndroidProfile(self, identifier):
+        if self.mode != "advanced":
+            return
+        profile = next((p for p in self.androidProfiles if p["id"] == identifier), None)
+        if not profile:
+            return
+        self._android_profile = identifier
+        self.chooseAndroidContainerMode(self._android_container_mode)
+        self.android_plan = preview_plan(self.package)
+        self.dataChanged.emit()
+
+    @Slot(str)
+    def chooseAndroidEnvironment(self, identifier):
+        if identifier not in {e["id"] for e in self.androidEnvironments}:
+            return
+        if identifier == "system-waydroid" and self.mode != "advanced":
+            return
+        self._android_environment = identifier
+        self.android_plan = preview_plan(self.package)
+        self.dataChanged.emit()
+
+    @Slot(str)
+    def setAndroidEnvironmentName(self, name):
+        if self.mode != "advanced":
+            return
+        self._android_label = name
+        self.dataChanged.emit()
+
+    @Property(bool, notify=dataChanged)
+    def androidEnvironmentExists(self):
+        return bool(self._android_environment)
+
+    @Property(str, notify=dataChanged)
+    def androidTranslationState(self):
+        state = self.android_plan.translation if self.android_plan else "native"
+        if self.android_target_sdk() not in (0, 33) and state in ("required", "check"):
+            return "unsupported"
+        return state
+
+    @Property(str, notify=dataChanged)
+    def androidTranslationExplanation(self):
+        if (
+            self.android_target_sdk() not in (0, 33)
+            and self.androidTranslationState == "unsupported"
+        ):
+            return tr("Automatic ARM translation setup currently supports Android 13 on x86_64.")
+        return self.android_plan.explanation if self.android_plan else ""
+
+    @Property(str, notify=dataChanged)
+    def androidTranslationDetails(self):
+        if self.androidTranslationState == "unsupported":
+            return self.androidTranslationExplanation
+        if self.androidTranslationState == "available":
+            return tr(
+                "The ARM translation layer required by this application is already available "
+                "in the Android container."
+            )
+        return tr(
+            "The ARM translation layer lets this application run on this computer. "
+            "MultiPak prepares this dependency automatically as part of the installation. "
+            "An existing compatible layer is reused. Installing the layer restarts "
+            "the selected Android environment."
+        )
 
     @Property(QUrl, notify=dataChanged)
     def applicationIcon(self):
@@ -201,7 +484,9 @@ class Welcome(QObject):
         return getattr(
             self,
             "_result_message",
-            tr("The AppImage was installed and added to the application launcher.")
+            tr("The Android application was installed and added to the application launcher.")
+            if self.isAndroid
+            else tr("The AppImage was installed and added to the application launcher.")
             if self.isAppImage
             else tr("The application was installed in the environment ")
             + self.environment.title
@@ -236,7 +521,7 @@ class Welcome(QObject):
 
     @Slot(str)
     def chooseMethod(self, method):
-        if self.isAppImage:
+        if self.isAppImage or self.isAndroid:
             return
         if method not in ("container", "system"):
             return
@@ -260,6 +545,14 @@ class Welcome(QObject):
         if self.isAppImage:
             return
         if mode not in ("standard", "advanced"):
+            return
+        if self.isAndroid:
+            self.method, self.mode = "waydroid", mode
+            if mode == "standard":
+                self.reset_android_default()
+            self.android_plan = preview_plan(self.package)
+            self.dataChanged.emit()
+            self.modeChosen.emit()
             return
         self.method, self.mode = "container", mode
         self._advanced_confirmed = False
