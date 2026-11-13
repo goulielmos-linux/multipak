@@ -50,6 +50,8 @@ Kirigami.ApplicationWindow {
     Connections {
         target: manager
         function onConfirmationRequested() { removalDialog.open(); }
+        function onRepairConfirmationRequested() { repairDialog.open(); }
+        function onDeleteConfirmationRequested() { deleteDialog.open(); }
         function onContainerRemovalRequested() { containerRemovalDialog.open(); }
         function onCompanionWarning(message) {
             companionWarningText.text = message;
@@ -145,6 +147,81 @@ Kirigami.ApplicationWindow {
                     onClicked: {
                         manager.confirmRemoval();
                         removalDialog.close();
+                    }
+                }
+            }
+        }
+    }
+
+    InformationWindow {
+        id: repairDialog
+        objectName: "repairDialog"
+        transientParent: root
+        title: qsTr("Repair application")
+        onClosing: manager.cancelRepair()
+        onShown: cancelRepairButton.forceActiveFocus()
+        Controls.Label {
+            objectName: "repairConfirmationText"
+            text: qsTr("Repair %1?\n\n%2").arg(manager.repairName).arg(manager.repairExplanation)
+            textFormat: Text.PlainText
+            wrapMode: Text.Wrap
+            Layout.fillWidth: true
+        }
+        footer: Controls.ToolBar {
+            padding: Kirigami.Units.largeSpacing * 2
+            contentItem: RowLayout {
+                Item { Layout.fillWidth: true }
+                Controls.Button {
+                    id: cancelRepairButton
+                    objectName: "cancelRepairButton"
+                    text: qsTr("Cancel")
+                    onClicked: repairDialog.close()
+                }
+                Controls.Button {
+                    objectName: "confirmRepairButton"
+                    text: qsTr("Confirm")
+                    highlighted: true
+                    onClicked: {
+                        manager.confirmRepair();
+                        repairDialog.close();
+                    }
+                }
+            }
+        }
+    }
+
+    InformationWindow {
+        id: deleteDialog
+        objectName: "deleteDialog"
+        transientParent: root
+        title: qsTr("Delete application")
+        onClosing: manager.cancelDelete()
+        onShown: cancelDeleteButton.forceActiveFocus()
+        Controls.Label {
+            objectName: "deleteConfirmationText"
+            text: qsTr("Delete %1?\n\nMultiPak will delete its copy of the AppImage, along with its shortcut and icon in the application launcher.\n\nTo use the application again, you will need to install the AppImage again.").arg(manager.deleteName)
+            textFormat: Text.PlainText
+            wrapMode: Text.Wrap
+            Layout.fillWidth: true
+        }
+        footer: Controls.ToolBar {
+            padding: Kirigami.Units.largeSpacing * 2
+            contentItem: RowLayout {
+                Item { Layout.fillWidth: true }
+                Controls.Button {
+                    id: cancelDeleteButton
+                    objectName: "cancelDeleteButton"
+                    text: qsTr("Cancel")
+                    onClicked: deleteDialog.close()
+                }
+                Controls.Button {
+                    objectName: "confirmDeleteButton"
+                    text: qsTr("Delete")
+                    icon.source: BreezeIcons.source("edit-delete", Kirigami.Theme.backgroundColor)
+                    palette.buttonText: Kirigami.Theme.negativeTextColor
+                    onClicked: {
+                        manager.confirmDelete();
+                        deleteDialog.close();
                     }
                 }
             }

@@ -1,8 +1,10 @@
 """Native application manager; journals and container operations stay in the core."""
 
 import argparse
+import html
 import os
 import sys
+import threading
 from pathlib import Path
 from threading import Lock
 
@@ -26,6 +28,7 @@ from multipak.environments import discover
 from multipak.file_associations import FORMATS, FileAssociations
 from multipak.localization import tr
 from multipak.models import ExistingEnvironment, Transaction
+from multipak.process import CommandError
 from multipak.store import Store
 from multipak.system import (
     SYSTEM_REMOVABLE_STATUSES,
@@ -52,6 +55,9 @@ class Manager(QObject):
     associationsSaved = Signal()
     languageSettingsRequested = Signal()
     companionWarning = Signal(str)
+    repairConfirmationRequested = Signal()
+    deleteConfirmationRequested = Signal()
+    _repairsFound = Signal(object)
 
     def __init__(
         self,
@@ -88,6 +94,14 @@ class Manager(QObject):
         self._unused_container = None
         self._container_error = ""
         self._remove_container_home = False
+        # AppImages whose container was renamed or deleted, as (transaction ID, name).
+        self._repairs = []
+        self._checking_repairs = False
+        self._repair_plan = None
+        self._repair_target = ""
+        self._pending_delete = None
+        self._delete_name = ""
+        self._repairsFound.connect(self._set_repairs, Qt.QueuedConnection)
         # Long container updates print many lines. Batch them so each line does not
         # trigger a full interface refresh, as the installer already does.
         self._pending_logs = ""
@@ -252,6 +266,172 @@ class Manager(QObject):
         self._status, self._error = self._container_error, True
         self.containerRemovalRequested.emit()
 
+    @Property("QVariantList", notify=changed)
+    def repairs(self):
+        return [
+            {"id": identifier, "name": name, "html": "<b>" + html.escape(name) + "</b>"}
+            for identifier, name in self._repairs
+        ]
+
+    @Slot()
+    def checkRepairs(self):
+        """Look for broken AppImages without blocking the window or other operations."""
+        if self.preview or self._checking_repairs:
+            return
+        self._checking_repairs = True
+        store = self.store
+
+        def work():
+            from multipak.appimage_container import needing_repair
+            from multipak.engine import Engine
+
+            try:
+                found = [
+                    (tx.id, tx.package_name)
+                    for tx in needing_repair(Engine(store, threading.Event()))
+                ]
+            except Exception:
+                found = None
+            self._repairsFound.emit(found)
+
+        threading.Thread(target=work, daemon=True).start()
+
+    @Slot(object)
+    def _set_repairs(self, found):
+        self._checking_repairs = False
+        if found is not None and found != self._repairs:
+            self._repairs = found
+            self.rowsChanged.emit()
+            self.changed.emit()
+
+    def _repair_name(self, identifier):
+        return next((name for item, name in self._repairs if item == identifier), "")
+
+    @Property(str, notify=changed)
+    def repairName(self):
+        return self._repair_plan["application"] if self._repair_plan else ""
+
+    @Property(str, notify=changed)
+    def repairExplanation(self):
+        plan = self._repair_plan
+        if not plan:
+            return ""
+        application, old = plan["application"], plan["old"]
+        current, target = plan["current"], plan["target"]
+        if plan["kind"] == "system":
+            return tr(
+                "The dependencies of {0} were found on your system. MultiPak will "
+                "open it directly on the system, without a container."
+            ).format(application)
+        if plan["kind"] == "renamed":
+            return tr(
+                "The container {0} was renamed to {1}. MultiPak will take it back and "
+                "rename it to {2} so that {3} works again."
+            ).format(old, current, target, application)
+        first = (
+            tr("The container {0} was deleted.")
+            if plan["deleted"]
+            else tr("The container {0} is no longer available.")
+        ).format(old)
+        if plan["kind"] == "install":
+            second = tr("MultiPak will install the dependencies of {0} in the container {1}.")
+            return first + " " + second.format(application, target)
+        return (
+            first
+            + " "
+            + tr("MultiPak will create it again so that {0} works again.").format(application)
+        )
+
+    @Slot(str)
+    def requestRepair(self, identifier):
+        if self.busy or not self._repair_name(identifier):
+            return
+        if self.preview:
+            self._status = tr("This is a preview. No application was repaired.")
+            self.changed.emit()
+            return
+        from multipak.appimage_container import repair_plan
+
+        self._repair_target = identifier
+        self._status, self._logs, self._error = tr("Checking the container…"), "", False
+        self._run(lambda engine: repair_plan(engine, identifier), self._planned_repair)
+
+    def _planned_repair(self, plan):
+        self._status = ""
+        self._repair_plan = plan | {"id": self._repair_target}
+        if plan["kind"] == "relink":
+            # Nothing to explain: the container already has the right name again.
+            QTimer.singleShot(0, self.confirmRepair)
+        else:
+            self.repairConfirmationRequested.emit()
+
+    @Slot()
+    def cancelRepair(self):
+        self._repair_plan = None
+        self.changed.emit()
+
+    @Slot()
+    def confirmRepair(self):
+        if self.busy or self._repair_plan is None:
+            return
+        from multipak.appimage_container import repair
+
+        plan, self._repair_plan = self._repair_plan, None
+        identifier, on_system = plan["id"], plan["kind"] == "system"
+        self._status = tr("Repairing {0}…").format(plan["application"])
+        self._logs, self._error = "", False
+        self._run(lambda engine: repair(engine, identifier, on_system=on_system), self._repaired)
+
+    def _repaired(self, tx):
+        self._repairs = [item for item in self._repairs if item[0] != tx.id]
+        self._status, self._progress = tr("{0} was repaired.").format(tx.package_name), 100
+        # Taking a container back repairs every AppImage in it.
+        self.checkRepairs()
+
+    @Property(str, notify=changed)
+    def deleteName(self):
+        return self._pending_delete[1] if self._pending_delete else ""
+
+    @Slot(str)
+    def requestDelete(self, identifier):
+        name = self._repair_name(identifier)
+        if not self.busy and name:
+            self._pending_delete = (identifier, name)
+            self.changed.emit()
+            self.deleteConfirmationRequested.emit()
+
+    @Slot()
+    def cancelDelete(self):
+        self._pending_delete = None
+        self.changed.emit()
+
+    @Slot()
+    def confirmDelete(self):
+        if self.busy or self._pending_delete is None:
+            return
+        (identifier, name), self._pending_delete = self._pending_delete, None
+        if self.preview:
+            self._status = tr("This is a preview. No application was removed.")
+            self.changed.emit()
+            return
+
+        def operation(engine):
+            tx = next((item for item in self.store.transactions() if item.id == identifier), None)
+            if tx is None or tx.method != "appimage":
+                raise RuntimeError(tr("This AppImage installation is unavailable."))
+            # Only MultiPak's copy and shortcuts: the container is left as it is.
+            engine.cleanup(tx)
+            return identifier
+
+        self._status = tr("Deleting {0}…").format(name)
+        self._logs, self._error = "", False
+        self._delete_name = name
+        self._run(operation, self._deleted)
+
+    def _deleted(self, identifier):
+        self._repairs = [item for item in self._repairs if item[0] != identifier]
+        self._status, self._progress = tr("{0} was deleted.").format(self._delete_name), 100
+
     @Property(str, constant=True)
     def version(self):
         return DISPLAY_VERSION
@@ -263,6 +443,7 @@ class Manager(QObject):
     @Property("QVariantList", notify=rowsChanged)
     def rows(self):
         if self._mode == "remove":
+            repair_ids = {identifier for identifier, _ in self._repairs}
             return [
                 {
                     "title": tx.package_name,
@@ -297,6 +478,8 @@ class Manager(QObject):
                         if tx.method == "system"
                         else tr("Removal pending")
                         if tx.status == "cleanup_failed"
+                        else tr("This application's container was replaced.")
+                        if tx.id in repair_ids
                         else ""
                     ),
                 }
@@ -448,6 +631,24 @@ class Manager(QObject):
                 from multipak.appimage_container import update_entry
                 from multipak.containers import _read_record
 
+                def answers_to_its_name(runner, env):
+                    try:
+                        current = runner.run(
+                            [
+                                "podman",
+                                "container",
+                                "inspect",
+                                "--format",
+                                "{{.Id}}",
+                                "--",
+                                env.name,
+                            ],
+                            timeout=30,
+                        )
+                    except (CommandError, OSError, TimeoutError):
+                        return False
+                    return current.strip() == env.container_id
+
                 def custom_and_unchanged(env):
                     # A custom-named container stays MultiPak's only under the name
                     # MultiPak recorded when it created it.
@@ -463,9 +664,14 @@ class Manager(QObject):
                     if env.multipak_managed or (env.custom_named and custom_and_unchanged(env))
                 ]
                 # The AppImage container is private to MultiPak and not offered for
-                # package installations, but its packages still need updates.
+                # package installations, but its packages still need updates. While it
+                # is renamed or deleted, it waits for a repair instead.
                 appimages = update_entry(self.store)
-                if appimages and all(env.name != appimages.name for env in environments):
+                if (
+                    appimages
+                    and all(env.name != appimages.name for env in environments)
+                    and answers_to_its_name(engine.runner, appimages)
+                ):
                     environments.append(appimages)
                 return sorted(environments, key=lambda env: env.name.casefold())
 
@@ -490,6 +696,7 @@ class Manager(QObject):
             self._pending = None
             self.rowsChanged.emit()
             self.changed.emit()
+            self.checkRepairs()
 
     @Slot()
     def refresh(self):
@@ -547,6 +754,7 @@ class Manager(QObject):
             )
         else:
             remaining = {tx.id for tx in self._removable()}
+            self._repairs = [item for item in self._repairs if item[0] in remaining]
             self._items = [
                 item for item in self._items if item.method == "system" or item.id in remaining
             ]
@@ -669,6 +877,8 @@ def create_manager(app, controller):
     window.setIcon(app.windowIcon())
     if host.is_flatpak() and not controller.preview:
         migration.when_ready(controller.initializeAssociations)
+    if not controller.preview:
+        migration.when_ready(controller.checkRepairs)
     return engine, controller, window
 
 

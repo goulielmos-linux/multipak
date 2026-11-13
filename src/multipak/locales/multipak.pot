@@ -21,6 +21,9 @@ msgstr ""
 msgid " — stable version"
 msgstr ""
 
+msgid "%1 needs to be repaired."
+msgstr ""
+
 msgid "(optional)"
 msgstr ""
 
@@ -171,6 +174,9 @@ msgstr ""
 msgid "Checking the container image…"
 msgstr ""
 
+msgid "Checking the container…"
+msgstr ""
+
 msgid "Checking…"
 msgstr ""
 
@@ -214,6 +220,9 @@ msgid "Configure file types and the interface language."
 msgstr ""
 
 msgid "Configuring the container…"
+msgstr ""
+
+msgid "Confirm"
 msgstr ""
 
 msgid "Connecting to the container image download…"
@@ -324,7 +333,13 @@ msgstr ""
 msgid "Could not open the application installer."
 msgstr ""
 
+msgid "Could not open the application."
+msgstr ""
+
 msgid "Could not open the software store."
+msgstr ""
+
+msgid "Could not open {0}."
 msgstr ""
 
 msgid "Could not prepare a private temporary folder in the environment."
@@ -411,7 +426,19 @@ msgstr ""
 msgid "Default settings (recommended)"
 msgstr ""
 
+msgid "Delete"
+msgstr ""
+
+msgid "Delete %1?\n\nMultiPak will delete its copy of the AppImage, along with its shortcut and icon in the application launcher.\n\nTo use the application again, you will need to install the AppImage again."
+msgstr ""
+
+msgid "Delete application"
+msgstr ""
+
 msgid "Delete container"
+msgstr ""
+
+msgid "Deleting {0}…"
 msgstr ""
 
 msgid "Dependencies"
@@ -777,7 +804,13 @@ msgstr ""
 msgid "MultiPak settings"
 msgstr ""
 
+msgid "MultiPak will create it again so that {0} works again."
+msgstr ""
+
 msgid "MultiPak will install in the container the dependencies it does not already have."
+msgstr ""
+
+msgid "MultiPak will install the dependencies of {0} in the container {1}."
 msgstr ""
 
 msgid "Native installation"
@@ -817,6 +850,9 @@ msgid "Not provided"
 msgstr ""
 
 msgid "Note: this list was obtained without running the application and may be incomplete."
+msgstr ""
+
+msgid "Open the MultiPak Application Manager to repair it."
 msgstr ""
 
 msgid "Open the package without --page or --screenshot; these options are for previews only."
@@ -915,6 +951,18 @@ msgstr ""
 msgid "Removing the components created by this installation…"
 msgstr ""
 
+msgid "Repair"
+msgstr ""
+
+msgid "Repair %1?\n\n%2"
+msgstr ""
+
+msgid "Repair application"
+msgstr ""
+
+msgid "Repairing {0}…"
+msgstr ""
+
 msgid "Requesting a system restart…"
 msgstr ""
 
@@ -949,6 +997,9 @@ msgid "Restart your computer to complete the installation."
 msgstr ""
 
 msgid "Restart your computer to complete the uninstallation."
+msgstr ""
+
+msgid "Restoring the container name…"
 msgstr ""
 
 msgid "Reusing downloaded image layers…"
@@ -1101,6 +1152,9 @@ msgstr ""
 msgid "The container for this AppImage is unavailable. Install the AppImage again."
 msgstr ""
 
+msgid "The container for {0} was replaced. Open the Application Manager to repair it."
+msgstr ""
+
 msgid "The container identity or ownership has changed. It will be kept."
 msgstr ""
 
@@ -1119,6 +1173,15 @@ msgstr ""
 msgid "The container was replaced; cleanup was blocked."
 msgstr ""
 
+msgid "The container {0} is no longer available."
+msgstr ""
+
+msgid "The container {0} was deleted."
+msgstr ""
+
+msgid "The container {0} was renamed to {1}. MultiPak will take it back and rename it to {2} so that {3} works again."
+msgstr ""
+
 msgid "The container's home folder could not be verified. It will be kept."
 msgstr ""
 
@@ -1135,6 +1198,9 @@ msgid "The container, other applications and personal data will be preserved."
 msgstr ""
 
 msgid "The copy is incomplete or has changed. Cancel and reopen the package."
+msgstr ""
+
+msgid "The dependencies of {0} were found on your system. MultiPak will open it directly on the system, without a container."
 msgstr ""
 
 msgid "The disk is full. Free up disk space, then try again."
@@ -1305,10 +1371,16 @@ msgstr ""
 msgid "This application is packaged in RPM format, used by distributions such as Fedora and Red Hat Enterprise Linux."
 msgstr ""
 
+msgid "This application's container was replaced."
+msgstr ""
+
 msgid "This is a preview. No application was opened."
 msgstr ""
 
 msgid "This is a preview. No application was removed."
+msgstr ""
+
+msgid "This is a preview. No application was repaired."
 msgstr ""
 
 msgid "This is a preview. No associations were changed."
@@ -1489,6 +1561,12 @@ msgid "rpm-ostree will remove the package and recalculate the required dependenc
 msgstr ""
 
 msgid "{0} exited with code {1}.\n{2}"
+msgstr ""
+
+msgid "{0} was deleted."
+msgstr ""
+
+msgid "{0} was repaired."
 msgstr ""
 
 msgid "{0} will be installed the next time you start your computer."

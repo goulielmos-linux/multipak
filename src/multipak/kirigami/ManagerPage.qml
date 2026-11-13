@@ -44,6 +44,33 @@ Kirigami.ScrollablePage {
             }
         }
 
+        // AppImages whose container was renamed or deleted, one message each.
+        Repeater {
+            model: manager.mode === "home" ? manager.repairs : []
+            delegate: Kirigami.InlineMessage {
+                required property var modelData
+                required property int index
+                objectName: "managerRepairMessage" + index
+                visible: true
+                // The name is escaped by the manager; the bold tag makes it rich text.
+                text: qsTr("%1 needs to be repaired.").arg(modelData.html)
+                type: Kirigami.MessageType.Warning
+                Layout.fillWidth: true
+                actions: [
+                    Kirigami.Action {
+                        text: qsTr("Delete")
+                        enabled: !manager.busy
+                        onTriggered: manager.requestDelete(modelData.id)
+                    },
+                    Kirigami.Action {
+                        text: qsTr("Repair")
+                        enabled: !manager.busy
+                        onTriggered: manager.requestRepair(modelData.id)
+                    }
+                ]
+            }
+        }
+
         Controls.Label {
             visible: manager.mode === "home"
             text: qsTr("Manage your applications and set your preferences.")

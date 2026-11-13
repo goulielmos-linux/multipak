@@ -370,7 +370,9 @@ def test_container_installation_records_the_container_and_installs_packages(stor
     monkeypatch.setattr(
         appimage_container,
         "verify_and_complete",
-        lambda engine, container, appdir, tx_id: calls.append(("verify", appdir)) or ["checked"],
+        lambda engine, container, appdir, tx_id, packages: (
+            calls.append(("verify", appdir)) or ["checked"]
+        ),
     )
     engine = Engine(store, threading.Event())
     tx = Transaction(
@@ -500,8 +502,9 @@ def test_launch_refuses_a_missing_container(store, monkeypatch):
         appimage.host, "run", lambda argv, **options: SimpleNamespace(returncode=1, stdout="")
     )
     monkeypatch.setattr(appimage.os, "execv", lambda *_: pytest.fail("Nothing may start"))
-    with pytest.raises(RuntimeError, match="unavailable"):
+    with pytest.raises(appimage.RepairNeeded, match="Application Manager") as raised:
         appimage.launch(tx.id, [])
+    assert raised.value.name == "Demo"
 
 
 def test_launch_refuses_another_container_that_took_the_name(store, monkeypatch):
@@ -515,7 +518,7 @@ def test_launch_refuses_another_container_that_took_the_name(store, monkeypatch)
 
     monkeypatch.setattr(appimage.host, "run", run)
     monkeypatch.setattr(appimage.os, "execv", lambda *_: pytest.fail("Nothing may start"))
-    with pytest.raises(RuntimeError, match="identity"):
+    with pytest.raises(appimage.RepairNeeded):
         appimage.launch(tx.id, [])
     # The name is resolved, not only the recorded ID.
     assert calls[0][-1] == appimage_container.CONTAINER_NAME
@@ -768,39 +771,204 @@ def test_squashfs_listing_reports_types_and_sizes(tmp_path):
     }
 
 
-def test_a_renamed_appimage_container_is_abandoned_and_replaced(store):
-    old = ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32)
-    _save_record(store, old)
-    state = {}
+def renamed_responses(state, current="Meus AppImages", others=()):
+    """Podman with MultiPak's AppImage container c...c renamed to current."""
 
     def responses(argv):
         if argv[:3] == ["podman", "container", "exists"]:
+            if argv[3] not in state.get("existing", {"c" * 64}):
+                raise CommandError(argv, 1, "")
             return ""
         if argv[:2] == ["podman", "ps"]:
-            return json.dumps([{"Names": ["Meus AppImages"]}])  # The renamed one.
+            rows = [{"Id": "c" * 64, "Names": [state.get("name", current)]}]
+            return json.dumps(rows + [{"Id": "e" * 64, "Names": [name]} for name in others])
+        if argv[:2] == ["podman", "rename"]:
+            state["renamed"] = argv[2:]
+            state["name"] = argv[3]
         if argv[:2] == ["distrobox", "create"]:
-            flags = argv[argv.index("--additional-flags") + 1]
-            state["owner"] = flags.split("--label=io.github.multipak.transaction=")[1].split()[0]
-            state["name"] = argv[argv.index("--name") + 1]
+            state["created"] = True
         if argv[:2] == ["podman", "inspect"]:
-            if argv[2] == "c" * 64:
-                labels = {
-                    "io.github.multipak.transaction": "a" * 32,
-                    appimage_container.APPIMAGE_LABEL: "1",
-                }
-                return json.dumps(
-                    [{"Id": "c" * 64, "Name": "Meus AppImages", "Config": {"Labels": labels}}]
-                )
-            labels = {"io.github.multipak.transaction": state.get("owner", "")}
-            return json.dumps([{"Id": "d" * 64, "Config": {"Labels": labels}}])
+            labels = {
+                "io.github.multipak.transaction": "a" * 32,
+                appimage_container.APPIMAGE_LABEL: "1",
+            }
+            return json.dumps(
+                [{"Id": "c" * 64, "Name": state.get("name", current), "Config": {"Labels": labels}}]
+            )
         return ""
 
-    engine = engine_for(store, Recorder(responses))
+    return responses
+
+
+def test_a_renamed_appimage_container_is_taken_back(store):
+    _save_record(store, ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32))
+    tx = installed_container_appimage(store, "8")
+    state = {}
+    engine = engine_for(store, Recorder(renamed_responses(state)))
     record = appimage_container.ensure_container(engine)
-    # The renamed container is left alone; a new one takes the free default name.
-    assert state["name"] == record.name == appimage_container.CONTAINER_NAME
-    assert record.container_id == "d" * 64
+    # No second container: the renamed one gets its name back.
+    assert "created" not in state
+    assert state["renamed"] == ["c" * 64, appimage_container.CONTAINER_NAME]
+    assert record.container_id == "c" * 64 and record.name == appimage_container.CONTAINER_NAME
     assert appimage_container.find_record(store) == record
+    assert next(item for item in store.transactions() if item.id == tx.id).container == record.name
+
+
+def test_a_taken_back_container_avoids_a_name_another_container_took(store):
+    _save_record(store, ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32))
+    tx = installed_container_appimage(store, "9")
+    state = {}
+    engine = engine_for(
+        store, Recorder(renamed_responses(state, others=[appimage_container.CONTAINER_NAME]))
+    )
+    record = appimage_container.ensure_container(engine)
+    assert record.name == "C2-MultiPak-AppImages"
+    assert appimage_container.find_record(store) == record
+    # The old record is gone and the AppImage follows the new name.
+    assert appimage_container._record_names(store) == ["C2-MultiPak-AppImages"]
+    assert next(item for item in store.transactions() if item.id == tx.id).container == record.name
+
+
+def test_appimages_of_a_renamed_or_deleted_container_need_repair(store):
+    renamed = installed_container_appimage(store, "a")
+    kept = installed_container_appimage(store, "b")
+    deleted = installed_container_appimage(store, "d")
+    deleted.container_id = "d" * 64
+    store.save(deleted)
+    kept.container_id = "e" * 64
+    store.save(kept)
+
+    def responses(argv):
+        return json.dumps(
+            [
+                {"Id": "c" * 64, "Names": ["Meus AppImages"]},
+                {"Id": "e" * 64, "Names": [appimage_container.CONTAINER_NAME]},
+            ]
+        )
+
+    found = appimage_container.needing_repair(engine_for(store, Recorder(responses)))
+    assert {tx.id for tx in found} == {renamed.id, deleted.id}
+
+
+def test_nothing_needs_repair_when_podman_cannot_be_queried(store):
+    installed_container_appimage(store, "a")
+
+    def responses(argv):
+        raise CommandError(argv, 125, "podman failed")
+
+    assert appimage_container.needing_repair(engine_for(store, Recorder(responses))) == []
+
+
+def no_system_dependencies(monkeypatch, everything=False):
+    monkeypatch.setattr(appimage_container, "_system_has_everything", lambda engine, tx: everything)
+
+
+def test_repair_plan_for_a_renamed_container(store, monkeypatch):
+    no_system_dependencies(monkeypatch)
+    _save_record(store, ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32))
+    tx = installed_container_appimage(store, "a")
+    engine = engine_for(store, Recorder(renamed_responses({})))
+    plan = appimage_container.repair_plan(engine, tx.id)
+    assert plan["kind"] == "renamed" and not plan["deleted"]
+    assert (plan["old"], plan["current"], plan["target"]) == (
+        appimage_container.CONTAINER_NAME,
+        "Meus AppImages",
+        appimage_container.CONTAINER_NAME,
+    )
+    # Nothing changes before the user confirms.
+    assert not any(argv[:2] == ["podman", "rename"] for argv in engine.runner.calls)
+
+
+def test_repair_plan_for_a_deleted_container(store, monkeypatch):
+    no_system_dependencies(monkeypatch)
+    _save_record(store, ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32))
+    tx = installed_container_appimage(store, "a")
+    engine = engine_for(store, Recorder(renamed_responses({"existing": set()})))
+    plan = appimage_container.repair_plan(engine, tx.id)
+    assert plan["kind"] == "recreate" and plan["deleted"]
+
+
+def test_repair_plan_prefers_the_system_when_it_has_every_dependency(store, monkeypatch):
+    no_system_dependencies(monkeypatch, everything=True)
+    tx = installed_container_appimage(store, "a")
+    engine = engine_for(store, Recorder(renamed_responses({"existing": set()})))
+    assert appimage_container.repair_plan(engine, tx.id)["kind"] == "system"
+
+
+def test_repair_on_the_system_leaves_containers_alone(store):
+    tx = installed_container_appimage(store, "a")
+    runner = Recorder(lambda argv: pytest.fail("No container command may run"))
+    repaired = appimage_container.repair(engine_for(store, runner), tx.id, on_system=True)
+    assert repaired.appimage_mode == "extracted" and not repaired.appimage_container
+    assert (repaired.container, repaired.container_id) == ("", "")
+    assert store.appimage_directory(tx.id).joinpath("AppDir/AppRun").is_file()
+
+
+def test_repair_takes_a_renamed_container_back_without_reinstalling(store):
+    _save_record(store, ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32))
+    tx = installed_container_appimage(store, "a")
+    tx.container = "Meus AppImages-antigo"
+    tx.appimage_packages = ["python3-tkinter"]
+    store.save(tx)
+    state = {}
+    runner = Recorder(renamed_responses(state))
+    repaired = appimage_container.repair(engine_for(store, runner), tx.id)
+    assert repaired.container == appimage_container.CONTAINER_NAME
+    assert repaired.container_id == "c" * 64
+    assert not any("dnf" in argv for argv in runner.calls)
+
+
+def test_repair_installs_the_dependencies_in_a_new_container(store, monkeypatch):
+    tx = installed_container_appimage(store, "a")
+    tx.appimage_packages = ["python3-tkinter", "libfoo.so.1()(64bit)"]
+    store.save(tx)
+    new = ManagedContainer(appimage_container.CONTAINER_NAME, "d" * 64, "b" * 32)
+    monkeypatch.setattr(appimage_container, "ensure_container", lambda engine: new)
+    installed = []
+    monkeypatch.setattr(
+        appimage_container,
+        "install_packages",
+        lambda engine, container, specs: installed.append((container, list(specs))) or [],
+    )
+    repaired = appimage_container.repair(engine_for(store, Recorder()), tx.id)
+    assert installed == [(new, ["python3-tkinter", "libfoo.so.1()(64bit)"])]
+    assert (repaired.container, repaired.container_id) == (new.name, new.container_id)
+
+
+def test_the_check_records_what_it_installed_for_later_repairs(store, monkeypatch):
+    rounds = iter(
+        [
+            ((Dependency("library", "libfoo.so.1", "libfoo.so.1()(64bit)"),), "unknown"),
+            ((), "running"),
+        ]
+    )
+    monkeypatch.setattr(appimage_container, "isolated_check", lambda *args: next(rounds))
+    monkeypatch.setattr(appimage_container, "install_packages", lambda *args: [])
+    packages = ["python3-tkinter"]
+    appimage_container.verify_and_complete(
+        engine_for(store, Recorder()), None, Path("/x"), "f" * 32, packages
+    )
+    assert packages == ["python3-tkinter", "libfoo.so.1()(64bit)"]
+
+
+def test_launcher_notifies_when_the_appimage_needs_repair(monkeypatch):
+    from multipak import appimage_launcher
+
+    def broken(*args):
+        raise appimage.RepairNeeded("Demo")
+
+    sent = []
+    monkeypatch.setattr(appimage_launcher, "launch", broken)
+    monkeypatch.setattr(appimage_launcher, "notify", lambda *args: sent.append(args))
+    monkeypatch.setattr("sys.argv", ["multipak-appimage", "a" * 32])
+    assert appimage_launcher.main() == 1
+    assert sent == [("Could not open Demo.", "Open the MultiPak Application Manager to repair it.")]
+
+
+def test_notification_text_is_a_safe_gvariant_string():
+    from multipak.appimage_launcher import _text
+
+    assert _text("it's \\ a\nname") == "'it\\'s \\\\ a name'"
 
 
 def test_a_renamed_package_container_is_no_longer_multipak_s():
@@ -868,3 +1036,14 @@ def test_nothing_is_forgotten_when_podman_cannot_be_queried(store):
     engine._log = lambda text: None
     assert containers.forget_abandoned(engine) == []
     assert len(store.transactions()) == 3
+
+
+def test_repair_plan_only_relinks_when_the_container_already_has_its_name(store, monkeypatch):
+    no_system_dependencies(monkeypatch, everything=True)
+    _save_record(store, ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32))
+    tx = installed_container_appimage(store, "a")
+    tx.container = "Meus AppImages"
+    store.save(tx)
+    state = {"name": appimage_container.CONTAINER_NAME}
+    engine = engine_for(store, Recorder(renamed_responses(state)))
+    assert appimage_container.repair_plan(engine, tx.id)["kind"] == "relink"

@@ -1514,3 +1514,81 @@ msgstr "Ver a lista completa de dependências exigidas"
 
 msgid "Could not check the containers: {0}"
 msgstr "Não foi possível verificar os contêineres: {0}"
+
+msgid "%1 needs to be repaired."
+msgstr "%1 precisa ser reparado."
+
+msgid "Checking the container…"
+msgstr "Verificando o contêiner…"
+
+msgid "Confirm"
+msgstr "Confirmar"
+
+msgid "Could not open the application."
+msgstr "Não foi possível abrir o aplicativo."
+
+msgid "Could not open {0}."
+msgstr "Não foi possível abrir {0}."
+
+msgid "Delete"
+msgstr "Excluir"
+
+msgid "Delete %1?\n\nMultiPak will delete its copy of the AppImage, along with its shortcut and icon in the application launcher.\n\nTo use the application again, you will need to install the AppImage again."
+msgstr "Excluir %1?\n\nO MultiPak apagará a cópia do AppImage que mantém, junto com o atalho e o ícone no lançador de aplicativos.\n\nPara usar o aplicativo de novo, será preciso instalar o AppImage novamente."
+
+msgid "Delete application"
+msgstr "Excluir aplicativo"
+
+msgid "Deleting {0}…"
+msgstr "Excluindo {0}…"
+
+msgid "MultiPak will create it again so that {0} works again."
+msgstr "O MultiPak vai recriá-lo para que {0} volte a funcionar."
+
+msgid "MultiPak will install the dependencies of {0} in the container {1}."
+msgstr "O MultiPak vai instalar as dependências de {0} no contêiner {1}."
+
+msgid "Open the MultiPak Application Manager to repair it."
+msgstr "Abra o Gerenciador do MultiPak para repará-lo."
+
+msgid "Repair"
+msgstr "Reparar"
+
+msgid "Repair %1?\n\n%2"
+msgstr "Reparar %1?\n\n%2"
+
+msgid "Repair application"
+msgstr "Reparar aplicativo"
+
+msgid "Repairing {0}…"
+msgstr "Reparando {0}…"
+
+msgid "Restoring the container name…"
+msgstr "Restaurando o nome do contêiner…"
+
+msgid "The container for {0} was replaced. Open the Application Manager to repair it."
+msgstr "O contêiner de {0} foi substituído. Abra o Gerenciador de Aplicativos para repará-lo."
+
+msgid "The container {0} is no longer available."
+msgstr "O contêiner {0} não está mais disponível."
+
+msgid "The container {0} was deleted."
+msgstr "O contêiner {0} foi excluído."
+
+msgid "The container {0} was renamed to {1}. MultiPak will take it back and rename it to {2} so that {3} works again."
+msgstr "O contêiner {0} foi renomeado para {1}. O MultiPak vai assumi-lo novamente e renomeá-lo para {2}, para que {3} volte a funcionar."
+
+msgid "The dependencies of {0} were found on your system. MultiPak will open it directly on the system, without a container."
+msgstr "As dependências de {0} foram encontradas no seu sistema. O MultiPak vai passar a abri-lo diretamente no sistema, sem contêiner."
+
+msgid "This application's container was replaced."
+msgstr "O contêiner deste aplicativo foi substituído."
+
+msgid "This is a preview. No application was repaired."
+msgstr "Esta é uma prévia. Nenhum aplicativo foi reparado."
+
+msgid "{0} was deleted."
+msgstr "{0} foi excluído."
+
+msgid "{0} was repaired."
+msgstr "{0} foi reparado."

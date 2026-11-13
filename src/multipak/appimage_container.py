@@ -4,6 +4,7 @@ import json
 import re
 import threading
 import uuid
+from dataclasses import replace
 from pathlib import Path
 
 from multipak.localization import tr
@@ -81,16 +82,16 @@ def ensure_container(engine):
     record = find_record(engine.store)
     if record is not None:
         data = _owned(runner, record)
-        if data is not None and (data.get("Name") or "").removeprefix("/") == record.name:
-            return record
-        # Removed or renamed: a renamed container is no longer MultiPak's. A new one is
-        # created and the old record is dropped once it exists.
-    rows = json.loads(runner.run(["podman", "ps", "--all", "--format", "json"], timeout=30))
+        if data is not None:
+            current = (data.get("Name") or "").removeprefix("/")
+            if current == record.name:
+                return record
+            # Renamed outside MultiPak: take it back instead of creating a second one.
+            return _reclaim(engine, record, current)
+        # Deleted: a new one is created and the old record is dropped once it exists.
     # A container MultiPak did not create may use the default name: take the lowest
     # free C2-, C3-... name instead, without asking.
-    name = free_container_name(
-        CONTAINER_NAME, {item for row in rows for item in row.get("Names") or []}
-    )
+    name = free_container_name(CONTAINER_NAME, _container_names(runner))
     engine.progress(-1, tr("Fetching the container image…"))
     ImageProgress(engine.progress).run(
         runner, ["podman", "pull", "--policy=missing", IMAGE], terminal_output=True
@@ -128,6 +129,171 @@ def ensure_container(engine):
     engine.progress(-1, tr("Initializing the container…"))
     PackageProgress(engine.progress).run(runner, _enter(name, "true"))
     return record
+
+
+def _container_names(runner):
+    rows = json.loads(runner.run(["podman", "ps", "--all", "--format", "json"], timeout=30))
+    return {item for row in rows for item in row.get("Names") or []}
+
+
+def _reclaim_name(runner, current):
+    """The name a renamed AppImage container gets back: the default or the lowest free."""
+    return free_container_name(CONTAINER_NAME, _container_names(runner) - {current})
+
+
+def _reclaim(engine, record, current):
+    name = _reclaim_name(engine.runner, current)
+    engine.progress(-1, tr("Restoring the container name…"))
+    engine.runner.run(["podman", "rename", record.container_id, name], timeout=60)
+    reclaimed = replace(record, name=name)
+    _save_record(engine.store, reclaimed)
+    if record.name != name:
+        old = _record_path(engine.store, record.name)
+        old.unlink(missing_ok=True)
+        try:
+            old.parent.rmdir()
+        except OSError:
+            pass
+    _retarget(engine.store, reclaimed)
+    return reclaimed
+
+
+def _retarget(store, record):
+    """Point every AppImage in this container at its current name."""
+    for tx in store.transactions():
+        if (
+            tx.method == "appimage"
+            and tx.appimage_mode == "container"
+            and tx.container_id == record.container_id
+            and tx.container != record.name
+        ):
+            tx.container = record.name
+            store.save(tx)
+
+
+def _installed_in_container(store):
+    return [
+        tx
+        for tx in store.transactions()
+        if tx.method == "appimage" and tx.appimage_mode == "container" and tx.status == "installed"
+    ]
+
+
+def needing_repair(engine):
+    """AppImages whose container was renamed or deleted. Nothing is reported when Podman
+    cannot be queried."""
+    candidates = _installed_in_container(engine.store)
+    if not candidates:
+        return []
+    try:
+        rows = json.loads(
+            engine.runner.run(["podman", "ps", "--all", "--format", "json"], timeout=30)
+        )
+    except (CommandError, OSError, TimeoutError, ValueError) as error:
+        engine._log(tr("Could not check the containers: {0}").format(error))
+        return []
+    if not isinstance(rows, list):
+        return []
+    names = {
+        str(row.get("Id", "")).removeprefix("sha256:"): set(row.get("Names") or [])
+        for row in rows
+        if isinstance(row, dict)
+    }
+    return [tx for tx in candidates if tx.container not in names.get(tx.container_id, set())]
+
+
+def _transaction(store, transaction_id):
+    tx = next((item for item in store.transactions() if item.id == transaction_id), None)
+    if tx is None or tx.method != "appimage" or tx.appimage_mode != "container":
+        raise RuntimeError(tr("This AppImage installation is unavailable."))
+    return tx
+
+
+def repair_plan(engine, transaction_id):
+    """What repairing this AppImage will do, for the confirmation.
+
+    kind is "system" (the system now has every dependency: no container is needed),
+    "renamed" (the container is taken back and renamed), "install" (its
+    dependencies go into MultiPak's current AppImage container), "recreate" (a new
+    container is created) or "relink" (nothing to confirm: the name is already right).
+    """
+    tx = _transaction(engine.store, transaction_id)
+    runner = engine.runner
+    plan = {"application": tx.package_name, "old": tx.container, "current": "", "target": ""}
+    try:
+        runner.run(["podman", "container", "exists", tx.container_id], timeout=30)
+        plan["deleted"] = False
+    except CommandError as error:
+        if error.code != 1:
+            raise
+        plan["deleted"] = True
+    record = find_record(engine.store)
+    data = _owned(runner, record) if record is not None else None
+    current = (data.get("Name") or "").removeprefix("/") if data is not None else ""
+    if data is not None and record.container_id == tx.container_id and current == record.name:
+        return plan | {"kind": "relink", "current": current, "target": current}
+    # Without a container, if the system itself now has everything, none is needed.
+    if _system_has_everything(engine, tx):
+        return plan | {"kind": "system"}
+    if data is None:
+        return plan | {
+            "kind": "recreate",
+            "target": free_container_name(CONTAINER_NAME, _container_names(runner)),
+        }
+    target = record.name if current == record.name else _reclaim_name(runner, current)
+    if record.container_id != tx.container_id:
+        return plan | {"kind": "install", "current": current, "target": target}
+    return plan | {"kind": "renamed", "current": current, "target": target}
+
+
+def _system_has_everything(engine, tx):
+    """Whether the system itself now provides what the AppImage needs, for example
+    because the user installed the dependencies after the container was gone."""
+    from .appimage import Archive
+    from .appimage_dependencies import analyze
+
+    application = engine.store.appimage_directory(tx.id) / "application.AppImage"
+    if application.is_symlink() or not application.is_file():
+        return False
+    try:
+        report = analyze(
+            Archive(application, engine.runner), engine.runner, scratch=engine.store.root
+        )
+    except Exception as error:
+        engine._log(tr("Could not check the AppImage dependencies: {0}").format(error))
+        return False
+    return not report.incomplete and not report.required
+
+
+def repair(engine, transaction_id, *, on_system=False):
+    """Make the AppImage run again: in MultiPak's AppImage container or, with on_system,
+    directly on the system, which already provides its dependencies."""
+    with engine.store.lock():
+        tx = _transaction(engine.store, transaction_id)
+        if tx.status != "installed":
+            raise RuntimeError(tr("This AppImage installation is unavailable."))
+        if on_system:
+            # The extracted application is already in place; the shortcut calls the
+            # transaction, not the container, so it keeps working unchanged.
+            tx.appimage_mode, tx.appimage_container = "extracted", False
+            tx.container, tx.container_id = "", ""
+            engine.store.save(tx)
+            return tx
+        container = ensure_container(engine)
+        tx = _transaction(engine.store, transaction_id)
+        if tx.container_id != container.container_id:
+            engine.progress(-1, tr("Installing the dependencies in the container…"))
+            missing = install_packages(engine, container, tx.appimage_packages)
+            if missing:
+                engine._log(
+                    tr("These dependencies could not be installed automatically: {0}.").format(
+                        ", ".join(missing)
+                    )
+                )
+            tx.container_id = container.container_id
+        tx.container = container.name
+        engine.store.save(tx)
+        return tx
 
 
 def install_packages(engine, container, specs):
@@ -240,8 +406,11 @@ def isolated_check(engine, container, appdir: Path, transaction_id: str):
     return (), "exited" if code == 0 else "unknown"
 
 
-def verify_and_complete(engine, container, appdir: Path, transaction_id: str):
-    """Repeat the isolated check while it finds installable components. Returns warnings."""
+def verify_and_complete(engine, container, appdir: Path, transaction_id: str, packages=None):
+    """Repeat the isolated check while it finds installable components. Returns warnings.
+
+    packages, when given, receives what the check installed, so a repair can install
+    the same components in a new container."""
     warnings, installed, unresolved = [], [], []
     outcome = "unknown"
     for _ in range(CHECK_ROUNDS):
@@ -259,6 +428,8 @@ def verify_and_complete(engine, container, appdir: Path, transaction_id: str):
         missing = install_packages(engine, container, [item.package for item in installable])
         unresolved.extend(item for item in installable if item.package in missing)
         installed.extend(item.package for item in installable if item.package not in missing)
+    if packages is not None:
+        packages.extend(item for item in installed if item not in packages)
     if installed:
         warnings.append(
             tr("The check installed additional dependencies: {0}.").format(", ".join(installed))
@@ -335,6 +506,9 @@ __all__ = [
     "install_packages",
     "isolated_check",
     "launch_command",
+    "needing_repair",
+    "repair",
+    "repair_plan",
     "update_entry",
     "verify_and_complete",
     "verify_name",

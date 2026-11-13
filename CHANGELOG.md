@@ -36,11 +36,21 @@
 - When a default name such as MultiPak-Fedora-45 is taken by another container, create
   the container with the lowest free name (C2-, C3-...) instead of stopping, and keep
   using it afterwards. The same applies to the AppImage container.
-- A container that is renamed after MultiPak created it, including one with a custom
-  name, is no longer treated as MultiPak's. A new one is created when needed.
-- Forget the applications of a renamed or deleted container: they leave the uninstall
-  list and their shortcuts, which no longer work, are removed. Nothing inside the
-  container is changed.
+- A container for RPM, DEB or Arch packages that is renamed after MultiPak created it,
+  including one with a custom name, is no longer treated as MultiPak's. A new one is
+  created when needed.
+- Forget the applications of such a renamed or deleted container: they leave the
+  uninstall list and their shortcuts, which no longer work, are removed. Nothing inside
+  the container is changed.
+- The AppImage container is taken back instead: when it was renamed, MultiPak gives it
+  its name again before using it, rather than creating a second one.
+- When the container of an AppImage was renamed or deleted, the Application Manager
+  shows a notice with Repair and Delete. Repair first explains what it will do: take
+  the renamed container back, create it again, or, when the system now has every
+  dependency, open the AppImage directly on the system. Delete removes MultiPak's copy
+  of the AppImage with its shortcut and icon, and leaves the container alone.
+- Opening such an AppImage from its shortcut shows a desktop notification that points
+  to the Application Manager.
 - Do not update a container recorded by MultiPak if another container has taken its
   name.
 

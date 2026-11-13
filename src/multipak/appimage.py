@@ -25,6 +25,19 @@ from .storage import record_install_failure
 
 LOG = logging.getLogger(__name__)
 
+
+class RepairNeeded(RuntimeError):
+    """The AppImage's container was renamed or deleted: the manager can repair it."""
+
+    def __init__(self, name):
+        super().__init__(
+            tr(
+                "The container for {0} was replaced. Open the Application Manager to repair it."
+            ).format(name)
+        )
+        self.name = name
+
+
 MAX_METADATA = 1024 * 1024
 MAX_ICON = 4 * 1024 * 1024
 
@@ -491,7 +504,9 @@ def _complete(engine, package):
 
         engine._stage(95, tr("Checking the application in an isolated environment…"))
         try:
-            tx.warnings.extend(verify_and_complete(engine, container, destination, tx.id))
+            tx.warnings.extend(
+                verify_and_complete(engine, container, destination, tx.id, tx.appimage_packages)
+            )
         except (CommandError, OSError, RuntimeError, TimeoutError, ValueError) as error:
             # The application is installed; an incomplete check must not undo that.
             tx.warnings.append(tr("The isolated check could not be completed: {0}").format(error))
@@ -648,16 +663,10 @@ def launch(transaction_id, arguments, extra_environment=None):
                 check=False,
             )
             current = result.stdout.strip() if result.returncode == 0 else ""
-        except (OSError, subprocess.TimeoutExpired):
-            current = ""
-        if not current:
-            raise RuntimeError(
-                tr("The container for this AppImage is unavailable. Install the AppImage again.")
-            )
+        except (OSError, subprocess.TimeoutExpired) as error:
+            raise RuntimeError(tr("Could not check the containers: {0}").format(error)) from error
         if current != tx.container_id:
-            raise RuntimeError(
-                tr("The AppImage container identity or ownership has changed. It was not used.")
-            )
+            raise RepairNeeded(tx.package_name)
         environment = {
             "APPIMAGE": str(application),
             "APPDIR": str(appdir),
