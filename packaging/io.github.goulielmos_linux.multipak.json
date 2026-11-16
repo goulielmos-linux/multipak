@@ -38,6 +38,7 @@
       "name": "rpm",
       "buildsystem": "cmake-ninja",
       "config-opts": [
+        "-DCMAKE_INSTALL_LIBDIR=lib",
         "-DENABLE_PYTHON=OFF",
         "-DENABLE_PLUGINS=OFF",
         "-DENABLE_NLS=OFF",

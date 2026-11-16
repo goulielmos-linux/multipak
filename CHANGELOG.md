@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.3
+
+- Fix RPM inspection in the Flatpak by installing the bundled RPM libraries
+  in the runtime library search path.
+
 ## 1.0.2
 
 - Fix an error that prevented the Flatpak from opening signed RPM packages,
