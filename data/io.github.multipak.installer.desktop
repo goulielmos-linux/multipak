@@ -2,13 +2,13 @@
 Type=Application
 Name=MultiPak Application Installer
 Name[pt_BR]=Instalador de Aplicativos — MultiPak
-Comment=Install RPM, DEB, Arch Linux, AppImage and Snap applications
-Comment[pt_BR]=Instale aplicativos RPM, DEB, Arch Linux, AppImage e Snap
+Comment=Install RPM, DEB, Arch Linux, AppImage, Snap and Android applications
+Comment[pt_BR]=Instale aplicativos RPM, DEB, Arch Linux, AppImage, Snap e Android
 Exec=multipak-installer %u
 Icon=io.github.multipak.installer
 Terminal=false
 Categories=System;PackageManager;
-MimeType=application/x-rpm;application/vnd.debian.binary-package;application/x-deb;application/x-archlinux-package;application/x-slackware-package;application/x-pisi-package;application/x-tazpkg;application/x-gentoo-binary-package;application/x-puppy-pet;application/x-alpine-package;application/x-xbps-package;application/x-eopkg-package;application/vnd.appimage;application/x-iso9660-appimage;application/x-appimage;application/x-multipak-appimage;application/vnd.snap;x-scheme-handler/snap;
+MimeType=application/x-rpm;application/vnd.debian.binary-package;application/x-deb;application/x-archlinux-package;application/x-slackware-package;application/x-pisi-package;application/x-tazpkg;application/x-gentoo-binary-package;application/x-puppy-pet;application/x-alpine-package;application/x-xbps-package;application/x-eopkg-package;application/vnd.appimage;application/x-iso9660-appimage;application/x-appimage;application/x-multipak-appimage;application/vnd.snap;x-scheme-handler/snap;application/vnd.android.package-archive;application/vnd.apkm;application/x-apks;application/xapk-package-archive;
 StartupNotify=true
 StartupWMClass=io.github.multipak.installer
 NoDisplay=true

@@ -2,14 +2,14 @@
 
 **English** | [Português (Brasil)](README.pt-BR.md)
 
-Version: 1.1.0
+Version: 1.2.0 (in development)
 
-Install packages made for other Linux distributions on atomic systems, without changing
-the base system.
+Install packages made for other Linux distributions, and Android apps, on atomic systems,
+without changing the base system.
 
 Open a package file and the **Installation Wizard** takes care of it. The **Application
-Manager**, in your application launcher, is where you update and uninstall applications
-and adjust MultiPak's settings.
+Manager**, in your application launcher, is where you update and uninstall applications,
+manage the Waydroid integration and adjust MultiPak's settings.
 
 ## Features
 
@@ -33,6 +33,8 @@ and adjust MultiPak's settings.
   [See how it works.](docs/howappimagecompatibilityworks.md)
 - **Snaps** install without snapd, from a file, a link or the Snap Store, background
   services included. [See how this miracle works.](docs/howsnapcompatibilityworks.md)
+- **Android apps** (APK, APKM, APKS, XAPK) run in Android containers based on Waydroid,
+  managed from the Waydroid integration.
 - **Review before installing**, with a search in your app store (Bazaar, GNOME Software
   or KDE Discover) for a Flatpak alternative.
 - **Updates by application:** see which ones have a newer version and update them one by
@@ -47,27 +49,28 @@ Supported files: `.rpm`, `.deb`, `.pkg.tar`, `.pkg.tar.zst`, `.pkg.tar.xz`,
 packages, Pisi Linux `.pisi` packages, SliTaz `.tazpkg` packages, Gentoo `.gpkg.tar`
 packages, Puppy Linux `.pet` packages, Alpine Linux `.apk` packages, Void Linux `.xbps`
 packages, Solus `.eopkg` packages, type 1 or type 2 `.AppImage` files,
-and `.snap` files.
+`.snap` files, and Android `.apk`, `.apkm`, `.apks` and `.xapk` apps. Alpine packages
+and Android apps share the `.apk` extension; MultiPak tells them apart by their contents.
 
 ## Screenshots
 
 ### Application Manager
-![Application Manager](docs/screenshots/1.1.0/application-manager.png)
+![Application Manager](docs/screenshots/1.2.0/application-manager.png)
 
 ### Installation Wizard
-![Installation Wizard](docs/screenshots/1.1.0/installation-welcome.png)
+![Installation Wizard](docs/screenshots/1.2.0/installation-welcome.png)
 
 ### Installation settings
-![Installation settings](docs/screenshots/1.1.0/installation-settings.png)
+![Installation settings](docs/screenshots/1.2.0/installation-settings.png)
 
 ### Installation summary
-![Installation summary](docs/screenshots/1.1.0/installation-summary.png)
+![Installation summary](docs/screenshots/1.2.0/installation-summary.png)
 
 ### Installation progress
-![Installation progress](docs/screenshots/1.1.0/installation-progress.png)
+![Installation progress](docs/screenshots/1.2.0/installation-progress.png)
 
 ### Installation completed
-![Installation completed](docs/screenshots/1.1.0/installation-completed.png)
+![Installation completed](docs/screenshots/1.2.0/installation-completed.png)
 
 ## Installation
 
@@ -78,7 +81,7 @@ Manager.
 2. Open it with a Flatpak installer, such as Bazaar, Discover, GNOME Software or
    Warehouse, and click **Install**.
 
-Or, in a terminal: `flatpak install --user multipak-1.1.0-x86_64.flatpak`
+Or, in a terminal: `flatpak install --user multipak-1.2.0-x86_64.flatpak`
 
 ## Updates
 
@@ -105,10 +108,18 @@ Direct RPM installation, without a container, is available only on rpm-ostree sy
 Snaps only need bubblewrap, which Flatpak already requires; snapd is not used. Before
 installing a snap, MultiPak says what it cannot provide for it.
 
+Android apps need Waydroid, a Wayland session, systemd and PolicyKit. MultiPak creates
+its own Android 13 or Android 11 containers and never changes the system's Waydroid;
+creating one asks for authorization and downloads Android images. Optional ARM
+translation is available for Android 13 on x86_64.
+
 ## Important notes
 
 - Install packages only from sources you trust. Distrobox containers and snaps share your
   home folder, devices and desktop session, so they are not a security sandbox.
+- Android apps keep Android's own separation between apps and cannot see your home
+  folder, but they share the network, display, sound and graphics card, and their
+  container is started with system privileges, as with Waydroid.
 - Direct RPM installation through rpm-ostree is a last resort: it can cause dependency
   conflicts, affect system updates and needs a restart.
 - When you uninstall the last application of a container, MultiPak offers to delete the

@@ -40,6 +40,8 @@ Both share `AboutWindow.qml`.
 them, so it runs with the other tests. To look at a screen, open a preview:
 `python3 src/multipak/kirigami/bootstrap.py --manager --preview --page update` (or
 without `--manager` for the wizard); `--screenshot FILE` saves it as an image.
+The Waydroid integration has its own scripts in
+[checks/native_ui](../checks/native_ui/README.md).
 
 ## Icons
 

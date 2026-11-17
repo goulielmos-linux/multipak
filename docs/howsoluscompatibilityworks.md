@@ -3,7 +3,7 @@
 *Translated from the [Portuguese version](howsoluscompatibilityworks.pt-BR.md), which is
 the reference text.*
 
-*MultiPak 1.1.0.*
+*MultiPak 1.2.0.*
 
 ---
 
@@ -101,8 +101,8 @@ DOCTYPE declarations. It accepts `PackageFormat` 1.2. The family comes from
 
 ### 2.3 Detection and environment
 
-A `PK\x03\x04` header with the `.apk` suffix is an Android app (with its own message);
-any other ZIP file goes to `pisi.read_info`. Family `solus` → `eopkg` kind,
+A `PK\x03\x04` header with the `.apk` suffix is an Android app and goes to the Android
+path; any other ZIP file goes to `pisi.read_info`. Family `solus` → `eopkg` kind,
 `solus-rolling` hint with a `metadata` source, **High** confidence, and a text that
 mentions the unofficial image. The only accepted architecture is `{x86_64}`.
 

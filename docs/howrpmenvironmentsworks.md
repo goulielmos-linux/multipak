@@ -3,7 +3,7 @@
 *Translated from the [Portuguese version](howrpmenvironmentsworks.pt-BR.md), which is
 the reference text.*
 
-*MultiPak 1.1.0.*
+*MultiPak 1.2.0.*
 
 ---
 

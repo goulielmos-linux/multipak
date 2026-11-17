@@ -2,14 +2,14 @@
 
 [English](README.md) | **Português (Brasil)**
 
-Versão: 1.1.0
+Versão: 1.2.0 (em desenvolvimento)
 
-Instale pacotes feitos para outras distribuições Linux em sistemas atômicos, sem
-alterar o sistema base.
+Instale pacotes feitos para outras distribuições Linux, e aplicativos Android, em sistemas
+atômicos, sem alterar o sistema base.
 
 Abra um arquivo de pacote e o **Assistente de Instalação** cuida do resto. O **Gerenciador de
-Aplicativos**, no lançador de aplicativos, é onde você atualiza e desinstala aplicativos
-e ajusta as configurações do MultiPak.
+Aplicativos**, no lançador de aplicativos, é onde você atualiza e desinstala aplicativos,
+gerencia a Integração Waydroid e ajusta as configurações do MultiPak.
 
 ## Recursos
 
@@ -33,6 +33,8 @@ e ajusta as configurações do MultiPak.
   compartilhado. [Veja como funciona.](docs/howappimagecompatibilityworks.pt-BR.md)
 - **Snaps** são instalados sem o snapd, a partir de um arquivo, de um link ou da Snap Store,
   com serviços em segundo plano incluídos. [Veja como esse milagre funciona.](docs/howsnapcompatibilityworks.pt-BR.md)
+- **Aplicativos Android** (APK, APKM, APKS, XAPK) rodam em contêineres Android baseados no
+  Waydroid, gerenciados pela Integração Waydroid.
 - **Revisão antes de instalar**, com uma busca na sua loja de aplicativos (Bazaar, GNOME Software
   ou KDE Discover) por uma alternativa em Flatpak.
 - **Atualizações por aplicativo:** veja quais têm versão nova e atualize um por um ou todos de
@@ -45,27 +47,29 @@ Arquivos suportados: `.rpm`, `.deb`, `.pkg.tar`, `.pkg.tar.zst`, `.pkg.tar.xz`,
 `.pkg.tar.gz`, `.pkg.tar.bz2`, pacotes do Slackware `.txz`, `.tgz`, `.tar.xz` e `.tar.gz`,
 pacotes do Pisi Linux `.pisi`, do SliTaz `.tazpkg`, do Gentoo `.gpkg.tar`, do Puppy Linux
 `.pet`, do Alpine Linux `.apk`, do Void Linux `.xbps` e do Solus `.eopkg`,
-arquivos `.AppImage` dos tipos 1 e 2 e arquivos `.snap`.
+arquivos `.AppImage` dos tipos 1 e 2, arquivos `.snap` e aplicativos Android `.apk`,
+`.apkm`, `.apks` e `.xapk`. Pacotes do Alpine e aplicativos Android usam a mesma extensão
+`.apk`; o MultiPak os diferencia pelo conteúdo.
 
 ## Capturas de tela
 
 ### Gerenciador de Aplicativos
-![Gerenciador de Aplicativos](docs/screenshots/1.1.0/application-manager.png)
+![Gerenciador de Aplicativos](docs/screenshots/1.2.0/application-manager.png)
 
 ### Assistente de Instalação
-![Assistente de Instalação](docs/screenshots/1.1.0/installation-welcome.png)
+![Assistente de Instalação](docs/screenshots/1.2.0/installation-welcome.png)
 
 ### Configurações da instalação
-![Configurações da instalação](docs/screenshots/1.1.0/installation-settings.png)
+![Configurações da instalação](docs/screenshots/1.2.0/installation-settings.png)
 
 ### Resumo da instalação
-![Resumo da instalação](docs/screenshots/1.1.0/installation-summary.png)
+![Resumo da instalação](docs/screenshots/1.2.0/installation-summary.png)
 
 ### Instalação em andamento
-![Instalação em andamento](docs/screenshots/1.1.0/installation-progress.png)
+![Instalação em andamento](docs/screenshots/1.2.0/installation-progress.png)
 
 ### Instalação concluída
-![Instalação concluída](docs/screenshots/1.1.0/installation-completed.png)
+![Instalação concluída](docs/screenshots/1.2.0/installation-completed.png)
 
 ## Instalação
 
@@ -75,7 +79,7 @@ O MultiPak é um único Flatpak, com o Assistente de Instalação e o Gerenciado
 2. Abra-o com um instalador de Flatpak, como Bazaar, Discover, GNOME Software ou Warehouse,
    e clique em **Instalar**.
 
-Ou, no terminal: `flatpak install --user multipak-1.1.0-x86_64.flatpak`
+Ou, no terminal: `flatpak install --user multipak-1.2.0-x86_64.flatpak`
 
 ## Atualizações
 
@@ -102,11 +106,19 @@ A instalação direta de RPM, sem contêiner, só está disponível em sistemas 
 Os snaps só precisam do bubblewrap, que o Flatpak já exige; o snapd não é usado. Antes de
 instalar um snap, o MultiPak informa o que não consegue oferecer a ele.
 
+Os aplicativos Android precisam do Waydroid, de uma sessão Wayland, do systemd e do PolicyKit.
+O MultiPak cria os próprios contêineres Android 13 ou Android 11 e nunca altera o Waydroid do
+sistema; criar um contêiner pede autorização e baixa as imagens do Android. A tradução ARM
+opcional está disponível para o Android 13 em x86_64.
+
 ## Avisos importantes
 
 - Instale pacotes apenas de fontes em que você confia. Os contêineres Distrobox e os snaps
   compartilham sua pasta pessoal, seus dispositivos e sua sessão, então não são uma área
   isolada de segurança.
+- Os aplicativos Android mantêm a separação entre aplicativos do próprio Android e não
+  enxergam sua pasta pessoal, mas compartilham a rede, a tela, o som e a placa de vídeo, e o
+  contêiner deles é iniciado com privilégios de sistema, como no Waydroid.
 - A instalação direta de RPM pelo rpm-ostree é o último recurso: pode causar conflitos de
   dependências, afetar as atualizações do sistema e exige reiniciar.
 - Quando você desinstala o último aplicativo de um contêiner, o MultiPak oferece apagar o

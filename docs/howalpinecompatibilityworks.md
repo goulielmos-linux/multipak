@@ -3,7 +3,7 @@
 *Translated from the [Portuguese version](howalpinecompatibilityworks.pt-BR.md), which
 is the reference text.*
 
-*MultiPak 1.1.0.*
+*MultiPak 1.2.0.*
 
 ---
 
@@ -19,7 +19,7 @@ joined together: the signature (optional), the `.PKGINFO` metadata file and the
 program's files.
 
 Not to be confused with the **Android** `.apk`, which is a ZIP file: MultiPak tells them
-apart by their contents and warns that Android applications are not supported.
+apart by their contents and installs the Android application through Waydroid.
 
 ### 1.2 What does MultiPak do?
 
@@ -100,7 +100,7 @@ Code paths are relative to `src/multipak`.
 The gzip segments are read in sequence with `tarfile` in *stream* mode (abuild's TAR
 archives have no end marker). Only `.PKGINFO` is read. The `ADB.`/`ADBd`/`ADBc` (v3)
 magic number triggers `alpine.v3_error()` before anything is read; a ZIP file with the
-`.apk` suffix is refused as an Android application.
+`.apk` suffix goes to the Android path (`android_bundle.inspect_android`).
 
 ### 2.3 Estimating the release
 

@@ -115,7 +115,7 @@ def test_arch_identification_does_not_claim_to_distinguish_derivatives(arch):
     )
     assert strength == "Medium"
     assert "does not distinguish" in explanation
-    assert "rolling release" in explanation
+    assert "suggested environment is Arch Linux" in explanation
     assert "Ubuntu" not in explanation
 
 

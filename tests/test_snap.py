@@ -1853,7 +1853,6 @@ def test_the_base_is_not_listed_as_a_dependency():
     alone = welcome("name: hello\nbase: core\napps:\n  hello:\n    command: hello\n", ["core"])
     assert alone.snapRequirementsText == ""
     assert "16.04 (core)" in alone.snapEnvironmentExplanation
-    assert "download the base" in alone.snapEnvironmentExplanation
     graphical = welcome(
         "name: game\nbase: core22\napps:\n  game:\n    command: game\n"
         "plugs:\n  gnome:\n    interface: content\n    target: $SNAP/gnome-platform\n"

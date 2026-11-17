@@ -174,3 +174,19 @@ def test_restart_is_not_sent_without_a_confirmed_idle_pending_install(setup_engi
     with pytest.raises(RuntimeError):
         reboot_after_distrobox(setup_engine)
     assert setup_engine.runner.calls == [["rpm-ostree", "status", "--json"]]
+
+
+def test_old_distrobox_and_podman_enter_the_distrobox_flow(setup_engine, monkeypatch):
+    monkeypatch.setattr("multipak.engine.host.which", lambda name: f"/usr/bin/{name}")
+    monkeypatch.setattr("multipak.distrobox_setup.host.which", lambda name: f"/usr/bin/{name}")
+    versions = {
+        ("distrobox", "version"): "distrobox: 1.7.0",
+        ("podman", "--version"): "podman version 4.9.3",
+    }
+    setup_engine.runner.run = lambda argv, **_kwargs: versions[tuple(argv)]
+    with pytest.raises(DistroboxMissing, match="Distrobox 1.7.0 and Podman 4.9.3"):
+        type(setup_engine).preflight(setup_engine)
+    result = distrobox_requirement(setup_engine)
+    assert not result.can_install and not result.restart_required
+    assert result.update_required
+    assert "Podman 4.9.3" in result.message
