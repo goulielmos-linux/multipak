@@ -15,6 +15,10 @@ from . import host
 
 DESKTOP_ID = host.installer_desktop_id() + ".desktop"
 MIME_TYPES = (
+    "application/vnd.android.package-archive",
+    "application/vnd.apkm",
+    "application/x-apks",
+    "application/xapk-package-archive",
     "application/x-rpm",
     "application/vnd.debian.binary-package",
     "application/x-deb",

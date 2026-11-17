@@ -99,6 +99,7 @@ def test_the_side_bar_opens_each_section(manager):
         assert wait(lambda: not controller.busy)
         assert find(window, "managerNav_" + key).property("highlighted"), key
     assert controller.mode == "language" or shown(window, "managerNav_language")
+    assert appears(window, "managerNav_waydroid")
 
 
 def test_about_is_the_last_item_and_opens_its_window(manager):

@@ -15,8 +15,7 @@ Paths are relative to `src/multipak`.
 | --- | --- |
 | Interface and preferences | `kirigami/`, `localization.py`, `file_associations.py` |
 | Package inspection and installation | `metadata.py`, `engine.py`, `appimage.py`, `system.py` |
-| Container discovery and management | `catalog.py`, `environments.py`, `containers.py`, `updates.py` |
-| Application updates in containers | `package_updates.py` (host side, cache), `package_check.py` (runs in the container) |
+| Container discovery and management | `catalog.py`, `environments.py`, `containers.py`, `updates.py`, `package_updates.py`, `package_check.py` |
 | Process execution and progress | `worker.py`, `process.py`, `host.py`, `container_progress.py` |
 | Records and desktop integration | `store.py`, `desktop.py`, `guest.py` |
 

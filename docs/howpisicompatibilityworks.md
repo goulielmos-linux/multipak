@@ -1,6 +1,6 @@
 # How MultiPak installs Pisi Linux packages
 
-*MultiPak 1.1.0. Translated from the [Portuguese version](howpisicompatibilityworks.pt-BR.md), which is the reference text.*
+*MultiPak 1.2.0. Translated from the [Portuguese version](howpisicompatibilityworks.pt-BR.md), which is the reference text.*
 
 ---
 
@@ -87,7 +87,7 @@ Code paths are relative to `src/multipak`.
 ### 2.2 Detection and environment
 
 Pisi Linux packages are ZIP files, like Android applications. A ZIP file with the `.apk`
-extension is refused with its own message; the others go to `pisi.read_info`. *Distribution*
+extension goes to the Android path; the others go to `pisi.read_info`. *Distribution*
 "Pisi Linux" → `pisi`; "Solus" → `eopkg`. Hint `pisilinux-rolling`, **High** confidence.
 `ROLLING_FAMILIES` makes the container accept any `VERSION_ID` (os-release says
 `ID=pisilinux`, `VERSION_ID=2.4.4`, which changes with every update).

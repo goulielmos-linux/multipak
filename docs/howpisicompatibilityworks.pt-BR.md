@@ -1,6 +1,6 @@
 # Como o MultiPak instala pacotes do Pisi Linux
 
-*MultiPak 1.1.0.*
+*MultiPak 1.2.0.*
 
 ---
 
@@ -84,9 +84,9 @@ Caminhos de código são relativos a `src/multipak`.
 
 ### 2.2 Detecção e ambiente
 
-Pacotes do Pisi Linux são ZIP, como os aplicativos Android. Um ZIP com extensão `.apk` é
-recusado com uma mensagem própria; os outros vão para `pisi.read_info`. *Distribution*
-"Pisi Linux" → `pisi`; "Solus" → `eopkg`. Dica `pisilinux-rolling`, confiança **Alta**.
+Pacotes do Pisi Linux são ZIP, como os aplicativos Android. Um ZIP com extensão `.apk`
+segue para o Android; os outros vão para `pisi.read_info`. *Distribution* "Pisi Linux" →
+`pisi`; "Solus" → `eopkg`. Dica `pisilinux-rolling`, confiança **Alta**.
 `ROLLING_FAMILIES` faz o contêiner aceitar qualquer `VERSION_ID` (o os-release diz
 `ID=pisilinux`, `VERSION_ID=2.4.4`, que muda a cada atualização).
 
