@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
+import "BreezeIcons.js" as BreezeIcons
 
 Kirigami.ScrollablePage {
     id: page
@@ -10,6 +11,12 @@ Kirigami.ScrollablePage {
     signal returnRequested()
     signal cancelRequested()
     signal containerRequested()
+    signal directRequested()
+    // With missing dependencies this page first asks how to install. "Only the
+    // application" then opens a second copy of the page with classic set: the usual
+    // AppImage review, with the application card and the Install button.
+    property bool classic: false
+    readonly property bool choosing: welcome.appImageNeedsDependencies && !classic
     readonly property real outerMargin: Kirigami.Units.largeSpacing * 2
     readonly property real preferredWindowWidth: Math.max(
         header.implicitWidth, actions.implicitWidth, Kirigami.Units.gridUnit * 29
@@ -31,13 +38,15 @@ Kirigami.ScrollablePage {
         }
         PackageSummary { Layout.fillWidth: true }
         Kirigami.Heading {
-            text: welcome.appImageNeedsDependencies
-                ? qsTr("Missing dependencies")
+            text: page.choosing
+                ? qsTr("Installation method")
                 : qsTr("Ready to install")
             level: 2
             Layout.fillWidth: true
         }
         Kirigami.AbstractCard {
+            objectName: "appimageApplicationSummary"
+            visible: !page.choosing
             Layout.fillWidth: true
             contentItem: RowLayout {
                 spacing: Kirigami.Units.largeSpacing
@@ -59,7 +68,7 @@ Kirigami.ScrollablePage {
             }
         }
         Controls.Label {
-            visible: !welcome.appImageNeedsDependencies
+            visible: !page.choosing
             text: qsTr("A copy of the AppImage will be saved and a shortcut added to your application launcher.")
             wrapMode: Text.WordWrap
             Layout.fillWidth: true
@@ -67,35 +76,33 @@ Kirigami.ScrollablePage {
 
         // Shown only when the analysis found required components missing on the system.
         ColumnLayout {
-            visible: welcome.appImageNeedsDependencies
+            visible: page.choosing
             spacing: Kirigami.Units.largeSpacing
             Layout.fillWidth: true
 
-            Controls.Label {
+            Kirigami.InlineMessage {
                 objectName: "appimageDependenciesLink"
+                visible: page.choosing
+                type: Kirigami.MessageType.Warning
+                icon.source: BreezeIcons.source("dialog-warning", Kirigami.Theme.backgroundColor)
                 // Only translated, fixed text here: dependency names go to a plain-text window.
                 text: qsTr("This AppImage does not include all the dependencies it needs.")
-                    + " <a href='dependencies'>" + qsTr("See which") + "</a>."
-                textFormat: Text.RichText
-                linkColor: Kirigami.Theme.linkColor
-                wrapMode: Text.WordWrap
+                    + " <a href='dependencies'>" + qsTr("See which") + "</a>"
                 activeFocusOnTab: true
                 Accessible.role: Accessible.Link
                 Accessible.name: qsTr("See which dependencies are missing")
+                Accessible.onPressAction: dependencyWindow.open()
                 onLinkActivated: dependencyWindow.open()
                 Keys.onReturnPressed: dependencyWindow.open()
                 Keys.onSpacePressed: dependencyWindow.open()
                 Layout.fillWidth: true
-                HoverHandler {
-                    cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
-                }
             }
 
             MethodCard {
                 objectName: "appimageContainerOption"
                 choiceObjectName: "appimageContainerChoice"
-                heading: qsTr("Install the application and its dependencies in a container (recommended)")
-                description: qsTr("The system will not be changed.")
+                heading: qsTr("Install the application and its dependencies (recommended)")
+                description: qsTr("The dependencies will be installed in a container. The system will not be changed.")
                 checked: welcome.appImageContainerSelected
                 Layout.fillWidth: true
                 onSelectionRequested: welcome.chooseAppImageContainer(true)
@@ -104,8 +111,8 @@ Kirigami.ScrollablePage {
             MethodCard {
                 objectName: "appimageDirectOption"
                 choiceObjectName: "appimageDirectChoice"
-                heading: qsTr("Install anyway")
-                description: qsTr("The application will be installed, but you will need to install the missing dependencies later.")
+                heading: qsTr("Install only the application")
+                description: qsTr("Any missing dependencies will need to be installed manually later.")
                 checked: !welcome.appImageContainerSelected
                 Layout.fillWidth: true
                 onSelectionRequested: welcome.chooseAppImageContainer(false)
@@ -116,6 +123,7 @@ Kirigami.ScrollablePage {
     AppImageDependenciesDialog {
         id: dependencyWindow
         transientParent: page.Window.window
+        introduction: qsTr("Not found on your system:")
         dependencies: welcome.appImageDependencyText
     }
     footer: Controls.ToolBar {
@@ -136,14 +144,16 @@ Kirigami.ScrollablePage {
             }
             Controls.Button {
                 objectName: "appimageInstallButton"
-                // The container path continues to a page that shows where it will go.
-                text: welcome.appImageContainerSelected ? qsTr("Continue") : qsTr("Install")
+                // While choosing, both options continue to their own review page.
+                text: page.choosing ? qsTr("Continue") : qsTr("Install")
                 highlighted: true
                 onClicked: {
-                    if (welcome.appImageContainerSelected)
+                    if (!page.choosing)
+                        welcome.requestInstallation();
+                    else if (welcome.appImageContainerSelected)
                         page.containerRequested();
                     else
-                        welcome.requestInstallation();
+                        page.directRequested();
                 }
             }
         }

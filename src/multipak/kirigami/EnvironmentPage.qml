@@ -202,11 +202,22 @@ Kirigami.ScrollablePage {
                 contentItem: RowLayout {
                     spacing: Kirigami.Units.largeSpacing
 
-                    Kirigami.Icon {
-                        source: Qt.resolvedUrl("assets/application.svg")
+                    Image {
+                        objectName: "installationApplicationIcon"
+                        readonly property url fallback: Qt.resolvedUrl("assets/application.svg")
+                        property bool failed: false
+                        source: failed ? fallback : welcome.applicationIcon
+                        sourceSize.width: Kirigami.Units.iconSizes.large
+                        sourceSize.height: Kirigami.Units.iconSizes.large
+                        fillMode: Image.PreserveAspectFit
                         Layout.preferredWidth: Kirigami.Units.iconSizes.large
                         Layout.preferredHeight: Kirigami.Units.iconSizes.large
                         Accessible.ignored: true
+                        onStatusChanged: {
+                            if (status === Image.Error && source.toString() !== fallback.toString()) {
+                                failed = true;
+                            }
+                        }
                     }
 
                     ColumnLayout {
@@ -297,5 +308,8 @@ Kirigami.ScrollablePage {
         id: dependenciesDialog
         transientParent: page.Window.window
         dependencies: welcome.dependencies
+        emptyText: welcome.packaging === "Slackware"
+            ? qsTr("Slackware packages do not list their dependencies. During installation, MultiPak adds the libraries the application needs.")
+            : qsTr("The package declares no dependencies.")
     }
 }

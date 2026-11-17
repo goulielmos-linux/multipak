@@ -59,7 +59,7 @@ def test_weak_rpm_suggestion_explains_fallback():
         "as the default environment: Fedora 45.\n\nIf the application does not "
         "work after installation, it may have been built for a different "
         "Fedora version or another distribution, such as Nobara, Rocky "
-        "Linux, AlmaLinux or openSUSE. Uninstall it through Application "
+        "Linux or AlmaLinux. Uninstall it through Application "
         "Manager — MultiPak and look for a package built for your chosen "
         "distribution."
     )

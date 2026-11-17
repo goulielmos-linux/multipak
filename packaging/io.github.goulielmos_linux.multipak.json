@@ -38,6 +38,7 @@
       "name": "rpm",
       "buildsystem": "cmake-ninja",
       "config-opts": [
+        "-DCMAKE_INSTALL_LIBDIR=lib",
         "-DENABLE_PYTHON=OFF",
         "-DENABLE_PLUGINS=OFF",
         "-DENABLE_NLS=OFF",
@@ -123,7 +124,9 @@
       "buildsystem": "simple",
       "build-commands": [
         "pip3 install --no-index --no-deps --no-build-isolation --prefix=/app .",
-        "install -Dm644 LICENSE /app/share/licenses/io.github.goulielmos_linux.multipak/python3-zstandard/LICENSE"
+        "install -Dm644 LICENSE /app/share/licenses/io.github.goulielmos_linux.multipak/python3-zstandard/LICENSE",
+        "install -Dm644 zstd/LICENSE /app/share/licenses/io.github.goulielmos_linux.multipak/zstd/LICENSE",
+        "install -Dm644 zstd/COPYING /app/share/licenses/io.github.goulielmos_linux.multipak/zstd/COPYING"
       ],
       "sources": [
         {

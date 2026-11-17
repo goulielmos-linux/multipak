@@ -68,6 +68,8 @@ os.execvp('sh', ['sh', '-ec', 'sed -i s/before/after/ "$1"; printf configured',
             [sys.executable, "-c", launch, str(config), *arguments],
             capture_output=True,
             text=True,
+            # The error is checked by its English text, whatever the computer's language.
+            env={**os.environ, "LC_ALL": "C"},
         )
 
     broken = configure(["APT::Status-Fd=1"])
@@ -626,7 +628,7 @@ def test_rpm_reports_download_progress_during_setup_and_install(fake_engine, tmp
 
     def emit_download(argv, **kwargs):
         if argv[0] == "rpm":
-            return b"demo\x1f1-1.fc45\x1fx86_64" if kwargs.get("binary") else ""
+            return b"demo\x1f1-1.fc45\x1fx86_64\x1fFedora Project" if kwargs.get("binary") else ""
         if callback := kwargs.get("on_output"):
             if argv[0] == "distrobox" and argv[-1] == "true":
                 callback("\x1b[0mInstalling basic packages...\n")

@@ -60,6 +60,20 @@ class CommandError(RuntimeError):
         )
 
 
+def shown_command(argv):
+    """argv as written to the log: environment values passed with --setenv, such as
+    those a snap receives from the session, may hold tokens and are left out."""
+    shown, index = [], 0
+    while index < len(argv):
+        shown.append(argv[index])
+        if argv[index] == "--setenv" and index + 2 < len(argv):
+            shown.extend([argv[index + 1], "…"])
+            index += 3
+            continue
+        index += 1
+    return shown
+
+
 class Runner:
     def __init__(self, cancelled: threading.Event, log: Callable[[str], None]):
         self.cancelled = cancelled
@@ -94,7 +108,7 @@ class Runner:
         on_host = host.is_flatpak() and os.path.basename(argv[0]) in host.HOST_TOOLS
         invocation = host.command(argv, environment=overrides, supervise=True) if on_host else argv
         env = os.environ | overrides
-        self.log("$ " + repr(argv))
+        self.log("$ " + repr(shown_command(argv)))
         start = time.monotonic()
         tail = bytearray()
         diagnostics = bytearray()
@@ -112,7 +126,8 @@ class Runner:
             selectors.DefaultSelector() as selector,
         ):
             output = terminal[0] if terminal else proc.stdout
-            assert output is not None
+            if output is None:
+                raise RuntimeError(tr("The command's output could not be read."))
             if terminal:
                 terminal[1].close()
             os.set_blocking(output.fileno(), False)

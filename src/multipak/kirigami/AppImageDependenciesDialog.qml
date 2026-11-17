@@ -7,22 +7,57 @@ InformationWindow {
     id: dialog
     objectName: "appimageDependenciesDialog"
     property string dependencies
-    property string note: qsTr("Note: this list was obtained without running the application and may be incomplete.")
+    property string introduction
+    property string note: qsTr("The AppImage was analyzed without running it. Some dependencies can only be identified when it is opened.")
     title: qsTr("Missing dependencies")
     preferredWidth: Kirigami.Units.gridUnit * 26
     closeText: qsTr("Close")
     closeObjectName: "appimageDependenciesCloseButton"
+    onShown: {
+        dependencyText.cursorPosition = 0;
+        dependencyText.deselect();
+    }
 
     ColumnLayout {
         spacing: Kirigami.Units.largeSpacing
 
         Controls.Label {
-            objectName: "appimageDependenciesText"
-            // Names come from the AppImage: always plain text.
-            text: dialog.dependencies
-            textFormat: Text.PlainText
+            visible: text.length > 0
+            text: dialog.introduction
             wrapMode: Text.WordWrap
             Layout.fillWidth: true
+        }
+
+        // The same scrolling box as the RPM, DEB and Arch dependency list.
+        Controls.ScrollView {
+            objectName: "appimageDependenciesScroll"
+            clip: true
+            contentWidth: availableWidth
+            Layout.fillWidth: true
+            Layout.preferredHeight: Math.min(
+                Kirigami.Units.gridUnit * 10,
+                dependencyText.implicitHeight + topPadding + bottomPadding
+            )
+            Controls.ScrollBar.vertical.policy: Controls.ScrollBar.AsNeeded
+
+            Flickable {
+                contentWidth: width
+                contentHeight: dependencyText.implicitHeight
+                boundsBehavior: Flickable.StopAtBounds
+
+                Controls.TextArea.flickable: Controls.TextArea {
+                    id: dependencyText
+                    objectName: "appimageDependenciesText"
+                    // Names come from the package: always plain text.
+                    text: dialog.dependencies
+                    textFormat: TextEdit.PlainText
+                    readOnly: true
+                    selectByMouse: true
+                    selectByKeyboard: true
+                    wrapMode: TextEdit.Wrap
+                    Accessible.name: dialog.title
+                }
+            }
         }
 
         Controls.Label {

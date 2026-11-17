@@ -9,3 +9,10 @@ dist/
 *.log
 
 *.private.asc
+
+.claude/
+.copilot/
+.cursor/
+.aider*
+.env
+.env.*

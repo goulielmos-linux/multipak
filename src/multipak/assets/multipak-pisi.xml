@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-pisi-package">
+    <comment>Pisi Linux package</comment>
+    <comment xml:lang="pt_BR">Pacote do Pisi Linux</comment>
+    <sub-class-of type="application/zip"/>
+    <glob pattern="*.pisi"/>
+    <icon name="package-x-generic"/>
+  </mime-type>
+</mime-info>

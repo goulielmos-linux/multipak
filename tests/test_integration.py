@@ -38,7 +38,8 @@ def test_desktop_entry_passes_the_opened_file_to_the_app():
     path = Path(__file__).parents[1] / "data/io.github.multipak.installer.desktop"
     config = configparser.ConfigParser(interpolation=None)
     config.read(path)
-    assert config["Desktop Entry"]["Exec"] == "multipak-installer %f"
+    # %u: a package file, or a snap:// link from the Snap Store website.
+    assert config["Desktop Entry"]["Exec"] == "multipak-installer %u"
     assert config["Desktop Entry"]["Icon"] == "io.github.multipak.installer"
     assert all(mime in config["Desktop Entry"]["MimeType"] for mime in MIME_TYPES)
 

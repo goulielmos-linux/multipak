@@ -15,10 +15,16 @@ msgstr ""
 msgid " The filename indicates Fedora {0}, unlike the internal metadata; the internal metadata took priority."
 msgstr ""
 
+msgid " The filename indicates {0}, unlike the internal metadata; the internal metadata took priority."
+msgstr ""
+
 msgid " The image version number has not been confirmed yet."
 msgstr ""
 
 msgid " — stable version"
+msgstr ""
+
+msgid "%1 is installed in a container, so MultiPak updates the whole container, including these applications:\n\n%2\n\nThe container's dependencies and system components are also updated. Your system outside the container is not changed."
 msgstr ""
 
 msgid "%1 needs to be closed.\n\nIf MultiPak closes it for you, unsaved work in it may be lost."
@@ -27,10 +33,25 @@ msgstr ""
 msgid "%1 needs to be repaired."
 msgstr ""
 
+msgid "%1, %2 updates"
+msgstr ""
+
+msgid "(already available)"
+msgstr ""
+
+msgid "(could not be found automatically)"
+msgstr ""
+
+msgid "(not available)"
+msgstr ""
+
 msgid "(optional)"
 msgstr ""
 
 msgid "<a href='dependencies'>View full list</a>"
+msgstr ""
+
+msgid "A component this snap needs ({0}) is missing. Install the snap again."
 msgstr ""
 
 msgid "A container with that name already exists. Choose another name."
@@ -43,6 +64,15 @@ msgid "A new container will be created and named during setup."
 msgstr ""
 
 msgid "A new version of MultiPak is available."
+msgstr ""
+
+msgid "A process of the snap is still running. Its services were left stopped. End that process or restart the session, then try again."
+msgstr ""
+
+msgid "A process of the snap's services is still running. The services were left stopped. End that process or restart the session, then try again."
+msgstr ""
+
+msgid "A snap data directory is unavailable or is a symbolic link."
 msgstr ""
 
 msgid "A system change is pending. Restart your computer before installing Distrobox."
@@ -60,6 +90,9 @@ msgstr ""
 msgid "A system operation or deployment is pending. Complete it and restart before trying again."
 msgstr ""
 
+msgid "About"
+msgstr ""
+
 msgid "About the Application Installer — MultiPak"
 msgstr ""
 
@@ -69,22 +102,55 @@ msgstr ""
 msgid "About the recommended environment"
 msgstr ""
 
+msgid "Adding Slackware's full package sets…"
+msgstr ""
+
 msgid "Adding application shortcuts…"
 msgstr ""
 
 msgid "Adding the application to the application launcher…"
 msgstr ""
 
+msgid "Adding the libraries the application needs…"
+msgstr ""
+
 msgid "Additional dependencies:"
+msgstr ""
+
+msgid "Administrator commands"
 msgstr ""
 
 msgid "Advanced settings"
 msgstr ""
 
+msgid "Alerts"
+msgstr ""
+
 msgid "All files"
 msgstr ""
 
+msgid "Alpine Linux edge (development branch)"
+msgstr ""
+
+msgid "Alpine Linux packages (.apk)"
+msgstr ""
+
+msgid "Alpine no longer updates this release. Prefer a newer package if one is available."
+msgstr ""
+
+msgid "Alpine package metadata exceeds the read limit."
+msgstr ""
+
+msgid "Alpine uses the musl C library instead of glibc, so its packages work only in an Alpine environment."
+msgstr ""
+
+msgid "Already up to date"
+msgstr ""
+
 msgid "Also delete the container's home folder, including its data and settings."
+msgstr ""
+
+msgid "An interrupted snap update needs recovery before retrying."
 msgstr ""
 
 msgid "An older MultiPak with a different Flatpak ID is still installed. It must be removed to avoid duplicate shortcuts and packages opening in the old version."
@@ -102,7 +168,7 @@ msgstr ""
 msgid "Another installation is already in progress."
 msgstr ""
 
-msgid "AppImage in container: {0}"
+msgid "Any missing dependencies will need to be installed manually later."
 msgstr ""
 
 msgid "AppImage managed by MultiPak"
@@ -132,6 +198,15 @@ msgstr ""
 msgid "Application: <b>%1</b> (%2)"
 msgstr ""
 
+msgid "Applications installed directly on the system (rpm-ostree) are updated together with the system."
+msgstr ""
+
+msgid "Applications with a window do not run as administrator: as root they could leave files in the snap's data that only root can change."
+msgstr ""
+
+msgid "Applications: {0}"
+msgstr ""
+
 msgid "Arch Linux packages (.pkg.tar, .pkg.tar.zst, .pkg.tar.xz, .pkg.tar.gz and .pkg.tar.bz2)"
 msgstr ""
 
@@ -139,6 +214,9 @@ msgid "Arch package metadata exceeds the read limit."
 msgstr ""
 
 msgid "Architecture {0} is incompatible with {1}."
+msgstr ""
+
+msgid "Arguments, for example: status"
 msgstr ""
 
 msgid "Authors"
@@ -150,7 +228,31 @@ msgstr ""
 msgid "Backend"
 msgstr ""
 
+msgid "Background services"
+msgstr ""
+
+msgid "Background services that will not run"
+msgstr ""
+
+msgid "Bases and content"
+msgstr ""
+
 msgid "Before continuing with the installation, check whether it is already available in your system's app store."
+msgstr ""
+
+msgid "Before the installation finishes, the application will run for %1 seconds in an isolated environment to look for other dependencies."
+msgstr ""
+
+msgid "Bluetooth"
+msgstr ""
+
+msgid "Bubblewrap based on %1"
+msgstr ""
+
+msgid "Building {0} in an isolated environment…"
+msgstr ""
+
+msgid "Bundled tools"
 msgstr ""
 
 msgid "Cancel"
@@ -165,7 +267,28 @@ msgstr ""
 msgid "Changes operating system files. This can cause dependency conflicts or prevent applications from working after an update."
 msgstr ""
 
+msgid "Channel"
+msgstr ""
+
+msgid "Channel:"
+msgstr ""
+
+msgid "Channel: {0}"
+msgstr ""
+
+msgid "Check for updates"
+msgstr ""
+
+msgid "Check for updates to include these snaps, bases or content: {0}"
+msgstr ""
+
+msgid "Checking for updates in {0}…"
+msgstr ""
+
 msgid "Checking for updates to {0}…"
+msgstr ""
+
+msgid "Checking for updates…"
 msgstr ""
 
 msgid "Checking package repositories — {0}%"
@@ -192,12 +315,6 @@ msgstr ""
 msgid "Checking…"
 msgstr ""
 
-msgid "Choose a MultiPak container to update."
-msgstr ""
-
-msgid "Choose a container to update everything installed in it, including applications and their dependencies. Your system itself is not changed."
-msgstr ""
-
 msgid "Choose a custom name. The MultiPak prefix is reserved for the application."
 msgstr ""
 
@@ -210,22 +327,25 @@ msgstr ""
 msgid "Choose a valid name for the new environment."
 msgstr ""
 
-msgid "Choose an AppImage to update."
-msgstr ""
-
-msgid "Choose an AppImage to update. Your system itself is not changed."
-msgstr ""
-
-msgid "Choose an RPM, DEB, prebuilt Arch Linux package or AppImage."
+msgid "Choose an RPM, DEB, prebuilt Arch Linux, Slackware, Pisi Linux, SliTaz, Gentoo, Puppy Linux, Alpine, Void Linux or Solus package, or an AppImage."
 msgstr ""
 
 msgid "Choose another distribution or version"
+msgstr ""
+
+msgid "Choose file…"
 msgstr ""
 
 msgid "Choose the language used by MultiPak."
 msgstr ""
 
 msgid "Choose which file types should open in the MultiPak Installation Wizard."
+msgstr ""
+
+msgid "Classic confinement"
+msgstr ""
+
+msgid "Classic snaps run without MultiPak's sandbox, so MultiPak does not run them as administrator."
 msgstr ""
 
 msgid "Cleaning up the installation…"
@@ -237,10 +357,22 @@ msgstr ""
 msgid "Close it for me"
 msgstr ""
 
+msgid "Close the snap application before updating it."
+msgstr ""
+
 msgid "Closing {0}…"
 msgstr ""
 
-msgid "Configure file types and the interface language."
+msgid "Collapse"
+msgstr ""
+
+msgid "Command"
+msgstr ""
+
+msgid "Component {0}"
+msgstr ""
+
+msgid "Components"
 msgstr ""
 
 msgid "Configuring the container…"
@@ -258,7 +390,13 @@ msgstr ""
 msgid "Container %1 has no applications registered in the Application Manager. Would you like to remove it to free up disk space?"
 msgstr ""
 
+msgid "Container %1 will be created for the dependencies."
+msgstr ""
+
 msgid "Container %1 will be created for this installation."
+msgstr ""
+
+msgid "Container %1 will be reused for the dependencies."
 msgstr ""
 
 msgid "Container %1 will be reused for this installation."
@@ -288,13 +426,13 @@ msgstr ""
 msgid "Container {0} will be {1} for this installation."
 msgstr ""
 
-msgid "Container: {0}"
-msgstr ""
-
 msgid "Continue"
 msgstr ""
 
 msgid "Continue with direct installation"
+msgstr ""
+
+msgid "Converting the Puppy Linux package…"
 msgstr ""
 
 msgid "Copy information"
@@ -307,6 +445,9 @@ msgid "Copying the package to the container…"
 msgstr ""
 
 msgid "Copying the package to the existing container…"
+msgstr ""
+
+msgid "Copying the snap…"
 msgstr ""
 
 msgid "Could not check for updates now. Showing the last result."
@@ -324,6 +465,9 @@ msgstr ""
 msgid "Could not check the containers: {0}"
 msgstr ""
 
+msgid "Could not check the services the snap uses: {0}"
+msgstr ""
+
 msgid "Could not check whether the container can be removed: {0}"
 msgstr ""
 
@@ -337,6 +481,9 @@ msgid "Could not connect: {0}"
 msgstr ""
 
 msgid "Could not find 7-Zip or bsdtar to read the type 1 AppImage."
+msgstr ""
+
+msgid "Could not find unsquashfs to read the snap."
 msgstr ""
 
 msgid "Could not find unsquashfs to read the type 2 AppImage."
@@ -369,6 +516,9 @@ msgstr ""
 msgid "Could not migrate the old MultiPak. Try again or close this window."
 msgstr ""
 
+msgid "Could not move {0} to the trash: {1}"
+msgstr ""
+
 msgid "Could not open the application installer."
 msgstr ""
 
@@ -384,6 +534,12 @@ msgstr ""
 msgid "Could not prepare a private temporary folder in the environment."
 msgstr ""
 
+msgid "Could not prepare a virtual display for the check: {0}"
+msgstr ""
+
+msgid "Could not prepare the snap's /tmp folder: {0}"
+msgstr ""
+
 msgid "Could not query direct installations: "
 msgstr ""
 
@@ -394,6 +550,9 @@ msgid "Could not query file associations: xdg-utils is missing."
 msgstr ""
 
 msgid "Could not query the system status."
+msgstr ""
+
+msgid "Could not read the content snap {0}: {1}"
 msgstr ""
 
 msgid "Could not refresh the list: "
@@ -414,6 +573,9 @@ msgstr ""
 msgid "Could not restore the shortcut: {0}"
 msgstr ""
 
+msgid "Could not restore the snap after the update failed. The backup was kept."
+msgstr ""
+
 msgid "Could not retrieve the list of layered system packages."
 msgstr ""
 
@@ -429,6 +591,15 @@ msgstr ""
 msgid "Could not save the update reminder."
 msgstr ""
 
+msgid "Could not start the snap's services:\n{0}"
+msgstr ""
+
+msgid "Could not stop the snap's services:\n{0}"
+msgstr ""
+
+msgid "Could not stop the snap's services: {0}"
+msgstr ""
+
 msgid "Could not update file associations: {0}"
 msgstr ""
 
@@ -439,6 +610,9 @@ msgid "Could not update the old AppImage shortcuts. Try again or close this wind
 msgstr ""
 
 msgid "Could not update the old file associations. Try again or close this window."
+msgstr ""
+
+msgid "Could not update:"
 msgstr ""
 
 msgid "Could not verify container ownership."
@@ -468,6 +642,9 @@ msgstr ""
 msgid "Decompressed metadata exceeds the limit."
 msgstr ""
 
+msgid "Decompresses zstd data."
+msgstr ""
+
 msgid "Default settings (recommended)"
 msgstr ""
 
@@ -487,6 +664,12 @@ msgid "Deleting {0}…"
 msgstr ""
 
 msgid "Dependencies"
+msgstr ""
+
+msgid "Dependencies not found"
+msgstr ""
+
+msgid "Dependencies of AppImages"
 msgstr ""
 
 msgid "Direct installation ended without confirming the pending deployment."
@@ -546,10 +729,28 @@ msgstr ""
 msgid "Downloading container packages…"
 msgstr ""
 
+msgid "Downloading the SliTaz system…"
+msgstr ""
+
+msgid "Downloading the component {0}…"
+msgstr ""
+
+msgid "Downloading the new snap revision…"
+msgstr ""
+
+msgid "Downloading {0} from the Snap Store: {1} of {2} MB…"
+msgstr ""
+
+msgid "Downloading {0} from the Snap Store…"
+msgstr ""
+
 msgid "Downloading {0} — {1}%"
 msgstr ""
 
 msgid "Downloading {0}…"
+msgstr ""
+
+msgid "Duplicate SliTaz receipt field: {0}."
 msgstr ""
 
 msgid "English is used if no translation is available."
@@ -561,13 +762,31 @@ msgstr ""
 msgid "Enter an address that starts with https://."
 msgstr ""
 
+msgid "Enter the identifier or the snapcraft.io link of a snap."
+msgstr ""
+
+msgid "Everything is up to date."
+msgstr ""
+
 msgid "Execution environment and graphics system."
 msgstr ""
 
 msgid "Existing compatible container"
 msgstr ""
 
+msgid "Expand"
+msgstr ""
+
 msgid "Extracting the application so it can run…"
+msgstr ""
+
+msgid "Extracting the snap…"
+msgstr ""
+
+msgid "Failed"
+msgstr ""
+
+msgid "Features that depend on them may not work."
 msgstr ""
 
 msgid "Fedora can locate the correct package from the name of each missing library, which makes it possible to install the dependencies automatically. All AppImages installed in a container will share this same environment."
@@ -579,10 +798,19 @@ msgstr ""
 msgid "Fetching the container image…"
 msgstr ""
 
+msgid "File associations"
+msgstr ""
+
+msgid "File on this computer"
+msgstr ""
+
 msgid "File types"
 msgstr ""
 
 msgid "Finalizing the installation record…"
+msgstr ""
+
+msgid "Finding the libraries the application needs…"
 msgstr ""
 
 msgid "Finish"
@@ -594,10 +822,25 @@ msgstr ""
 msgid "Flatpak runtime"
 msgstr ""
 
+msgid "For example: hello-world or https://snapcraft.io/hello-world"
+msgstr ""
+
 msgid "Foundation of the graphical interface."
 msgstr ""
 
+msgid "From the {0} channel."
+msgstr ""
+
+msgid "GNOME online accounts"
+msgstr ""
+
 msgid "GNU C Library {0} or newer"
+msgstr ""
+
+msgid "Gentoo binary packages (.gpkg.tar)"
+msgstr ""
+
+msgid "Gentoo package metadata exceeds the read limit."
 msgstr ""
 
 msgid "GitHub limits how often it can be consulted. Try again later."
@@ -616,6 +859,12 @@ msgid "How to use the container"
 msgstr ""
 
 msgid "I understand the risks and want to continue."
+msgstr ""
+
+msgid "Ignoring the content source {0}."
+msgstr ""
+
+msgid "Ignoring the content target {0}."
 msgstr ""
 
 msgid "Initializing the container…"
@@ -642,13 +891,19 @@ msgstr ""
 msgid "Install applications"
 msgstr ""
 
+msgid "Install bubblewrap on the system to open snaps."
+msgstr ""
+
 msgid "Install directly on the system"
 msgstr ""
 
 msgid "Install directly on your system"
 msgstr ""
 
-msgid "Install the application and its dependencies in a container (recommended)"
+msgid "Install only the application"
+msgstr ""
+
+msgid "Install the application and its dependencies (recommended)"
 msgstr ""
 
 msgid "Install xdg-utils to associate RPM, DEB, Arch and AppImage packages."
@@ -672,6 +927,9 @@ msgstr ""
 msgid "Installation in progress"
 msgstr ""
 
+msgid "Installation method"
+msgstr ""
+
 msgid "Installation method and settings"
 msgstr ""
 
@@ -679,6 +937,15 @@ msgid "Installation pending. Restart to apply."
 msgstr ""
 
 msgid "Installed directly on the system"
+msgstr ""
+
+msgid "Installed from a file, without a source of updates. To update it, install the new version from a file."
+msgstr ""
+
+msgid "Installed from a local file. Updates are unavailable."
+msgstr ""
+
+msgid "Installed revisions: {0}"
 msgstr ""
 
 msgid "Installed version: %1 → New version: %2"
@@ -726,6 +993,18 @@ msgstr ""
 msgid "Invalid .PKGINFO metadata."
 msgstr ""
 
+msgid "Invalid Alpine .PKGINFO metadata."
+msgstr ""
+
+msgid "Invalid Alpine package architecture."
+msgstr ""
+
+msgid "Invalid Alpine package name."
+msgstr ""
+
+msgid "Invalid Alpine package version."
+msgstr ""
+
 msgid "Invalid AppImage launch method."
 msgstr ""
 
@@ -735,7 +1014,52 @@ msgstr ""
 msgid "Invalid ELF header."
 msgstr ""
 
+msgid "Invalid Gentoo metadata file."
+msgstr ""
+
+msgid "Invalid Gentoo package identity."
+msgstr ""
+
+msgid "Invalid Puppy Linux package directory."
+msgstr ""
+
+msgid "Invalid Puppy Linux package name or version."
+msgstr ""
+
+msgid "Invalid Puppy Linux pet.specs metadata."
+msgstr ""
+
 msgid "Invalid RPM metadata record."
+msgstr ""
+
+msgid "Invalid Slackware package file name."
+msgstr ""
+
+msgid "Invalid SliTaz CPIO header."
+msgstr ""
+
+msgid "Invalid SliTaz CPIO member name."
+msgstr ""
+
+msgid "Invalid SliTaz CPIO trailer."
+msgstr ""
+
+msgid "Invalid SliTaz package name or version."
+msgstr ""
+
+msgid "Invalid SliTaz receipt checksum."
+msgstr ""
+
+msgid "Invalid XBPS dependency list: {0}."
+msgstr ""
+
+msgid "Invalid XBPS metadata file: {0}."
+msgstr ""
+
+msgid "Invalid XBPS package properties."
+msgstr ""
+
+msgid "Invalid XBPS package version."
 msgstr ""
 
 msgid "Invalid application name in the AppImage."
@@ -762,6 +1086,12 @@ msgstr ""
 msgid "Invalid image metadata."
 msgstr ""
 
+msgid "Invalid install/slack-desc file."
+msgstr ""
+
+msgid "Invalid install/slack-required file."
+msgstr ""
+
 msgid "Invalid installation ID."
 msgstr ""
 
@@ -771,13 +1101,43 @@ msgstr ""
 msgid "Invalid managed environment name."
 msgstr ""
 
+msgid "Invalid member in Gentoo GPKG archive."
+msgstr ""
+
 msgid "Invalid multiline desktop entry."
+msgstr ""
+
+msgid "Invalid or duplicate Gentoo metadata file."
+msgstr ""
+
+msgid "Invalid or duplicate Puppy Linux pet.specs metadata."
+msgstr ""
+
+msgid "Invalid or duplicate SliTaz package member."
+msgstr ""
+
+msgid "Invalid or duplicate {0} package member: {1}."
 msgstr ""
 
 msgid "Invalid package name."
 msgstr ""
 
 msgid "Invalid shortcut argument."
+msgstr ""
+
+msgid "Invalid snap name: {0}"
+msgstr ""
+
+msgid "Invalid socket for a snap service: {0}"
+msgstr ""
+
+msgid "Invalid {0} binary package metadata."
+msgstr ""
+
+msgid "Invalid {0} package dependency."
+msgstr ""
+
+msgid "Invalid {0} package name, version, release or architecture."
 msgstr ""
 
 msgid "KDE interface components."
@@ -807,6 +1167,9 @@ msgstr ""
 msgid "Library {0}"
 msgstr ""
 
+msgid "Links of this kind are not opened for snaps: {0}"
+msgstr ""
+
 msgid "List of dependencies declared by the package"
 msgstr ""
 
@@ -817,6 +1180,9 @@ msgid "Loading preferences…"
 msgstr ""
 
 msgid "Loading…"
+msgstr ""
+
+msgid "Looking for {0} in the Snap Store…"
 msgstr ""
 
 msgid "Low"
@@ -834,7 +1200,16 @@ msgstr ""
 msgid "Missing dependencies"
 msgstr ""
 
+msgid "Missing or duplicate Alpine metadata: {0}."
+msgstr ""
+
 msgid "Missing or duplicate Arch metadata: {0}."
+msgstr ""
+
+msgid "Missing or invalid Gentoo metadata: {0}."
+msgstr ""
+
+msgid "Missing or invalid {0} metadata: {1}."
 msgstr ""
 
 msgid "MultiPak Application Manager"
@@ -843,13 +1218,40 @@ msgstr ""
 msgid "MultiPak Installation Wizard"
 msgstr ""
 
+msgid "MultiPak cannot check this container for updates yet."
+msgstr ""
+
+msgid "MultiPak cannot create this service's socket: {0}"
+msgstr ""
+
 msgid "MultiPak cannot look for updates at this address."
 msgstr ""
 
-msgid "MultiPak could not determine which RPM-based distribution this package was built for, so it will use the latest Fedora version as the default environment: {0}.\n\nIf the application does not work after installation, it may have been built for a different Fedora version or another distribution, such as Nobara, Rocky Linux, AlmaLinux or openSUSE. Uninstall it through Application Manager — MultiPak and look for a package built for your chosen distribution."
+msgid "MultiPak cannot run these services yet: {0}"
+msgstr ""
+
+msgid "MultiPak cannot run this service yet: {0}"
+msgstr ""
+
+msgid "MultiPak cannot run this service: {0}"
+msgstr ""
+
+msgid "MultiPak could not determine which RPM-based distribution this package was built for, so it will use the latest Fedora version as the default environment: {0}.\n\nIf the application does not work after installation, it may have been built for a different Fedora version or another distribution, such as Nobara, Rocky Linux or AlmaLinux. Uninstall it through Application Manager — MultiPak and look for a package built for your chosen distribution."
 msgstr ""
 
 msgid "MultiPak could not load its interface: {0}"
+msgstr ""
+
+msgid "MultiPak does not mount or unmount anything for snaps; nothing was changed"
+msgstr ""
+
+msgid "MultiPak does not run the snap's background services; nothing was started"
+msgstr ""
+
+msgid "MultiPak does not support XBPS packages compressed with LZ4."
+msgstr ""
+
+msgid "MultiPak has no equivalent for snapctl {0}"
 msgstr ""
 
 msgid "MultiPak language"
@@ -864,25 +1266,28 @@ msgstr ""
 msgid "MultiPak settings"
 msgstr ""
 
+msgid "MultiPak uses a local repository for this XBPS file. Its signature was not verified. Install only packages from sources you trust."
+msgstr ""
+
 msgid "MultiPak will create it again so that {0} works again."
 msgstr ""
 
-msgid "MultiPak will install in the container the dependencies it does not already have."
+msgid "MultiPak will download from the Snap Store the dependencies it does not already have."
+msgstr ""
+
+msgid "MultiPak will download the base from the Snap Store if it does not already have it."
 msgstr ""
 
 msgid "MultiPak will install the dependencies of {0} in the container {1}."
+msgstr ""
+
+msgid "MultiPak's copy of the snap and its shortcuts will be removed. The application's data in the snap folder of your home will be preserved."
 msgstr ""
 
 msgid "Native installation"
 msgstr ""
 
 msgid "No AppImage for this computer was found at this address."
-msgstr ""
-
-msgid "No AppImages are available to update."
-msgstr ""
-
-msgid "No MultiPak containers are available to update."
 msgstr ""
 
 msgid "No applications are available to uninstall."
@@ -894,10 +1299,25 @@ msgstr ""
 msgid "No container base is available."
 msgstr ""
 
+msgid "No installation is in progress."
+msgstr ""
+
+msgid "No installed snap has background services."
+msgstr ""
+
+msgid "No installed snap has commands that MultiPak can run as administrator."
+msgstr ""
+
 msgid "No pending Distrobox installation was found. Check the system status before restarting."
 msgstr ""
 
+msgid "No snaps were installed through MultiPak."
+msgstr ""
+
 msgid "No supported app store was found. Install Bazaar, GNOME Software or KDE Discover to search for applications."
+msgstr ""
+
+msgid "No update source"
 msgstr ""
 
 msgid "Not available for %1."
@@ -906,7 +1326,13 @@ msgstr ""
 msgid "Not checked"
 msgstr ""
 
+msgid "Not checked for updates"
+msgstr ""
+
 msgid "Not found"
+msgstr ""
+
+msgid "Not found on your system:"
 msgstr ""
 
 msgid "Not installed"
@@ -915,7 +1341,13 @@ msgstr ""
 msgid "Not provided"
 msgstr ""
 
-msgid "Note: this list was obtained without running the application and may be incomplete."
+msgid "Not updated: {0}"
+msgstr ""
+
+msgid "Nothing installed by MultiPak can be updated."
+msgstr ""
+
+msgid "Only files in the home folder can be opened: {0}"
 msgstr ""
 
 msgid "Open the MultiPak Application Manager to repair it."
@@ -927,7 +1359,16 @@ msgstr ""
 msgid "Opening the app store…"
 msgstr ""
 
+msgid "Opens snap and AppImage files."
+msgstr ""
+
 msgid "Operation timed out: {0}"
+msgstr ""
+
+msgid "Optional components not installed"
+msgstr ""
+
+msgid "Optional components:"
 msgstr ""
 
 msgid "Original environment"
@@ -939,7 +1380,22 @@ msgstr ""
 msgid "Package operations must use sudo only inside the environment."
 msgstr ""
 
+msgid "Packages added: {0}"
+msgstr ""
+
+msgid "Personal files"
+msgstr ""
+
+msgid "Pisi Linux packages (.pisi)"
+msgstr ""
+
 msgid "Preferences saved."
+msgstr ""
+
+msgid "Preliminary dependencies"
+msgstr ""
+
+msgid "Preliminary dependencies:"
 msgstr ""
 
 msgid "Preparing Distrobox"
@@ -957,13 +1413,28 @@ msgstr ""
 msgid "Preparing the AppImage…"
 msgstr ""
 
+msgid "Preparing the SliTaz image…"
+msgstr ""
+
+msgid "Preparing the Solus image…"
+msgstr ""
+
+msgid "Preparing the components the snap needs…"
+msgstr ""
+
 msgid "Preparing the container for the application…"
 msgstr ""
 
 msgid "Preparing the container's basic components…"
 msgstr ""
 
+msgid "Preparing the desktop theme…"
+msgstr ""
+
 msgid "Preparing the existing container {0}…"
+msgstr ""
+
+msgid "Preparing the new snap revision…"
 msgstr ""
 
 msgid "Preparing to install directly on the system…"
@@ -975,16 +1446,43 @@ msgstr ""
 msgid "Preparing to uninstall the system package…"
 msgstr ""
 
+msgid "Preparing {0}…"
+msgstr ""
+
 msgid "Preview: {0} × {1} px"
 msgstr ""
 
+msgid "Puppy Linux is built from another distribution's packages, and pet.specs says this package was built for {0}. MultiPak converts it into a package of that distribution and adds the libraries its programs need."
+msgstr ""
+
+msgid "Puppy Linux is built from another distribution's packages, but this package does not say which one, or names a release MultiPak does not offer. MultiPak suggests {0}. Compatibility is uncertain: if the application does not open, try another environment."
+msgstr ""
+
+msgid "Puppy Linux package metadata exceeds the read limit."
+msgstr ""
+
+msgid "Puppy Linux packages (.pet)"
+msgstr ""
+
 msgid "PyPI did not provide a ready-made package for {0}."
+msgstr ""
+
+msgid "PyPI only offers the source code of {0}, which needs to be compiled; MultiPak builds only packages made of Python code."
 msgstr ""
 
 msgid "Python 3 interpreter"
 msgstr ""
 
 msgid "Python module {0}"
+msgstr ""
+
+msgid "Read access"
+msgstr ""
+
+msgid "Read-only system files"
+msgstr ""
+
+msgid "Reads RPM packages."
 msgstr ""
 
 msgid "Ready to install"
@@ -1003,9 +1501,6 @@ msgid "Removal pending"
 msgstr ""
 
 msgid "Remove"
-msgstr ""
-
-msgid "Remove applications installed through MultiPak."
 msgstr ""
 
 msgid "Remove container?"
@@ -1074,10 +1569,43 @@ msgstr ""
 msgid "Reusing downloaded image layers…"
 msgstr ""
 
+msgid "Revert to previous version"
+msgstr ""
+
+msgid "Revision {0} is already downloaded. Still to switch: {1}"
+msgstr ""
+
 msgid "Run MultiPak as a regular user."
 msgstr ""
 
 msgid "Run as a regular user with rootless Podman."
+msgstr ""
+
+msgid "Run as administrator"
+msgstr ""
+
+msgid "Run as administrator?"
+msgstr ""
+
+msgid "Running"
+msgstr ""
+
+msgid "Running the snap's installation scripts…"
+msgstr ""
+
+msgid "Running {0} as administrator…"
+msgstr ""
+
+msgid "Running {0} as the snap's administrator. It is root inside the snap's sandbox, never on your computer, and can change all of the snap's data."
+msgstr ""
+
+msgid "Runs on its schedule ({0})."
+msgstr ""
+
+msgid "Runs with your account and starts with your session."
+msgstr ""
+
+msgid "Run…"
 msgstr ""
 
 msgid "Save"
@@ -1087,6 +1615,9 @@ msgid "Saving preferences…"
 msgstr ""
 
 msgid "Saving the container image…"
+msgstr ""
+
+msgid "Scheduled"
 msgstr ""
 
 msgid "Search the app store"
@@ -1107,9 +1638,6 @@ msgstr ""
 msgid "Select a compatible container."
 msgstr ""
 
-msgid "Select a container to update"
-msgstr ""
-
 msgid "Select a prebuilt Arch package, not a source package."
 msgstr ""
 
@@ -1122,10 +1650,10 @@ msgstr ""
 msgid "Select an RPM that MultiPak installed directly on your system."
 msgstr ""
 
-msgid "Select an application to uninstall"
+msgid "Selected base image"
 msgstr ""
 
-msgid "Selected base image"
+msgid "Services missing on this system"
 msgstr ""
 
 msgid "Shortcuts created: {0}"
@@ -1137,10 +1665,112 @@ msgstr ""
 msgid "Show details"
 msgstr ""
 
+msgid "Show the log of %1"
+msgstr ""
+
+msgid "Slackware 15.0 — full (about 1.2 GB more to download)"
+msgstr ""
+
+msgid "Slackware 15.0 — light"
+msgstr ""
+
+msgid "Slackware package metadata exceeds the read limit."
+msgstr ""
+
+msgid "Slackware packages (.txz and .tgz)"
+msgstr ""
+
+msgid "Slackware packages do not list their dependencies. During installation, MultiPak adds the libraries the application needs."
+msgstr ""
+
+msgid "Slackware packages do not say which release they were built for. MultiPak uses Slackware 15.0, the current stable release.\n\nThe light environment adds only what the application needs, but may miss something. The full environment downloads about 1.2 GB more and includes Slackware's common packages."
+msgstr ""
+
+msgid "SliTaz cooking — 32-bit (i486)"
+msgstr ""
+
+msgid "SliTaz cooking — 64-bit"
+msgstr ""
+
+msgid "SliTaz packages (.tazpkg)"
+msgstr ""
+
+msgid "Snap (classic)"
+msgstr ""
+
+msgid "Snap Store"
+msgstr ""
+
+msgid "Snap managed by MultiPak"
+msgstr ""
+
+msgid "Snap services"
+msgstr ""
+
+msgid "Snap uninstalled. Personal data was preserved."
+msgstr ""
+
+msgid "Snap update cancelled."
+msgstr ""
+
+msgid "Snap update permissions"
+msgstr ""
+
+msgid "Snap with classic confinement"
+msgstr ""
+
+msgid "Solus (rolling release)"
+msgstr ""
+
+msgid "Solus packages (.eopkg)"
+msgstr ""
+
+msgid "Some libraries were not found in Slackware's packages: {0}. If the application does not open, install it in the full Slackware environment."
+msgstr ""
+
+msgid "Some libraries were not found in the distribution's packages: {0}. Puppy Linux may provide them in other .pet packages; install those in the same environment first. Otherwise the application may not open."
+msgstr ""
+
 msgid "Some temporary environment files could not be removed."
 msgstr ""
 
+msgid "Start %1"
+msgstr ""
+
+msgid "Started after installation and when you ask."
+msgstr ""
+
+msgid "Started only when you ask."
+msgstr ""
+
+msgid "Starting"
+msgstr ""
+
+msgid "Starting the snap's background services…"
+msgstr ""
+
+msgid "Starting {0}…"
+msgstr ""
+
+msgid "Stop %1"
+msgstr ""
+
+msgid "Stopped"
+msgstr ""
+
+msgid "Stopping"
+msgstr ""
+
+msgid "Stopping the snap's services…"
+msgstr ""
+
+msgid "Stopping {0}…"
+msgstr ""
+
 msgid "Suggested environment"
+msgstr ""
+
+msgid "System files"
 msgstr ""
 
 msgid "System language"
@@ -1150,6 +1780,12 @@ msgid "System package installation was not confirmed."
 msgstr ""
 
 msgid "The .PKGINFO metadata identifies this as an Arch-based package, but does not distinguish Arch Linux from its derivatives. The recommended environment is Arch Linux (rolling release)."
+msgstr ""
+
+msgid "The Alpine package could not be read: {0}"
+msgstr ""
+
+msgid "The Alpine package is not signed with a key Alpine trusts. MultiPak installed it without the signature check; install only packages from sources you trust."
 msgstr ""
 
 msgid "The AppImage container identity or ownership has changed. It was not used."
@@ -1167,7 +1803,16 @@ msgstr ""
 msgid "The AppImage must contain one .desktop file at its root."
 msgstr ""
 
+msgid "The AppImage was analyzed without running it. Some dependencies can only be identified when it is opened."
+msgstr ""
+
 msgid "The AppImage was installed and added to the application launcher."
+msgstr ""
+
+msgid "The CPIO archive does not contain the required SliTaz package files."
+msgstr ""
+
+msgid "The D-Bus name {0} belongs to another program; it does not start {1}."
 msgstr ""
 
 msgid "The DEB control file is missing the {0} field."
@@ -1176,13 +1821,112 @@ msgstr ""
 msgid "The DEB file is truncated."
 msgstr ""
 
+msgid "The Gentoo package could not be read: {0}"
+msgstr ""
+
+msgid "The Puppy Linux PET checksum does not match."
+msgstr ""
+
+msgid "The Puppy Linux package contains a reserved folder: {0}."
+msgstr ""
+
+msgid "The Puppy Linux package contains an unsupported special file."
+msgstr ""
+
+msgid "The Puppy Linux package contains no files or metadata."
+msgstr ""
+
+msgid "The Puppy Linux package could not be read: {0}"
+msgstr ""
+
+msgid "The Puppy Linux package exceeds the read limit."
+msgstr ""
+
+msgid "The Puppy Linux package lists too many files."
+msgstr ""
+
+msgid "The Puppy Linux package must use gzip or XZ compression."
+msgstr ""
+
 msgid "The Release field in the package metadata indicates that it was built for Fedora {0}."
+msgstr ""
+
+msgid "The Slackware package could not be read: {0}"
+msgstr ""
+
+msgid "The Slackware package has an invalid name, version, architecture or build."
+msgstr ""
+
+msgid "The SliTaz CPIO archive contains too many members."
+msgstr ""
+
+msgid "The SliTaz CPIO archive is truncated."
+msgstr ""
+
+msgid "The SliTaz ISO image does not contain {0}."
+msgstr ""
+
+msgid "The SliTaz ISO image is not valid."
+msgstr ""
+
+msgid "The SliTaz download is larger than expected."
+msgstr ""
+
+msgid "The SliTaz download server returned an invalid checksum."
+msgstr ""
+
+msgid "The SliTaz download {0} failed verification. Try again later."
+msgstr ""
+
+msgid "The SliTaz package could not be read: {0}"
+msgstr ""
+
+msgid "The SliTaz package {0} is not in the repository."
+msgstr ""
+
+msgid "The SliTaz receipt exceeds the read limit."
+msgstr ""
+
+msgid "The SliTaz receipt field {0} is not a literal."
+msgstr ""
+
+msgid "The SliTaz system archive is not valid."
+msgstr ""
+
+msgid "The SliTaz system archive is too large."
+msgstr ""
+
+msgid "The SliTaz system could not be downloaded: {0}"
+msgstr ""
+
+msgid "The Snap Store could not be reached: {0}"
+msgstr ""
+
+msgid "The Snap Store has no release of {0} in the channel {1} for this computer."
+msgstr ""
+
+msgid "The Snap Store has no snap named {0}."
+msgstr ""
+
+msgid "The Snap Store has no stable release of {0} for this computer."
+msgstr ""
+
+msgid "The Snap Store returned incomplete information for {0}."
+msgstr ""
+
+msgid "The XBPS package could not be read: {0}"
+msgstr ""
+
+msgid "The ZIP does not contain the required {0} binary package files."
 msgstr ""
 
 msgid "The address was not found."
 msgstr ""
 
 msgid "The app store is open. Search for “{0}”. The search term has been copied to your clipboard."
+msgstr ""
+
+msgid "The app's data in {0} was moved to the trash."
 msgstr ""
 
 msgid "The application directory must not be a symbolic link."
@@ -1197,13 +1941,22 @@ msgstr ""
 msgid "The application entry point is unavailable."
 msgstr ""
 
+msgid "The application may not work completely."
+msgstr ""
+
 msgid "The application was installed in the environment "
 msgstr ""
 
 msgid "The application was installed in the {0} environment."
 msgstr ""
 
-msgid "The application will be installed, but you will need to install the missing dependencies later."
+msgid "The available snap revision changed. Check for updates again."
+msgstr ""
+
+msgid "The build also needs: {0}"
+msgstr ""
+
+msgid "The build system could not say what it needs: {0}"
 msgstr ""
 
 msgid "The check could not confirm that the application starts correctly. Applications that need a display, for example, cannot be checked this way."
@@ -1215,10 +1968,28 @@ msgstr ""
 msgid "The check runs without access to your files or to the network."
 msgstr ""
 
+msgid "The command ended with exit code {0}. Its output is in the details below."
+msgstr ""
+
 msgid "The command finished, but no pending deployment was found. Check rpm-ostree status in the system details."
 msgstr ""
 
 msgid "The command finished, but package removal was not confirmed. Reload the list to check the system status."
+msgstr ""
+
+msgid "The command finished. Its output is in the details below."
+msgstr ""
+
+msgid "The command runs as root inside the snap's sandbox. It can read, change and delete all of this snap's data, and run any program of the snap. It does not get administrator rights on your computer. Run only commands you trust, such as those in the snap's documentation."
+msgstr ""
+
+msgid "The command's output could not be read."
+msgstr ""
+
+msgid "The component {0} cannot be installed by MultiPak."
+msgstr ""
+
+msgid "The component {0} does not belong to {1}."
 msgstr ""
 
 msgid "The components owned by this installation were removed. Shared environments and personal files were preserved."
@@ -1275,10 +2046,19 @@ msgstr ""
 msgid "The container, other applications and personal data will be preserved."
 msgstr ""
 
+msgid "The content snap {0} does not provide {1}."
+msgstr ""
+
 msgid "The copy is incomplete or has changed. Cancel and reopen the package."
 msgstr ""
 
 msgid "The dependencies of {0} were found on your system. MultiPak will open it directly on the system, without a container."
+msgstr ""
+
+msgid "The dependencies will be installed in a Distrobox container using %1, without changing the base system image. The application will open from this container.\n\nAny available shortcuts will appear in your application launcher."
+msgstr ""
+
+msgid "The dependencies will be installed in a container. The system will not be changed."
 msgstr ""
 
 msgid "The disk is full. Free up disk space, then try again."
@@ -1299,6 +2079,12 @@ msgstr ""
 msgid "The downloaded file is not a valid AppImage: {0}"
 msgstr ""
 
+msgid "The downloaded snap is larger than expected."
+msgstr ""
+
+msgid "The downloaded snap {0} failed verification."
+msgstr ""
+
 msgid "The environment directory must not be a symbolic link."
 msgstr ""
 
@@ -1317,16 +2103,37 @@ msgstr ""
 msgid "The extraction directory already exists."
 msgstr ""
 
-msgid "The file contents do not match a valid RPM, DEB, Arch or AppImage package. {0}"
+msgid "The file contents do not match a valid RPM, DEB, Arch, AppImage, snap, Slackware, Pisi Linux, SliTaz, Gentoo, Puppy Linux, Alpine, Void Linux or Solus package. {0}"
+msgstr ""
+
+msgid "The file does not contain Alpine .PKGINFO metadata."
 msgstr ""
 
 msgid "The file does not contain Arch package .PKGINFO metadata."
+msgstr ""
+
+msgid "The file does not contain XBPS props.plist and files.plist metadata."
+msgstr ""
+
+msgid "The file does not contain control.tar."
+msgstr ""
+
+msgid "The file does not contain the required Gentoo GPKG members."
 msgstr ""
 
 msgid "The file has changed. Open the AppImage again."
 msgstr ""
 
 msgid "The file has changed. Open the package again."
+msgstr ""
+
+msgid "The file has changed. Open the snap again."
+msgstr ""
+
+msgid "The file is missing a valid Puppy Linux PET checksum trailer."
+msgstr ""
+
+msgid "The file is not a compressed Slackware package."
 msgstr ""
 
 msgid "The file is not a valid DEB package."
@@ -1339,6 +2146,9 @@ msgid "The file is not a valid type 1 or type 2 AppImage."
 msgstr ""
 
 msgid "The file is too large."
+msgstr ""
+
+msgid "The file name does not identify a Slackware package (name-version-arch-build)."
 msgstr ""
 
 msgid "The filename suggests that this package was built for {0}, but its internal metadata does not confirm this. MultiPak used the filename to suggest this version."
@@ -1354,6 +2164,9 @@ msgid "The isolated check could not be completed: {0}"
 msgstr ""
 
 msgid "The link does not match this application. Enter it again."
+msgstr ""
+
+msgid "The log is in the details below."
 msgstr ""
 
 msgid "The managed AppImage copy and its shortcuts will be removed. Personal data will be preserved."
@@ -1383,6 +2196,9 @@ msgstr ""
 msgid "The new image still exists; cleanup is incomplete."
 msgstr ""
 
+msgid "The new revision does not provide the installed component {0}."
+msgstr ""
+
 msgid "The new version requires new dependencies."
 msgstr ""
 
@@ -1401,28 +2217,91 @@ msgstr ""
 msgid "The package and its dependencies will be installed in a Distrobox container using %1, without changing the base system image.\n\nAny available shortcuts will appear in your application launcher."
 msgstr ""
 
+msgid "The package and its dependencies will be installed in an environment created with bubblewrap, without changing the base system image.\n\nAny available shortcuts will appear in your application launcher."
+msgstr ""
+
+msgid "The package and its dependencies will be installed in an environment created with bubblewrap. As a classic snap, the application sees the whole system there, with your user's permissions: bubblewrap only adds the /snap folder, with the snap and the %1 it needs, without isolating it. The base system image is not changed.\n\nAny available shortcuts will appear in your application launcher."
+msgstr ""
+
 msgid "The package and its dependencies will be layered onto the base system image using rpm-ostree. This creates a new deployment that takes effect after you restart."
+msgstr ""
+
+msgid "The package contains an unsafe path."
 msgstr ""
 
 msgid "The package declares no dependencies."
 msgstr ""
 
+msgid "The package description exceeds the read limit."
+msgstr ""
+
 msgid "The package does not contain control metadata."
 msgstr ""
 
-msgid "The package does not contain control.tar."
+msgid "The package does not contain install/slack-desc."
 msgstr ""
 
 msgid "The package is no longer requested as a direct installation."
 msgstr ""
 
+msgid "The package is not a snap."
+msgstr ""
+
+msgid "The package metadata does not identify Pisi Linux or Solus."
+msgstr ""
+
 msgid "The package still exists in the shared environment."
+msgstr ""
+
+msgid "The package was built with a newer version of abuild than Alpine's stable releases use, probably for Alpine's development branch. MultiPak uses {0}."
 msgstr ""
 
 msgid "The package {0} on PyPI does not contain the module the application uses."
 msgstr ""
 
+msgid "The package's .PKGINFO does not show which Alpine release built it. MultiPak uses {0}, the newest stable release. If the package was built for an older release, a library may be missing."
+msgstr ""
+
+msgid "The package's .PKGINFO names the version of abuild that built it, the one Alpine {0} uses. MultiPak uses {1}, from Alpine's official image."
+msgstr ""
+
 msgid "The package's internal metadata indicates that it was built for {0}, so MultiPak recommends this version."
+msgstr ""
+
+msgid "The package's metadata identifies Gentoo. MultiPak uses Gentoo's official base system, about 400 MB the first time, and its prebuilt packages for dependencies."
+msgstr ""
+
+msgid "The package's metadata identifies Pisi Linux. MultiPak uses the official Pisi Linux image, which is updated continuously."
+msgstr ""
+
+msgid "The package's metadata identifies Solus. Solus publishes no container image: MultiPak uses an unofficial image built from Solus's official repository, about 300 MB to download the first time, and installs dependencies from it."
+msgstr ""
+
+msgid "The package's metadata identifies {0} but not the release it was built for. MultiPak uses {1}, the newest stable release. If a library is missing, try another release of {0}."
+msgstr ""
+
+msgid "The package's metadata identifies {0}."
+msgstr ""
+
+msgid "The package's metadata indicates that it was built for {0}, but MultiPak could not offer an environment of that distribution. It suggests {1}; the application may not work there."
+msgstr ""
+
+msgid "The package's metadata indicates that it was built for {0}, newer than the releases MultiPak offers. MultiPak uses {1}; if a library is missing, look for a package built for it."
+msgstr ""
+
+msgid "The package's metadata indicates that it was built for {0}. MultiPak installs it in {0} with that distribution's package manager, {1}."
+msgstr ""
+
+msgid "The package's programs show whether it is for SliTaz's 64-bit or 32-bit (i486) repository. MultiPak builds its SliTaz environment from the official system image the first time, a download of about 30 MB."
+msgstr ""
+
+msgid "The package's signature could not be verified with the distribution's keys. MultiPak installed it without the signature check; install only packages from sources you trust."
+msgstr ""
+
+msgid "The previous snap revision is unavailable."
+msgstr ""
+
+msgid "The previous snap revision was restored."
 msgstr ""
 
 msgid "The selected environment does not match the package format."
@@ -1434,7 +2313,13 @@ msgstr ""
 msgid "The selected environment no longer exists."
 msgstr ""
 
+msgid "The selected snap base or content is unavailable."
+msgstr ""
+
 msgid "The server answered with error {0}."
+msgstr ""
+
+msgid "The server redirected to an insecure address."
 msgstr ""
 
 msgid "The server's answer could not be read."
@@ -1443,10 +2328,91 @@ msgstr ""
 msgid "The server's answer is too large."
 msgstr ""
 
+msgid "The service has not written anything yet."
+msgstr ""
+
 msgid "The shortcut {0} was skipped because its desktop file is invalid."
 msgstr ""
 
-msgid "The system will not be changed."
+msgid "The shortcut {0} was skipped."
+msgstr ""
+
+msgid "The snap asks to change them. Features that write to them may not work."
+msgstr ""
+
+msgid "The snap asks to change these system files, which MultiPak shows read-only: {0}. Features that write to them may not work."
+msgstr ""
+
+msgid "The snap contains special files outside /dev, which MultiPak cannot create: {0}"
+msgstr ""
+
+msgid "The snap copy has changed. Open the snap again."
+msgstr ""
+
+msgid "The snap copy is missing. Open the snap again."
+msgstr ""
+
+msgid "The snap directory must not be a symbolic link."
+msgstr ""
+
+msgid "The snap does not contain meta/snap.yaml."
+msgstr ""
+
+msgid "The snap does not contain {0}."
+msgstr ""
+
+msgid "The snap files are missing. Install the snap again."
+msgstr ""
+
+msgid "The snap layout {0} is not valid."
+msgstr ""
+
+msgid "The snap metadata could not be read: {0}"
+msgstr ""
+
+msgid "The snap metadata has an invalid {0} field."
+msgstr ""
+
+msgid "The snap metadata is too large."
+msgstr ""
+
+msgid "The snap still has running services. Stop them before updating."
+msgstr ""
+
+msgid "The snap was installed and added to the application launcher."
+msgstr ""
+
+msgid "The snap {0} could not be downloaded: {1}"
+msgstr ""
+
+msgid "The snap {0} has no component named {1}."
+msgstr ""
+
+msgid "The snap {0} has unexpected contents."
+msgstr ""
+
+msgid "The snap's background services could not be started: {0}"
+msgstr ""
+
+msgid "The snap's file list could not be read."
+msgstr ""
+
+msgid "The snap's metadata indicates that it was built for {0} ({1})."
+msgstr ""
+
+msgid "The snap's services depend on each other in a loop."
+msgstr ""
+
+msgid "The snap's {0} script failed:\n{1}"
+msgstr ""
+
+msgid "The source code does not say clearly how it is built."
+msgstr ""
+
+msgid "The source code of {0} could not be built into a package."
+msgstr ""
+
+msgid "The store redirected to an insecure address."
 msgstr ""
 
 msgid "The target distribution could not be identified. Since the .deb format is used by both Ubuntu and Debian, the latest Ubuntu LTS version is used by default."
@@ -1455,10 +2421,25 @@ msgstr ""
 msgid "The temporary local copy of the package could not be removed."
 msgstr ""
 
+msgid "The timer is empty."
+msgstr ""
+
+msgid "The timer {0} is not understood."
+msgstr ""
+
+msgid "The timer {0} runs too often."
+msgstr ""
+
 msgid "The update information could not be read."
 msgstr ""
 
 msgid "The welcome component did not create a Qt Quick window."
+msgstr ""
+
+msgid "The {0} package could not be read: {1}"
+msgstr ""
+
+msgid "The {0} package has no release history."
 msgstr ""
 
 msgid "There are pending system changes. Restart before uninstalling."
@@ -1467,10 +2448,49 @@ msgstr ""
 msgid "There is not enough free space to copy the package."
 msgstr ""
 
+msgid "There is not enough free space: {0} MB are needed, {1} MB are free."
+msgstr ""
+
+msgid "These AppImages do not indicate their update address. Select each one and choose Update: {0}"
+msgstr ""
+
+msgid "These background services of the snap will not run: {0}. Features that depend on them may not work."
+msgstr ""
+
+msgid "These background services run with your user account, not as the administrator: {0}. They cannot use network ports below 1024."
+msgstr ""
+
+msgid "These dependencies could not be found automatically: {0}. The application may not work completely."
+msgstr ""
+
 msgid "These dependencies could not be installed automatically: {0}."
 msgstr ""
 
 msgid "These dependencies were installed from PyPI, the Python package index: {0}."
+msgstr ""
+
+msgid "These features may not work, because this system does not have the service they use: {0}."
+msgstr ""
+
+msgid "These features may not work."
+msgstr ""
+
+msgid "These optional components are not installed: {0}. Features that depend on them may not work."
+msgstr ""
+
+msgid "These services of the snap are still running: {0}. Nothing was removed; stop them and try again."
+msgstr ""
+
+msgid "They run as root inside the snap's sandbox, never as the administrator of your computer."
+msgstr ""
+
+msgid "They run with your user account, never as the administrator."
+msgstr ""
+
+msgid "They run with your user account. Ports below 1024 are unavailable."
+msgstr ""
+
+msgid "This Alpine package uses the new apk v3 format, which MultiPak cannot read yet. Use a package in the classic format, like those in Alpine's repositories."
 msgstr ""
 
 msgid "This AppImage does not contain a recognized type 2 SquashFS payload."
@@ -1482,7 +2502,31 @@ msgstr ""
 msgid "This AppImage installation is unavailable."
 msgstr ""
 
+msgid "This application is in the PET package format used by Puppy Linux. MultiPak converts it into a package of the distribution Puppy was built from."
+msgstr ""
+
+msgid "This application is in the binary package format used by Gentoo."
+msgstr ""
+
+msgid "This application is in the package format used by Alpine Linux."
+msgstr ""
+
 msgid "This application is in the package format used by Arch Linux and its derivatives."
+msgstr ""
+
+msgid "This application is in the package format used by Pisi Linux."
+msgstr ""
+
+msgid "This application is in the package format used by Slackware."
+msgstr ""
+
+msgid "This application is in the package format used by SliTaz."
+msgstr ""
+
+msgid "This application is in the package format used by Solus."
+msgstr ""
+
+msgid "This application is in the package format used by Void Linux."
 msgstr ""
 
 msgid "This application is packaged in DEB format, used by distributions such as Debian and Ubuntu."
@@ -1491,7 +2535,16 @@ msgstr ""
 msgid "This application is packaged in RPM format, used by distributions such as Fedora and Red Hat Enterprise Linux."
 msgstr ""
 
+msgid "This application is packaged in Snap format, used by distributions such as Ubuntu."
+msgstr ""
+
 msgid "This application's container was replaced."
+msgstr ""
+
+msgid "This cannot be opened: {0}"
+msgstr ""
+
+msgid "This file is not a snap."
 msgstr ""
 
 msgid "This is a preview. No application was opened."
@@ -1509,10 +2562,22 @@ msgstr ""
 msgid "This is a preview. No container was removed."
 msgstr ""
 
+msgid "This is a preview. No service was changed."
+msgstr ""
+
 msgid "This is a preview. No update was started."
 msgstr ""
 
+msgid "This is a preview. Nothing was run."
+msgstr ""
+
 msgid "This is a preview. The preference was not saved."
+msgstr ""
+
+msgid "This is a {0} delta package, which only updates an installed earlier version. Download the full package instead."
+msgstr ""
+
+msgid "This is an Android app. MultiPak installs Linux packages; its .apk support is for Alpine Linux packages."
 msgstr ""
 
 msgid "This operation requires a system booted with rpm-ostree."
@@ -1527,10 +2592,61 @@ msgstr ""
 msgid "This package is already installed in the selected environment. MultiPak will not overwrite the existing installation."
 msgstr ""
 
+msgid "This package is for {0}, but the Void Linux environment installs {1} packages. Choose a matching Void Linux environment."
+msgstr ""
+
 msgid "This preview does not start an installation."
 msgstr ""
 
 msgid "This shortcut does not belong to this installation."
+msgstr ""
+
+msgid "This snap cannot be installed"
+msgstr ""
+
+msgid "This snap does not contain an application to open."
+msgstr ""
+
+msgid "This snap does not have a background service named {0}."
+msgstr ""
+
+msgid "This snap does not have a {0} script."
+msgstr ""
+
+msgid "This snap does not have an application named {0}."
+msgstr ""
+
+msgid "This snap does not include an application shortcut."
+msgstr ""
+
+msgid "This snap installation changed. Reload the list before updating."
+msgstr ""
+
+msgid "This snap installation is unavailable."
+msgstr ""
+
+msgid "This snap is a system component ({0}), not an application."
+msgstr ""
+
+msgid "This snap is already installed. MultiPak will not overwrite the existing installation."
+msgstr ""
+
+msgid "This snap names system files that snapd itself would not accept: {0}"
+msgstr ""
+
+msgid "This snap needs system user accounts ({0}) that MultiPak does not create."
+msgstr ""
+
+msgid "This snap needs system user accounts ({0}). They need subordinate IDs for your user (/etc/subuid and /etc/subgid) and newuidmap, as rootless Podman does."
+msgstr ""
+
+msgid "This snap needs system-level permissions ({0}) that MultiPak does not grant."
+msgstr ""
+
+msgid "This snap only runs background services that MultiPak cannot run yet: {0}."
+msgstr ""
+
+msgid "This snap was built for {0} and cannot run on this computer ({1})."
 msgstr ""
 
 msgid "This system package cannot be uninstalled through MultiPak."
@@ -1539,7 +2655,16 @@ msgstr ""
 msgid "This version of MultiPak has a security issue. Update to continue installing applications."
 msgstr ""
 
+msgid "To install applications, open a package from your file manager or use one of the options below. Snaps from the <a href='https://snapcraft.io/store'>snapcraft.io</a> site also open directly in MultiPak."
+msgstr ""
+
+msgid "To run the AppImage in the container:"
+msgstr ""
+
 msgid "Try again"
+msgstr ""
+
+msgid "Ubuntu online accounts"
 msgstr ""
 
 msgid "Ubuntu — default catalog version"
@@ -1549,6 +2674,9 @@ msgid "Unavailable"
 msgstr ""
 
 msgid "Uninstall"
+msgstr ""
+
+msgid "Uninstall %1"
 msgstr ""
 
 msgid "Uninstall %1?\n\n%2"
@@ -1566,16 +2694,31 @@ msgstr ""
 msgid "Uninstalling {0}… Please wait."
 msgstr ""
 
-msgid "Uninstall…"
+msgid "Unknown action: {0}"
 msgstr ""
 
 msgid "Unrecognized local package ID: "
 msgstr ""
 
+msgid "Unstable channel"
+msgstr ""
+
 msgid "Unsupported DEB metadata compression."
 msgstr ""
 
+msgid "Unsupported Gentoo metadata compression: {0}."
+msgstr ""
+
+msgid "Unsupported SliTaz package architecture."
+msgstr ""
+
 msgid "Unsupported package type."
+msgstr ""
+
+msgid "Unsupported {0} binary package format."
+msgstr ""
+
+msgid "Unsupported {0} metadata compression."
 msgstr ""
 
 msgid "Up to date"
@@ -1584,13 +2727,22 @@ msgstr ""
 msgid "Update"
 msgstr ""
 
-msgid "Update AppImages"
+msgid "Update %1"
+msgstr ""
+
+msgid "Update %1?"
 msgstr ""
 
 msgid "Update MultiPak to continue installing applications."
 msgstr ""
 
 msgid "Update address"
+msgstr ""
+
+msgid "Update all"
+msgstr ""
+
+msgid "Update all of them"
 msgstr ""
 
 msgid "Update application"
@@ -1602,13 +2754,52 @@ msgstr ""
 msgid "Update available"
 msgstr ""
 
+msgid "Update available: revision {0}"
+msgstr ""
+
 msgid "Update available: {0}"
+msgstr ""
+
+msgid "Update available: {0} (revision {1})"
+msgstr ""
+
+msgid "Update complete."
 msgstr ""
 
 msgid "Update complete. All applications and packages in the container are up to date."
 msgstr ""
 
+msgid "Updated: {0}"
+msgstr ""
+
+msgid "Updates not checked yet."
+msgstr ""
+
+msgid "Updating the ALT Linux package lists…"
+msgstr ""
+
+msgid "Updating the Alpine package lists…"
+msgstr ""
+
 msgid "Updating the Arch Linux environment…"
+msgstr ""
+
+msgid "Updating the Gentoo package tree…"
+msgstr ""
+
+msgid "Updating the Pisi Linux package lists…"
+msgstr ""
+
+msgid "Updating the Slackware package lists…"
+msgstr ""
+
+msgid "Updating the SliTaz package lists…"
+msgstr ""
+
+msgid "Updating the Solus package lists…"
+msgstr ""
+
+msgid "Updating the openSUSE package lists…"
 msgstr ""
 
 msgid "Updating {0}… Please wait."
@@ -1627,6 +2818,18 @@ msgid "Use system management for rpm-ostree operations."
 msgstr ""
 
 msgid "Use the default MultiPak container"
+msgstr ""
+
+msgid "Used by RPM for package scripts."
+msgstr ""
+
+msgid "Used by RPM to read its options."
+msgstr ""
+
+msgid "Using the snap revision downloaded earlier."
+msgstr ""
+
+msgid "Using {0} revision {1} ({2} of {3})."
 msgstr ""
 
 msgid "Verifying the Distrobox installation…"
@@ -1659,19 +2862,46 @@ msgstr ""
 msgid "Visual completion preview; no application was installed."
 msgstr ""
 
+msgid "Void Linux (rolling release)"
+msgstr ""
+
+msgid "Void Linux 32-bit (rolling release)"
+msgstr ""
+
+msgid "Void Linux musl (rolling release)"
+msgstr ""
+
+msgid "Void Linux packages (.xbps)"
+msgstr ""
+
+msgid "Void Linux publishes no 32-bit image."
+msgstr ""
+
 msgid "Wait for rpm-ostree to finish. The window will close when the operation ends."
 msgstr ""
 
 msgid "Wait for the operation to finish before closing the manager."
 msgstr ""
 
+msgid "Wait for the snap update to finish."
+msgstr ""
+
 msgid "Waiting for the current step to finish before cleaning up…"
+msgstr ""
+
+msgid "Welcome"
 msgstr ""
 
 msgid "Welcome to the MultiPak Installation Wizard"
 msgstr ""
 
-msgid "When finished, open the application for a few seconds in an isolated environment to find other missing dependencies and install them."
+msgid "With updates"
+msgstr ""
+
+msgid "Write access"
+msgstr ""
+
+msgid "XBPS package metadata exceeds the read limit."
 msgstr ""
 
 msgid "You can now open it from the application launcher."
@@ -1683,7 +2913,79 @@ msgstr ""
 msgid "You confirmed the installation."
 msgstr ""
 
+msgid "an empty base"
+msgstr ""
+
+msgid "battery status"
+msgstr ""
+
+msgid "calendars (GNOME's evolution-data-server)"
+msgstr ""
+
+msgid "components cannot be installed now"
+msgstr ""
+
+msgid "contacts (GNOME's evolution-data-server)"
+msgstr ""
+
 msgid "created"
+msgstr ""
+
+msgid "disks and removable media"
+msgstr ""
+
+msgid "error: which command?"
+msgstr ""
+
+msgid "file chooser and other desktop integration"
+msgstr ""
+
+msgid "finding devices on the local network"
+msgstr ""
+
+msgid "icon in the system tray"
+msgstr ""
+
+msgid "install/slack-desc does not describe the named package."
+msgstr ""
+
+msgid "invalid JSON value: {0}"
+msgstr ""
+
+msgid "invalid configuration: {0} (want key=value)"
+msgstr ""
+
+msgid "invalid health status"
+msgstr ""
+
+msgid "invalid option name: {0}"
+msgstr ""
+
+msgid "is-connected needs the name of one plug or slot"
+msgstr ""
+
+msgid "keeping the screen on"
+msgstr ""
+
+msgid "location (Ubuntu's location service)"
+msgstr ""
+
+msgid "mobile modems"
+msgstr ""
+
+msgid "name a component as +component"
+msgstr ""
+
+msgid "network status"
+msgstr ""
+
+msgid "or"
+msgstr ""
+
+msgid "previous values are only available while a configuration changes"
+msgstr ""
+
+msgid "printing"
 msgstr ""
 
 msgid "reused"
@@ -1695,13 +2997,61 @@ msgstr ""
 msgid "rpm-ostree will remove the package and recalculate the required dependencies. A restart will be needed to finish. Your personal data will be preserved."
 msgstr ""
 
+msgid "saved passwords"
+msgstr ""
+
+msgid "set which option?"
+msgstr ""
+
+msgid "sound"
+msgstr ""
+
+msgid "the configuration is too large"
+msgstr ""
+
+msgid "the snap's services cannot be managed from here"
+msgstr ""
+
+msgid "unknown option {0}"
+msgstr ""
+
+msgid "unknown service: {0}"
+msgstr ""
+
+msgid "unset which option?"
+msgstr ""
+
+msgid "{0} can have problems and change often."
+msgstr ""
+
 msgid "{0} did not close. Close it and try again."
 msgstr ""
 
 msgid "{0} exited with code {1}.\n{2}"
 msgstr ""
 
+msgid "{0} is not a snap base."
+msgstr ""
+
 msgid "{0} is up to date."
+msgstr ""
+
+msgid "{0} metadata XML must not contain a document type declaration."
+msgstr ""
+
+msgid "{0} no longer provides the content {1} required by {2}."
+msgstr ""
+
+msgid "{0} package directory exceeds the read limit."
+msgstr ""
+
+msgid "{0} package metadata exceeds the read limit."
+msgstr ""
+
+msgid "{0} requests new permissions:"
+msgstr ""
+
+msgid "{0} returned to version {1} (revision {2})."
 msgstr ""
 
 msgid "{0} was deleted."
@@ -1714,4 +3064,7 @@ msgid "{0} was updated."
 msgstr ""
 
 msgid "{0} will be installed the next time you start your computer."
+msgstr ""
+
+msgid "{0} · {1}: {2}"
 msgstr ""

@@ -1,10 +1,28 @@
 """Update one container through Distrobox, with output streamed by the worker."""
 
+from pathlib import Path
+
 from multipak.localization import tr
 
+from . import host
 from .container_progress import PackageProgress
+from .environments import read_os_release
 from .models import valid_environment_name
 from .process import CommandError
+
+# distrobox upgrade knows neither pisi nor tazpkg, and only syncs Gentoo's tree;
+# MultiPak's setup scripts update Pisi Linux, SliTaz and Gentoo. On Void, Distrobox's
+# xbps-install -Syu asks for confirmation and, without a terminal, aborts with status 0.
+# Distrobox does not know Solus's eopkg either.
+SCRIPTS = {
+    "void": ("void-setup.sh", "/usr/libexec/multipak-void-setup.sh"),
+    "pisilinux": ("pisi-setup.sh", "/usr/libexec/multipak-pisi-setup.sh"),
+    "slitaz": ("slitaz-setup.sh", "/usr/libexec/multipak-slitaz-setup.sh"),
+    "gentoo": ("gentoo-setup.sh", "/usr/libexec/multipak-gentoo-setup.sh"),
+    # Solus has no /usr/libexec.
+    "solus": ("solus-setup.sh", "/usr/lib/multipak-solus-setup.sh"),
+}
+PISI_SCRIPT = SCRIPTS["pisilinux"][1]
 
 
 def upgrade_command(name: str) -> list[str]:
@@ -31,20 +49,47 @@ def _update(engine, name, command):
             ) from exc
         raise
     _check_identity(engine, name)
+    family = _family(engine, name)
+    if family in SCRIPTS:
+        asset, target = SCRIPTS[family]
+        script = Path(__file__).with_name("assets") / asset
+        with host.accessible_file(script) as visible:
+            engine.runner.run(["podman", "cp", str(visible), f"{name}:{target}"], timeout=60)
+        command = [
+            "distrobox",
+            "enter",
+            "--name",
+            name,
+            "--no-tty",
+            "--no-workdir",
+            "--",
+            "sudo",
+            "-n",
+            "sh",
+            target,
+            "--upgrade",
+        ]
     # Runner disables stdin interaction and fixes the backend to rootless Podman.
     # Keep the package manager's output and exit status; do not infer success from launch.
     PackageProgress(engine.progress, updating=True).run(engine.runner, command, timeout=7200)
 
 
+def _family(engine, name) -> str:
+    try:
+        return read_os_release(engine.runner, name).get("ID", "")
+    except (CommandError, ValueError, OSError, TimeoutError):
+        return ""
+
+
 def _check_identity(engine, name):
     """A container recorded by MultiPak must still be the one that answers to its name."""
-    from .containers import _read_record
+    from .containers import read_record
 
     store = getattr(engine, "store", None)
     if store is None:
         return
     try:
-        record = _read_record(store, name)
+        record = read_record(store, name)
     except (OSError, TypeError, ValueError):
         record = None
     if record is None:

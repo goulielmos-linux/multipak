@@ -120,10 +120,32 @@ class PackageProgress(OutputProgress):
                 else tr("Configuring the container…"),
             )
             return
+        # emerge counts the packages it merges: ">>> Emerging binary (3 of 12) cat/name".
+        if match := re.match(r">>> emerging (?:binary )?\((\d+) of (\d+)\)", lower):
+            current, total = int(match[1]), int(match[2])
+            if 0 < current <= total:
+                percent = (current - 1) * 100 // total
+                self.phase = "install"
+                self.emit(percent, tr("Installing packages — {0}%").format(percent))
+            return
+        # pisi counts the packages it downloads and installs: "Installing 3 / 12".
+        if match := re.fullmatch(r"(downloading|installing) (\d+) / (\d+)", lower):
+            current, total = int(match[2]), int(match[3])
+            if 0 < current <= total:
+                percent = current * 100 // total
+                if match[1] == "downloading":
+                    self.phase = "download"
+                    self.emit(percent, tr("Downloading container packages — {0}%").format(percent))
+                else:
+                    self.phase = "install"
+                    self.emit(percent, tr("Installing packages — {0}%").format(percent))
+            return
         if any(
             token in lower
             for token in (
                 "running transaction",
+                "unpacking packages",
+                "configuring unpacked packages",
                 "preparing to unpack",
                 "unpacking ",
                 "setting up ",
@@ -132,7 +154,7 @@ class PackageProgress(OutputProgress):
                 "reinstalling:",
                 "processing triggers",
             )
-        ) or re.match(r"^\(\d+/\d+\)\s+(?:installing|upgrading|reinstalling)", lower):
+        ) or re.match(r"^\(\s*\d+/\d+\)\s+(?:installing|upgrading|reinstalling)", lower):
             self.phase = "install"
             self.emit(-1, self.install_label)
             return
@@ -149,6 +171,7 @@ class PackageProgress(OutputProgress):
                 "retrieving packages",
                 "need to get ",
                 "total download size:",
+                "size to download:",
                 "total size of inbound packages",
             )
         ):
@@ -169,6 +192,7 @@ class PackageProgress(OutputProgress):
                 "synchronizing package databases",
                 "updating and loading repositories",
                 "reading package lists",
+                "-repodata' ...",
             )
         ):
             self.phase = "repositories"

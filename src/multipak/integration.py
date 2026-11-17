@@ -19,10 +19,20 @@ MIME_TYPES = (
     "application/vnd.debian.binary-package",
     "application/x-deb",
     "application/x-archlinux-package",
+    "application/x-slackware-package",
+    "application/x-pisi-package",
+    "application/x-tazpkg",
+    "application/x-gentoo-binary-package",
+    "application/x-puppy-pet",
+    "application/x-alpine-package",
+    "application/x-xbps-package",
+    "application/x-eopkg-package",
     "application/vnd.appimage",
     "application/x-iso9660-appimage",
     "application/x-appimage",
     "application/x-multipak-appimage",
+    "application/vnd.snap",
+    "x-scheme-handler/snap",
 )
 
 

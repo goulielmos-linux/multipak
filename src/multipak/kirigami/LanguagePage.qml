@@ -8,6 +8,8 @@ Kirigami.ScrollablePage {
     objectName: "languagePage"
     signal aboutRequested()
     signal returnRequested()
+    // Inside the Application Manager's side bar: no header and no Back button.
+    property bool embedded: false
     readonly property real outerMargin: Kirigami.Units.largeSpacing * 2
     readonly property real preferredWindowWidth: Math.max(
         header.implicitWidth, Kirigami.Units.gridUnit * 29
@@ -22,6 +24,7 @@ Kirigami.ScrollablePage {
         spacing: Kirigami.Units.largeSpacing * 2
         BrandHeader {
             id: header
+            visible: !page.embedded
             heading: qsTr("MultiPak Application Manager")
             logoSource: "assets/multipak-manager.svg"
             showAbout: true
@@ -73,6 +76,7 @@ Kirigami.ScrollablePage {
             Item { Layout.fillWidth: true }
             Controls.Button {
                 objectName: "languageBackButton"
+                visible: !page.embedded
                 text: qsTr("Back")
                 onClicked: page.returnRequested()
             }

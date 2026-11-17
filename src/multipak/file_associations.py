@@ -28,6 +28,38 @@ FORMATS = {
         ),
         ("application/x-archlinux-package",),
     ),
+    "slackware": (
+        mark("Slackware packages (.txz and .tgz)"),
+        ("application/x-slackware-package",),
+    ),
+    "pisi": (
+        mark("Pisi Linux packages (.pisi)"),
+        ("application/x-pisi-package",),
+    ),
+    "slitaz": (
+        mark("SliTaz packages (.tazpkg)"),
+        ("application/x-tazpkg",),
+    ),
+    "gentoo": (
+        mark("Gentoo binary packages (.gpkg.tar)"),
+        ("application/x-gentoo-binary-package",),
+    ),
+    "puppy": (
+        mark("Puppy Linux packages (.pet)"),
+        ("application/x-puppy-pet",),
+    ),
+    "xbps": (
+        mark("Void Linux packages (.xbps)"),
+        ("application/x-xbps-package",),
+    ),
+    "eopkg": (
+        mark("Solus packages (.eopkg)"),
+        ("application/x-eopkg-package",),
+    ),
+    "apk": (
+        mark("Alpine Linux packages (.apk)"),
+        ("application/x-alpine-package",),
+    ),
     "appimage": (
         "AppImage (.AppImage)",
         (
@@ -37,8 +69,19 @@ FORMATS = {
             APPIMAGE_MIME,
         ),
     ),
+    # Also the snap:// links of the Snap Store website's "View in Desktop store" button.
+    "snap": ("Snap (.snap)", ("application/vnd.snap", "x-scheme-handler/snap")),
 }
+# Choices saved by MultiPak 1.0.2 and earlier cover exactly these formats.
+FORMATS_UNTIL_1_0_2 = frozenset({"rpm", "deb", "arch", "appimage"})
 SECTIONS = ("Default Applications", "Added Associations", "Removed Associations")
+
+
+def _missing_new_formats(saved):
+    """Formats added since a complete earlier choice was saved, such as Snap."""
+    if not isinstance(saved, dict) or not FORMATS_UNTIL_1_0_2 <= set(saved):
+        return set()
+    return set(FORMATS) - set(saved)
 
 
 def _without_multipak(value):
@@ -137,6 +180,15 @@ class FileAssociations:
         self.state_path = self.config / "multipak/file-associations.json"
         self.xml_path = self.data / "mime/packages/io.github.multipak.appimage.xml"
         self.arch_xml_path = self.data / "mime/packages/io.github.multipak.packages.xml"
+        self.snap_xml_path = self.data / "mime/packages/io.github.multipak.snap.xml"
+        self.slackware_xml_path = self.data / "mime/packages/io.github.multipak.slackware.xml"
+        self.pisi_xml_path = self.data / "mime/packages/io.github.multipak.pisi.xml"
+        self.slitaz_xml_path = self.data / "mime/packages/io.github.multipak.slitaz.xml"
+        self.gentoo_xml_path = self.data / "mime/packages/io.github.multipak.gentoo.xml"
+        self.puppy_xml_path = self.data / "mime/packages/io.github.multipak.puppy.xml"
+        self.void_xml_path = self.data / "mime/packages/io.github.multipak.void.xml"
+        self.alpine_xml_path = self.data / "mime/packages/io.github.multipak.alpine.xml"
+        self.solus_xml_path = self.data / "mime/packages/io.github.multipak.solus.xml"
         self.reader = reader or _preferred_application
         self.refresher = refresher or self._refresh
 
@@ -151,8 +203,13 @@ class FileAssociations:
         if not host.is_flatpak():
             return False
         with self._locked():
-            if self._read_state().get("desktop_id") == DESKTOP_ID:
-                return False
+            state = self._read_state()
+            if state.get("desktop_id") == DESKTOP_ID:
+                if not _missing_new_formats(state.get("selected")):
+                    return False
+                # A format added by a newer MultiPak, such as Snap, starts selected.
+                self._apply(self.load())
+                return True
             self._apply({key: True for key in FORMATS})
         return True
 
@@ -232,6 +289,10 @@ class FileAssociations:
             if saved.get(key) is False:
                 selected[key] = False
                 continue
+            if key in _missing_new_formats(saved):
+                # A format added after the last choice starts selected, as on first use.
+                selected[key] = True
+                continue
             selected[key] = self.reader(mime) == DESKTOP_ID
         return selected
 
@@ -310,7 +371,21 @@ class FileAssociations:
         config.write(output, space_around_delimiters=False)
         snapshots = {
             path: path.read_bytes() if path.exists() else None
-            for path in (self.path, self.state_path, self.xml_path, self.arch_xml_path)
+            for path in (
+                self.path,
+                self.state_path,
+                self.xml_path,
+                self.arch_xml_path,
+                self.snap_xml_path,
+                self.slackware_xml_path,
+                self.pisi_xml_path,
+                self.slitaz_xml_path,
+                self.gentoo_xml_path,
+                self.puppy_xml_path,
+                self.alpine_xml_path,
+                self.void_xml_path,
+                self.solus_xml_path,
+            )
         }
         try:
             _atomic_write(
@@ -328,6 +403,69 @@ class FileAssociations:
                 )
             else:
                 self.arch_xml_path.unlink(missing_ok=True)
+            if selected["slackware"]:
+                _atomic_write(
+                    self.slackware_xml_path,
+                    (Path(__file__).with_name("assets") / "multipak-slackware.xml").read_text(),
+                )
+            else:
+                self.slackware_xml_path.unlink(missing_ok=True)
+            if selected["pisi"]:
+                _atomic_write(
+                    self.pisi_xml_path,
+                    (Path(__file__).with_name("assets") / "multipak-pisi.xml").read_text(),
+                )
+            else:
+                self.pisi_xml_path.unlink(missing_ok=True)
+            if selected["slitaz"]:
+                _atomic_write(
+                    self.slitaz_xml_path,
+                    (Path(__file__).with_name("assets") / "multipak-slitaz.xml").read_text(),
+                )
+            else:
+                self.slitaz_xml_path.unlink(missing_ok=True)
+            if selected["gentoo"]:
+                _atomic_write(
+                    self.gentoo_xml_path,
+                    (Path(__file__).with_name("assets") / "multipak-gentoo.xml").read_text(),
+                )
+            else:
+                self.gentoo_xml_path.unlink(missing_ok=True)
+            if selected["puppy"]:
+                _atomic_write(
+                    self.puppy_xml_path,
+                    (Path(__file__).with_name("assets") / "multipak-puppy.xml").read_text(),
+                )
+            else:
+                self.puppy_xml_path.unlink(missing_ok=True)
+            if selected["xbps"]:
+                _atomic_write(
+                    self.void_xml_path,
+                    (Path(__file__).with_name("assets") / "multipak-void.xml").read_text(),
+                )
+            else:
+                self.void_xml_path.unlink(missing_ok=True)
+            if selected["apk"]:
+                _atomic_write(
+                    self.alpine_xml_path,
+                    (Path(__file__).with_name("assets") / "multipak-alpine.xml").read_text(),
+                )
+            else:
+                self.alpine_xml_path.unlink(missing_ok=True)
+            if selected["eopkg"]:
+                _atomic_write(
+                    self.solus_xml_path,
+                    (Path(__file__).with_name("assets") / "multipak-solus.xml").read_text(),
+                )
+            else:
+                self.solus_xml_path.unlink(missing_ok=True)
+            if selected["snap"]:
+                _atomic_write(
+                    self.snap_xml_path,
+                    (Path(__file__).with_name("assets") / "multipak-snap.xml").read_text(),
+                )
+            else:
+                self.snap_xml_path.unlink(missing_ok=True)
             if selected["appimage"]:
                 _atomic_write(
                     self.xml_path,

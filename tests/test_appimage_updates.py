@@ -2,9 +2,11 @@
 
 import hashlib
 import json
+import os
 import shutil
 import struct
 import subprocess
+import sys
 import threading
 import zipfile
 from pathlib import Path
@@ -379,6 +381,17 @@ def test_cache_entries_follow_the_installed_copy(store, tmp_path):
     assert appimage_updates.UpdateCache(store).get(tx) is None
 
 
+def test_only_recent_results_are_read_without_the_network(store, tmp_path):
+    tx = installed(store, tmp_path)
+    cache = appimage_updates.UpdateCache(store)
+    cache.put(tx, Check("current", checked=1000.0))
+    cache.save()
+    recent = appimage_updates.cached(store, now=lambda: 1000.0 + 60)
+    assert recent[tx.id].status == "current"
+    later = 1000.0 + appimage_updates.CACHE_SECONDS + 1
+    assert appimage_updates.cached(store, now=lambda: later) == {}
+
+
 # Running copies
 
 
@@ -609,3 +622,224 @@ def test_install_packages_falls_back_to_pypi_for_python_modules(engine, monkeypa
 def test_results_survive_being_saved(store, tmp_path):
     check = Check("available", "https://github.com/o/a", Release("https://x", "x", "2", 5))
     assert Check.from_dict(json.loads(json.dumps(check.to_dict()))) == check
+
+
+def source_package(path, *members):
+    import io
+    import tarfile
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tarfile.open(path, "w:gz") as archive:
+        for name in members:
+            data = b"# code\n"
+            info = tarfile.TarInfo(name)
+            info.size = len(data)
+            archive.addfile(info, io.BytesIO(data))
+    return path
+
+
+class SourceRunner:
+    """PyPI with only the source code of a project, as for ttkthemes."""
+
+    def __init__(self, members, built="package-1.0-py3-none-any.whl"):
+        self.members, self.built, self.calls = members, built, []
+
+    def run(self, argv, **kwargs):
+        from multipak.process import CommandError
+
+        self.calls.append(argv)
+        if argv[:3] == ["podman", "container", "inspect"]:
+            return "c" * 64 + "\n"
+        if "download" in argv and argv[-1] == "ttkthemes":
+            if "--only-binary=:all:" in argv:
+                raise CommandError(argv, 1, "ERROR: No matching distribution found")
+            destination = Path(argv[argv.index("--dest") + 1])
+            source_package(destination / "package-1.0.tar.gz", *self.members)
+        if argv[:2] == ["podman", "run"]:
+            self.output = next(
+                item.rsplit(":", 1)[0] for item in argv if item.endswith(":/opt/output")
+            )
+        if argv[:2] == ["podman", "exec"] and "/opt/helper/discover.py" in argv:
+            return "MULTIPAK-REQUIRES []\n"
+        if argv[:2] == ["podman", "exec"] and "--wheel-dir" in argv:
+            wheel(Path(self.output) / self.built, "ttkthemes/__init__.py")
+        return ""
+
+
+def test_a_module_with_only_python_source_on_pypi_is_built_and_installed(engine):
+    runner = SourceRunner(["ttkthemes-3.2.2/setup.py", "ttkthemes-3.2.2/ttkthemes/__init__.py"])
+    engine.runner = runner
+    container = ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32)
+    assert appimage_container.install_from_pypi(engine, container, "ttkthemes")
+    source = next(argv for argv in runner.calls if "--no-binary=:all:" in argv)
+    assert "--no-deps" in source
+    build = next(argv for argv in runner.calls if "--wheel-dir" in argv)
+    # Built offline, in a throwaway container, with the declared tools as wheels.
+    started = [argv for argv in runner.calls if argv[:2] == ["podman", "run"]]
+    assert len(started) == 1
+    (command,) = started
+    assert command[command.index("--user") + 1] == f"{os.getuid()}:{os.getgid()}"
+    assert {"--network=none", "--cap-drop=all", "--read-only"} <= set(command)
+    assert build[:2] == ["podman", "exec"] and build[-1].endswith(".tar.gz")
+    assert "--no-index" in build
+    tools = next(argv for argv in runner.calls if "download" in argv and argv[-1] == "wheel")
+    assert "--only-binary=:all:" in tools and "setuptools>=40.8.0" in tools
+    install = next(argv for argv in runner.calls if "install" in argv and "pip" in argv)
+    assert install[-1].endswith("-none-any.whl")
+    assert not any((engine.store.root / "pypi").iterdir())
+
+
+@pytest.mark.parametrize(
+    "members",
+    [
+        ["fast-1.0/setup.py", "fast-1.0/ttkthemes/__init__.py", "fast-1.0/ttkthemes/_c.c"],
+        ["fast-1.0/Cargo.toml", "fast-1.0/ttkthemes/__init__.py"],
+        ["fast-1.0/ttkthemes/speed.pyx", "fast-1.0/ttkthemes/__init__.py"],
+        ["other-1.0/setup.py", "other-1.0/other/__init__.py"],  # Not the module wanted.
+    ],
+)
+def test_source_to_compile_or_without_the_module_is_never_built(engine, members):
+    runner = SourceRunner(members)
+    engine.runner = runner
+    container = ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32)
+    assert not appimage_container.install_from_pypi(engine, container, "ttkthemes")
+    assert not any("--wheel-dir" in argv for argv in runner.calls)
+    assert not any("install" in argv and "pip" in argv for argv in runner.calls)
+
+
+def test_a_built_package_for_one_computer_is_not_installed(engine):
+    runner = SourceRunner(
+        ["t-1.0/setup.py", "t-1.0/ttkthemes/__init__.py"],
+        built="package-1.0-cp313-cp313-linux_x86_64.whl",
+    )
+    engine.runner = runner
+    container = ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32)
+    assert not appimage_container.install_from_pypi(engine, container, "ttkthemes")
+    assert not any("install" in argv and "pip" in argv for argv in runner.calls)
+
+
+def fake_backend_wheel(directory, asked):
+    """A build backend, as a wheel, that asks for more while building (PEP 517)."""
+    directory.mkdir(parents=True, exist_ok=True)
+    path = directory / "fakebackend-1.0-py3-none-any.whl"
+    code = (
+        "def get_requires_for_build_wheel(config_settings=None):\n"
+        f"    return {asked!r}\n"
+        "def build_wheel(wheel_directory, config_settings=None, metadata_directory=None):\n"
+        "    raise RuntimeError('not here')\n"
+    )
+    with zipfile.ZipFile(path, "w") as archive:
+        archive.writestr("fakebackend/__init__.py", code)
+        archive.writestr(
+            "fakebackend-1.0.dist-info/METADATA",
+            "Metadata-Version: 2.1\nName: fakebackend\nVersion: 1.0\n",
+        )
+        archive.writestr(
+            "fakebackend-1.0.dist-info/WHEEL",
+            "Wheel-Version: 1.0\nGenerator: test\nRoot-Is-Purelib: true\nTag: py3-none-any\n",
+        )
+        archive.writestr("fakebackend-1.0.dist-info/RECORD", "")
+    return path
+
+
+def test_the_discovery_script_asks_the_build_system_through_pip(tmp_path):
+    # The script that runs inside the throwaway container, run here directly.
+    import io
+    import tarfile
+
+    vendored = pytest.importorskip("pip._vendor.pyproject_hooks")
+    tools = tmp_path / "tools"
+    fake_backend_wheel(tools, ["extra-tool>=1", "other; python_version>'3'"])
+    # The public pyproject_hooks, as MultiPak downloads it; here pip's own copy of it.
+    hooks = Path(vendored.__file__).parent
+    info = "pyproject_hooks-1.2.0.dist-info"
+    with zipfile.ZipFile(tools / "pyproject_hooks-1.2.0-py3-none-any.whl", "w") as archive:
+        for path in hooks.rglob("*.py"):
+            archive.write(path, f"pyproject_hooks/{path.relative_to(hooks)}")
+        archive.writestr(
+            f"{info}/METADATA", "Metadata-Version: 2.1\nName: pyproject_hooks\nVersion: 1.2.0\n"
+        )
+        archive.writestr(
+            f"{info}/WHEEL",
+            "Wheel-Version: 1.0\nGenerator: test\nRoot-Is-Purelib: true\nTag: py3-none-any\n",
+        )
+        archive.writestr(f"{info}/RECORD", "")
+    source = tmp_path / "pkg-1.0.tar.gz"
+    pyproject = b'[build-system]\nrequires = ["fakebackend"]\nbuild-backend = "fakebackend"\n'
+    with tarfile.open(source, "w:gz") as archive:
+        for name, data in (("pkg-1.0/pyproject.toml", pyproject), ("pkg-1.0/pkg.py", b"")):
+            info = tarfile.TarInfo(name)
+            info.size = len(data)
+            archive.addfile(info, io.BytesIO(data))
+    script = tmp_path / "discover.py"
+    script.write_text(appimage_container.DISCOVERY)
+    result = subprocess.run(
+        [sys.executable, str(script), str(source), str(tools)], capture_output=True, text=True
+    )
+    line = next(item for item in result.stdout.splitlines() if item.startswith("MULTIPAK-"))
+    assert json.loads(line.split(" ", 1)[1]) == ["extra-tool>=1", "other; python_version>'3'"]
+
+
+class BuildRunner:
+    """The throwaway container answering the discovery with asked requirements."""
+
+    def __init__(self, rounds):
+        self.rounds, self.calls = list(rounds), []
+
+    def run(self, argv, **kwargs):
+        self.calls.append(argv)
+        if argv[:3] == ["podman", "container", "inspect"]:
+            return "c" * 64 + "\n"
+        if argv[:2] == ["podman", "exec"] and "/opt/helper/discover.py" in argv:
+            asked = self.rounds.pop(0) if self.rounds else []
+            return "noise\nMULTIPAK-REQUIRES " + json.dumps(asked) + "\n"
+        return ""
+
+
+def test_what_the_build_asks_for_is_checked_then_downloaded_as_wheels(engine, tmp_path):
+    runner = BuildRunner([["wheel", "hatch-vcs>=0.3"], ["hatch-vcs>=0.3"]])
+    engine.runner = runner
+    container = ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32)
+    (tmp_path / "work/source").mkdir(parents=True)
+    source = tmp_path / "work/source/p-1.0.tar.gz"
+    source.write_bytes(b"")
+    for name in ("tools", "built"):
+        (tmp_path / "work" / name).mkdir()
+    appimage_container.build_isolated(
+        engine, container, source, tmp_path / "work/tools", tmp_path / "work/built", ["wheel"]
+    )
+    downloads = [argv for argv in runner.calls if "download" in argv]
+    # The public hooks library first, then only what was asked and not there yet.
+    assert [argv[-1] for argv in downloads] == ["pyproject_hooks", "hatch-vcs>=0.3"]
+    assert all("--only-binary=:all:" in argv for argv in downloads)
+    # One throwaway container for every round and the build, removed afterwards.
+    runs = [argv for argv in runner.calls if argv[:2] == ["podman", "run"]]
+    assert len(runs) == 1 and "--network=none" in runs[0]
+    execs = [argv for argv in runner.calls if argv[:2] == ["podman", "exec"]]
+    assert len(execs) == 3 and "--no-index" in execs[-1] and "wheel" in execs[-1]
+    assert sum(argv[:3] == ["podman", "image", "rm"] for argv in runner.calls) == 1
+
+
+@pytest.mark.parametrize(
+    "asked",
+    [
+        ["pkg @ https://example.invalid/pkg.whl"],
+        ["git+https://example.invalid/pkg"],
+        ["../local/path"],
+        ["--index-url=https://evil.invalid"],
+        [{"not": "a string"}],
+    ],
+)
+def test_links_paths_and_options_asked_by_the_build_are_never_downloaded(engine, tmp_path, asked):
+    runner = BuildRunner([asked])
+    engine.runner = runner
+    container = ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32)
+    (tmp_path / "w/source").mkdir(parents=True)
+    source = tmp_path / "w/source/p-1.0.tar.gz"
+    source.write_bytes(b"")
+    for name in ("tools", "built"):
+        (tmp_path / "w" / name).mkdir()
+    appimage_container.build_isolated(
+        engine, container, source, tmp_path / "w/tools", tmp_path / "w/built", []
+    )
+    assert [argv[-1] for argv in runner.calls if "download" in argv] == ["pyproject_hooks"]

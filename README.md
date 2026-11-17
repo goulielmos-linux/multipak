@@ -1,70 +1,91 @@
 # MultiPak
 
-Version: Unreleased
+**English** | [Português (Brasil)](README.pt-BR.md)
 
-MultiPak makes installing different package formats on atomic Linux distributions
-easier and more consistent, with a Kirigami interface that follows KDE’s design.
+Version: 1.1.0
 
-MultiPak includes an Installation Wizard, which opens package files, and an
-Application Manager, available from the application launcher.
+Install packages made for other Linux distributions on atomic systems, without changing
+the base system.
+
+Open a package file and the **Installation Wizard** takes care of it. The **Application
+Manager**, in your application launcher, is where you update and uninstall applications
+and adjust MultiPak's settings.
+
+## Features
+
+- **Linux packages**, installed with their dependencies in Distrobox containers:
+  - RPM for Fedora, Mageia, openSUSE and ALT Linux.
+    [See how it works.](docs/howrpmenvironmentsworks.md)
+  - DEB and Arch Linux.
+  - Alpine Linux. [See how it works.](docs/howalpinecompatibilityworks.md)
+  - Void Linux. [See how it works.](docs/howvoidcompatibilityworks.md)
+  - Solus. [See how it works.](docs/howsoluscompatibilityworks.md)
+  - Slackware. [See how it works.](docs/howslackwarecompatibilityworks.md)
+  - Gentoo. [See how it works.](docs/howgentoocompatibilityworks.md)
+  - Pisi Linux. [See how it works.](docs/howpisicompatibilityworks.md)
+  - SliTaz. [See how it works.](docs/howslitazcompatibilityworks.md)
+  - Puppy Linux. [See how it works.](docs/howpuppycompatibilityworks.md)
+- **Always up to date:** new releases of each distribution show up in MultiPak on their
+  own, without an update. The exceptions are Slackware and Pisi Linux, whose supported
+  release is set in MultiPak.
+- **AppImages** that need libraries your system lacks still run: MultiPak finds what is
+  missing before the first launch and provides it in a shared container.
+  [See how it works.](docs/howappimagecompatibilityworks.md)
+- **Snaps** install without snapd, from a file, a link or the Snap Store, background
+  services included. [See how this miracle works.](docs/howsnapcompatibilityworks.md)
+- **Review before installing**, with a search in your app store (Bazaar, GNOME Software
+  or KDE Discover) for a Flatpak alternative.
+- **Updates by application:** see which ones have a newer version and update them one by
+  one or all at once. An application in a container is updated together with its
+  container.
+- **Containers your way:** standard, custom, or an existing one you reuse.
+- **Settings** for file associations and the interface language (English or Brazilian
+  Portuguese).
+
+Supported files: `.rpm`, `.deb`, `.pkg.tar`, `.pkg.tar.zst`, `.pkg.tar.xz`,
+`.pkg.tar.gz`, `.pkg.tar.bz2`, Slackware `.txz`, `.tgz`, `.tar.xz` and `.tar.gz`
+packages, Pisi Linux `.pisi` packages, SliTaz `.tazpkg` packages, Gentoo `.gpkg.tar`
+packages, Puppy Linux `.pet` packages, Alpine Linux `.apk` packages, Void Linux `.xbps`
+packages, Solus `.eopkg` packages, type 1 or type 2 `.AppImage` files,
+and `.snap` files.
 
 ## Screenshots
 
 ### Application Manager
-![Application Manager](docs/screenshots/1.0.2/application-manager.png)
+![Application Manager](docs/screenshots/1.1.0/application-manager.png)
 
 ### Installation Wizard
-![Installation Wizard](docs/screenshots/1.0.1/installation-welcome.png)
+![Installation Wizard](docs/screenshots/1.1.0/installation-welcome.png)
 
 ### Installation settings
-![Installation settings](docs/screenshots/1.0.2/installation-settings.png)
+![Installation settings](docs/screenshots/1.1.0/installation-settings.png)
 
 ### Installation summary
-![Installation summary](docs/screenshots/1.0.1/installation-summary.png)
+![Installation summary](docs/screenshots/1.1.0/installation-summary.png)
 
 ### Installation progress
-![Installation progress](docs/screenshots/1.0.1/installation-progress.png)
+![Installation progress](docs/screenshots/1.1.0/installation-progress.png)
 
 ### Installation completed
-![Installation completed](docs/screenshots/1.0.1/installation-completed.png)
-
-## Features
-
-- Review package details before installation.
-- Install RPM, DEB and compiled Arch Linux packages with their dependencies inside
-  Distrobox containers.
-- Create a standard or custom container, or reuse a compatible existing one.
-- Add AppImages to the application launcher while preserving the original download.
-- Uninstall applications and update Distrobox containers.
-- Update AppImages from the Application Manager, using the address the AppImage
-  indicates, its project page or a link you enter.
-- Show download progress when Podman or the package manager reports it.
-- Search Bazaar, GNOME Software or KDE Discover for a Flatpak alternative before
-  installing a non-native package.
-- Configure file associations and choose the interface language: English, Brazilian
-  Portuguese or the system language. Unsupported system languages fall back to English.
-
-Supported files: `.rpm`, `.deb`, `.pkg.tar`, `.pkg.tar.zst`, `.pkg.tar.xz`,
-`.pkg.tar.gz`, `.pkg.tar.bz2`, and type 1 or type 2 `.AppImage` files.
+![Installation completed](docs/screenshots/1.1.0/installation-completed.png)
 
 ## Installation
 
-MultiPak is distributed as a Flatpak package containing both the Installation
-Wizard and the Application Manager.
+MultiPak is a single Flatpak with both the Installation Wizard and the Application
+Manager.
 
 1. Download the `.flatpak` file from [Releases](https://github.com/goulielmos-linux/multipak/releases).
-2. Open the downloaded file with Bazaar or another Flatpak bundle installer.
-3. Click **Install** and wait for installation to finish.
-4. Open a supported package file with MultiPak to start the Installation Wizard.
-5. To install or uninstall applications or change preferences, open **MultiPak
-   Application Manager** from the application launcher.
+2. Open it with a Flatpak installer, such as Bazaar, Discover, GNOME Software or
+   Warehouse, and click **Install**.
+
+Or, in a terminal: `flatpak install --user multipak-1.1.0-x86_64.flatpak`
 
 ## Updates
 
-Signed updates are delivered through the system's software store. MultiPak shows
-update notices in the manager and installer, with an option to remind you in
-24 hours. A required security update blocks new application installations until
-MultiPak is updated; viewing and uninstalling applications remain available.
+Signed updates arrive through your app store, like any other Flatpak. MultiPak tells you
+when a new version is out, and you can ask to be reminded later. A required security
+update blocks new installations until MultiPak is updated; you can still see and
+uninstall your applications.
 
 ## Compatibility
 
@@ -75,37 +96,33 @@ tested on all of the distributions listed above.
 MultiPak may also work on openSUSE (Kalpa and Aeon) and KDE Linux. Compatibility
 with these distributions has yet to be tested.
 
-It may work on other Linux distributions, including non-atomic
-systems, provided the required dependencies are available. Container installations
-require Distrobox 1.8+ and rootless Podman. The Flatpak includes the RPM inspection
-tool; native development requires `rpm` on the host.
+Other Linux distributions, including non-atomic ones, may work if they have Distrobox 1.8
+or later and rootless Podman. On rpm-ostree systems without Distrobox, MultiPak offers to
+install it; this may ask for your password and needs a restart.
 
-If Distrobox is missing on an rpm-ostree system, MultiPak offers to install it with
-system authorization and a restart. Reopen the package after restarting to
-continue.
+Direct RPM installation, without a container, is available only on rpm-ostree systems.
 
-Direct RPM installation is available only on systems using rpm-ostree.
+Snaps only need bubblewrap, which Flatpak already requires; snapd is not used. Before
+installing a snap, MultiPak says what it cannot provide for it.
 
 ## Important notes
 
-- Install packages from sources you trust. Distrobox integrates with the host and
-  is not a security sandbox.
-- Direct RPM installation through rpm-ostree is a last resort. It requires explicit
-  confirmation, can cause dependency conflicts or affect system updates, and
-  requires a restart for changes to take effect.
-- Removing the last registered application can offer to delete its MultiPak
-  container. The container's home folder is kept unless you choose to delete it.
+- Install packages only from sources you trust. Distrobox containers and snaps share your
+  home folder, devices and desktop session, so they are not a security sandbox.
+- Direct RPM installation through rpm-ostree is a last resort: it can cause dependency
+  conflicts, affect system updates and needs a restart.
+- When you uninstall the last application of a container, MultiPak offers to delete the
+  container. Its home folder is kept unless you choose otherwise.
 
 ## Documentation
 
 - [Changelog](CHANGELOG.md)
+- [Contributing](CONTRIBUTING.md)
 - [Local development](docs/development.md)
 - [Architecture](docs/architecture.md)
 
 ## Author and license
 
-Author: [Goulielmos](https://github.com/goulielmos-linux).
-
-MultiPak is licensed under the GNU General Public License v3.0 (`GPL-3.0-only`).
-See [LICENSE](LICENSE) and [NOTICE](NOTICE) for the license and attribution.
-Dependencies and third-party assets retain their own licenses.
+Made by [Goulielmos](https://github.com/goulielmos-linux). MultiPak is free software under
+the GNU General Public License v3.0 (`GPL-3.0-only`); see [LICENSE](LICENSE). Third-party
+components keep their own licenses, listed in [NOTICE](NOTICE).

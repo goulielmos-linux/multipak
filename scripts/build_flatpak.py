@@ -96,6 +96,9 @@ def main():
             "--user",
             "--force-clean",
             "--disable-rofiles-fuse",
+            # The exact sources of every bundled component, as the GPL asks for
+            # RPM and squashfs-tools: an APP_ID.Sources runtime in the same repo.
+            "--bundle-sources",
             *signing,
             f"--state-dir={output / 'state'}",
             f"--repo={output / 'repo'}",
@@ -134,10 +137,25 @@ def main():
         ],
         check=True,
     )
-    bundle.with_suffix(".flatpak.sha256").write_text(
-        hashlib.sha256(bundle.read_bytes()).hexdigest() + "  " + bundle.name + "\n"
+    sources = output / f"multipak-{release_version}-sources.flatpak"
+    subprocess.run(
+        [
+            "flatpak",
+            "build-bundle",
+            "--runtime",
+            str(output / "repo"),
+            str(sources),
+            f"{APP_ID}.Sources",
+            "stable",
+        ],
+        check=True,
     )
+    for path in (bundle, sources):
+        path.with_suffix(".flatpak.sha256").write_text(
+            hashlib.sha256(path.read_bytes()).hexdigest() + "  " + path.name + "\n"
+        )
     print(f"Created {bundle}")
+    print(f"Created {sources} (publish it with the bundle)")
 
 
 if __name__ == "__main__":

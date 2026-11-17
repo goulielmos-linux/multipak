@@ -15,7 +15,7 @@ def main() -> None:
     desktop.parent.mkdir(parents=True, exist_ok=True)
     text = (project / "data/io.github.multipak.installer.desktop").read_text()
     text = text.replace(
-        "Exec=multipak-installer %f", f"Exec={quote_exec(str(multipak_command))} %f"
+        "Exec=multipak-installer %u", f"Exec={quote_exec(str(multipak_command))} %u"
     )
     icons = {}
     for role in ("installer", "manager"):

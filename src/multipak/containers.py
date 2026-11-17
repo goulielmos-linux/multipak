@@ -29,15 +29,15 @@ class ManagedContainer:
         )
 
 
-def _record_path(store, name):
+def record_path(store, name):
     path = store.environment_directory(name) / "container.json"
     if path.is_symlink():
         raise ValueError(tr("The container record must not be a symbolic link."))
     return path
 
 
-def _read_record(store, name):
-    path = _record_path(store, name)
+def read_record(store, name):
+    path = record_path(store, name)
     if not path.exists():
         return None
     if not path.is_file() or path.stat().st_size > 65536:
@@ -52,10 +52,10 @@ def _read_record(store, name):
     return container
 
 
-def _save_record(store, container):
+def save_record(store, container):
     if not container.valid():
         raise ValueError(tr("Invalid container record."))
-    path = _record_path(store, container.name)
+    path = record_path(store, container.name)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(".tmp")
     temporary.write_text(json.dumps(asdict(container), indent=2) + "\n", encoding="utf-8")
@@ -72,7 +72,7 @@ def remember_container(store, transaction):
             transaction.managed_home,
         )
         if container.valid():
-            _save_record(store, container)
+            save_record(store, container)
 
 
 def _registered_shortcut(store, container):
@@ -100,7 +100,7 @@ def _uses_container(transaction):
 def _candidate(store, transaction):
     if transaction.method == "appimage" and transaction.appimage_mode == "container":
         # The shared AppImage container is owned only through its own record.
-        record = _read_record(store, transaction.container)
+        record = read_record(store, transaction.container)
         if record is not None and record.container_id == transaction.container_id:
             return record
         return None
@@ -109,7 +109,7 @@ def _candidate(store, transaction):
     container = ManagedContainer(transaction.container, transaction.container_id)
     if not container.valid():
         return None
-    record = _read_record(store, container.name)
+    record = read_record(store, container.name)
     if record is not None:
         return record if record.container_id == container.container_id else None
     if transaction.container_created:
@@ -235,7 +235,7 @@ def uninstall_application(engine, transaction):
                 data, _home_path(engine.store, container)
             ):
                 container = replace(container, managed_home=False)
-            _save_record(engine.store, container)
+            save_record(engine.store, container)
             if _referenced(engine.store, container):
                 return None
         return container
@@ -249,7 +249,7 @@ def remove_container(engine, container, *, remove_home=False):
     if not isinstance(container, ManagedContainer) or not container.valid():
         raise ValueError(tr("Invalid container record."))
     with engine.store.lock():
-        if _read_record(engine.store, container.name) != container:
+        if read_record(engine.store, container.name) != container:
             raise ValueError(
                 tr("The container identity or ownership has changed. It will be kept.")
             )
@@ -279,7 +279,7 @@ def remove_container(engine, container, *, remove_home=False):
         if _registered_shortcut(engine.store, container):
             (engine.store.applications / f"{container.name}.desktop").unlink()
         # Other files in the environment directory are outside this confirmation.
-        _record_path(engine.store, container.name).unlink()
+        record_path(engine.store, container.name).unlink()
 
 
 def forget_abandoned(engine):

@@ -1,72 +1,76 @@
 # Changelog
 
-## Unreleased
+## 1.1.0
+
+### New package formats
+
+- RPM packages built for Mageia, openSUSE and ALT Linux are installed in a container of
+  their own distribution, with its package manager.
+  [See how it works.](docs/howrpmenvironmentsworks.md)
+- Solus packages (`.eopkg`). [See how it works.](docs/howsoluscompatibilityworks.md)
+- Void Linux packages (`.xbps`): glibc, musl and 32-bit (`i686`).
+  [See how it works.](docs/howvoidcompatibilityworks.md)
+- Alpine Linux packages (`.apk`), in the Alpine release each one was built for.
+  [See how it works.](docs/howalpinecompatibilityworks.md)
+- Puppy Linux packages (`.pet`), converted for the distribution they were built from.
+  [See how it works.](docs/howpuppycompatibilityworks.md)
+- Gentoo binary packages (`.gpkg.tar`), with dependencies from Gentoo's binary packages.
+  [See how it works.](docs/howgentoocompatibilityworks.md)
+- SliTaz packages (`.tazpkg`), in an image MultiPak builds from the official ISO.
+  [See how it works.](docs/howslitazcompatibilityworks.md)
+- Pisi Linux packages (`.pisi`). [See how it works.](docs/howpisicompatibilityworks.md)
+- Slackware 15.0 packages (`.txz`, `.tgz`), in a light or a full environment.
+  [See how it works.](docs/howslackwarecompatibilityworks.md)
+
+### Snaps
+
+- Install snaps without snapd, from a `.snap` file or by name or link from the Snap
+  Store, choosing the channel. [See how this miracle works.](docs/howsnapcompatibilityworks.md)
+- Bases and content snaps are downloaded and shared automatically. Snaps that need
+  system-level permissions are refused before anything is downloaded.
+- Background services run as services of your user; the Application Manager starts and
+  stops them and shows their logs.
+- Administrator commands, such as Nextcloud's occ, run as root only inside the snap's
+  sandbox. Applications with a window are not offered.
+- Update snaps, their bases and content from the Application Manager, and go back to
+  the previous revision.
+- The review page says what MultiPak cannot provide for a snap.
 
 ### AppImages
 
-- Check, without running the application, whether an AppImage needs libraries or
-  Python modules that are not installed on the system. The check reads the
-  AppImage's ELF files and Python sources and asks the system's own Python which
-  components exist. It stays within fixed size limits and reads one file at a time.
-- When something is missing, offer to install the AppImage and its dependencies in
-  MultiPak's Fedora container for AppImages, without changing the system, or to
-  install it anyway. "See which" lists what is missing.
-- Before a container installation, show the container and the application as on the
-  review page for other formats, with the full list of required dependencies. All of
-  them are requested in the container, since it can lack components the system has.
-- Optionally, after a container installation, start the application for a few
-  seconds in a throwaway copy of the container without network or access to personal
-  files, and install other dependencies it reports as missing. Report when the check
-  cannot confirm that the application starts, and always remove the copy, even after
-  cancelling.
-- Open and update the AppImage container only while its name still leads to the
-  container MultiPak created.
-- Offer to remove the AppImage container after its last application is uninstalled,
-  and include it in the container update list.
-- When Fedora does not package a Python module an AppImage needs, install it in the
-  AppImage container from PyPI. Only ready-made wheels are used, and only after the
-  downloaded wheel is found to contain the module the application imports.
-- Show the completion screen with a warning when a dependency could not be installed,
-  and name dependencies as Python modules and libraries instead of package capabilities.
-- Update AppImages from the Application Manager. MultiPak looks for new versions at the
-  address saved for the application, in the update information embedded in the
-  AppImage, or on the project page in its AppStream metadata once a published file
-  matches the installed copy. When none of these exists, the user can enter the address.
-  Versions are compared by file, not by version number, and results are kept for six
-  hours unless the list is reloaded.
-- Before an update, ask to close the application if it is running, and confirm new
-  dependencies the new version needs. The downloaded file must be the same application;
-  the previous copy is restored if the update fails.
+- Before installing, MultiPak checks, without running the AppImage, which libraries or
+  modules it needs that the system lacks.
+  [See how it works.](docs/howappimagecompatibilityworks.md)
+- Missing dependencies are installed in a shared Fedora container, and the application
+  is tested in an isolated copy first.
+- Update AppImages from the Application Manager, from the address they indicate, their
+  project page or a link you enter.
 
-### MultiPak updates
+### Application Manager
 
-- Only postpone update notices when Remind me later is selected.
+- A new layout: a side bar with Install, Uninstall, Update, Snap services, File
+  associations, Language and About, with its own icons.
+- Install from a file or from the Snap Store; snaps from the snapcraft.io site open
+  directly in MultiPak.
+- Update lists applications, not containers, and shows which ones have a newer version,
+  asking each container's package manager. Updating one updates its whole container,
+  after listing the other applications that share it.
+- Each application in a list has its own buttons: update, uninstall, start or stop a
+  service, show its log.
+- About lists Lua and popt, built into the Flatpak with RPM.
 
 ### Containers
 
-- Only containers that MultiPak created are treated as its own. A container that
-  someone else created with a MultiPak name is no longer reused, listed or updated as
-  MultiPak's.
-- When a default name such as MultiPak-Fedora-45 is taken by another container, create
-  the container with the lowest free name (C2-, C3-...) instead of stopping, and keep
-  using it afterwards. The same applies to the AppImage container.
-- A container for RPM, DEB or Arch packages that is renamed after MultiPak created it,
-  including one with a custom name, is no longer treated as MultiPak's. A new one is
-  created when needed.
-- Forget the applications of such a renamed or deleted container: they leave the
-  uninstall list and their shortcuts, which no longer work, are removed. Nothing inside
-  the container is changed.
-- The AppImage container is taken back instead: when it was renamed, MultiPak gives it
-  its name again before using it, rather than creating a second one.
+- Only containers that MultiPak created are treated as its own. When one is renamed or
+  deleted, its applications leave the lists, and a container that takes its name is
+  never updated by mistake.
 - When the container of an AppImage was renamed or deleted, the Application Manager
-  shows a notice with Repair and Delete. Repair first explains what it will do: take
-  the renamed container back, create it again, or, when the system now has every
-  dependency, open the AppImage directly on the system. Delete removes MultiPak's copy
-  of the AppImage with its shortcut and icon, and leaves the container alone.
-- Opening such an AppImage from its shortcut shows a desktop notification that points
-  to the Application Manager.
-- Do not update a container recorded by MultiPak if another container has taken its
-  name.
+  offers to repair or delete it.
+
+### Fixes
+
+- Closing an update notice no longer postpones it; only Remind me later does.
+- When an operation fails, details that only repeat the message are no longer offered.
 
 ## 1.0.2
 

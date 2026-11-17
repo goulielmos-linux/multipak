@@ -67,7 +67,13 @@ Kirigami.ApplicationWindow {
         if (!welcome.live) {
             return;
         }
+        if (welcome.state === "switching") {
+            return;  // Another snap channel downloads on the review page itself.
+        }
         if (welcome.state === "ready") {
+            if (pageStack.currentItem && pageStack.currentItem.objectName === "snapPage") {
+                return;
+            }
             pageStack.clear();
             pageStack.push(welcomeComponent);
         } else if (welcome.state === "success" || welcome.state === "cancelled") {
@@ -87,7 +93,8 @@ Kirigami.ApplicationWindow {
 
     function openMethod() {
         if (pageStack.depth === 1) {
-            pageStack.push(welcome.isAppImage ? appimageComponent : methodComponent);
+            pageStack.push(welcome.isSnap ? snapComponent
+                : welcome.isAppImage ? appimageComponent : methodComponent);
         }
     }
 
@@ -95,6 +102,14 @@ Kirigami.ApplicationWindow {
         if (welcome.appImageContainerSelected && currentPage
                 && currentPage.objectName === "appimagePage") {
             pageStack.push(appimageContainerComponent);
+        }
+    }
+
+    function openAppImageDirect() {
+        if (welcome.appImageNeedsDependencies && !welcome.appImageContainerSelected
+                && currentPage && currentPage.objectName === "appimagePage"
+                && !currentPage.classic) {
+            pageStack.push(appimageDirectComponent);
         }
     }
 
@@ -106,7 +121,7 @@ Kirigami.ApplicationWindow {
     }
 
     function openEnvironment() {
-        if (welcome.isAppImage) {
+        if (welcome.isAppImage || welcome.isSnap) {
             openMethod();
             return;
         }
@@ -243,6 +258,16 @@ Kirigami.ApplicationWindow {
     }
 
     Component {
+        id: snapComponent
+        SnapPage {
+            parent: root.pageStack
+            onAboutRequested: aboutDialog.open()
+            onReturnRequested: root.pageStack.pop()
+            onCancelRequested: root.close()
+        }
+    }
+
+    Component {
         id: appimageComponent
         AppImagePage {
             parent: root.pageStack
@@ -250,6 +275,18 @@ Kirigami.ApplicationWindow {
             onReturnRequested: root.pageStack.pop()
             onCancelRequested: root.close()
             onContainerRequested: root.openAppImageContainer()
+            onDirectRequested: root.openAppImageDirect()
+        }
+    }
+
+    Component {
+        id: appimageDirectComponent
+        AppImagePage {
+            classic: true
+            parent: root.pageStack
+            onAboutRequested: aboutDialog.open()
+            onReturnRequested: root.pageStack.pop()
+            onCancelRequested: root.close()
         }
     }
 

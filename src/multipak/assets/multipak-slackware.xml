@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-slackware-package">
+    <comment>Slackware package</comment>
+    <comment xml:lang="pt_BR">Pacote Slackware</comment>
+    <sub-class-of type="application/x-xz-compressed-tar"/>
+    <sub-class-of type="application/x-compressed-tar"/>
+    <!-- Only names shaped like name-version-arch-build. Other archives keep their app. -->
+    <glob pattern="*-*-x86_64-*.txz" weight="80"/>
+    <glob pattern="*-*-x86_64-*.tgz" weight="80"/>
+    <glob pattern="*-*-noarch-*.txz" weight="80"/>
+    <glob pattern="*-*-noarch-*.tgz" weight="80"/>
+    <icon name="package-x-generic"/>
+  </mime-type>
+</mime-info>

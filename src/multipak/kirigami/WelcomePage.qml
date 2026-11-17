@@ -60,6 +60,33 @@ Kirigami.Page {
                     case "Arch Linux":
                         formatNote = qsTr("This application is in the package format used by Arch Linux and its derivatives.")
                         break
+                    case "Slackware":
+                        formatNote = qsTr("This application is in the package format used by Slackware.")
+                        break
+                    case "Pisi Linux":
+                        formatNote = qsTr("This application is in the package format used by Pisi Linux.")
+                        break
+                    case "SliTaz":
+                        formatNote = qsTr("This application is in the package format used by SliTaz.")
+                        break
+                    case "Gentoo":
+                        formatNote = qsTr("This application is in the binary package format used by Gentoo.")
+                        break
+                    case "Puppy Linux":
+                        formatNote = qsTr("This application is in the PET package format used by Puppy Linux. MultiPak converts it into a package of the distribution Puppy was built from.")
+                        break
+                    case "Void Linux":
+                        formatNote = qsTr("This application is in the package format used by Void Linux.")
+                        break
+                    case "Alpine Linux":
+                        formatNote = qsTr("This application is in the package format used by Alpine Linux.")
+                        break
+                    case "Solus":
+                        formatNote = qsTr("This application is in the package format used by Solus.")
+                        break
+                    case "Snap":
+                        formatNote = qsTr("This application is packaged in Snap format, used by distributions such as Ubuntu.")
+                        break
                     }
                     const recommendation = qsTr("Before continuing with the installation, check whether it is already available in your system's app store.")
                     return formatNote ? formatNote + " " + recommendation : recommendation

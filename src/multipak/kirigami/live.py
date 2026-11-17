@@ -1,5 +1,6 @@
 """Run package operations for the MultiPak installation assistant."""
 
+import dataclasses
 from pathlib import Path
 from threading import Lock
 
@@ -18,7 +19,14 @@ from multipak.environments import container_names, discover
 from multipak.file_associations import FileAssociations
 from multipak.localization import tr
 from multipak.metadata import inspect_package
-from multipak.models import ENVIRONMENTS, PackageInspection, Transaction
+from multipak.models import (
+    ENVIRONMENTS,
+    PackageInspection,
+    Transaction,
+    package_profiles,
+    slitaz_environment,
+    void_environment,
+)
 from multipak.process import Cancelled
 from multipak.software_store import search_command
 from multipak.store import Store
@@ -30,6 +38,97 @@ from .main import Welcome
 from .update_notice import installation_allowed
 
 
+class SnapRequest(str):
+    """A snap to download from the Snap Store, by name, with the channel the link
+    asked for (empty: the latest stable)."""
+
+    channel = ""
+
+    def __new__(cls, name, channel=""):
+        value = super().__new__(cls, name)
+        value.channel = channel
+        return value
+
+
+def installer_target(argument):
+    """What the installer was asked to open: a Path, or a Snap Store name to download.
+
+    Launchers pass %u, so a local file may arrive as a file:// URL, and the Snap Store
+    website's "View in Desktop store" button passes snap://NAME.
+    """
+    from urllib.parse import unquote, urlsplit
+
+    from multipak.snap_store import store_channel, store_name
+
+    if not isinstance(argument, str):
+        return Path(argument)
+    if argument.startswith("file://"):
+        return Path(unquote(urlsplit(argument).path))
+    name = store_name(argument)
+    if name and not Path(argument).exists():
+        return SnapRequest(name, store_channel(argument))
+    return Path(argument)
+
+
+def download_snap(engine, name, channel=""):
+    """Download a snap from the Snap Store to inspect and install it; channel as
+    track/risk, or empty for the latest stable."""
+    import time
+
+    from multipak import snap_store
+    from multipak.snap import inspect_snap
+
+    directory = engine.store.snap_download_directory()
+    directory.mkdir(parents=True, exist_ok=True, mode=0o700)
+    # Downloads that were never installed are removed after a day.
+    for old in directory.glob("*.snap"):
+        try:
+            if time.time() - old.stat().st_mtime > 86400:
+                old.unlink()
+        except OSError:
+            pass
+    from multipak.snap import already_installed, installed_snap
+
+    if installed_snap(engine.store, name) is not None:
+        raise ValueError(already_installed())  # Before downloading it again.
+    engine.progress(-1, tr("Looking for {0} in the Snap Store…").format(name))
+    release = snap_store.release(name, channel=channel)
+    target = directory / f"{release.name}_{release.revision}.snap"
+
+    def progress(received, total):
+        percent = min(99, received * 100 // max(1, total))
+        engine.progress(
+            percent,
+            tr("Downloading {0} from the Snap Store: {1} of {2} MB…").format(
+                name, received // 1024**2, max(1, total // 1024**2)
+            ),
+        )
+
+    snap_store.download(release, target, progress=progress, cancelled=engine.cancelled)
+    package = inspect_snap(target, engine.runner, revision=release.revision)
+    package = dataclasses.replace(
+        package,
+        snap_resources=release.resources,
+        snap_channel=release.channel,
+        snap_channels=release.channels,
+    )
+    if package.name != release.name:
+        target.unlink(missing_ok=True)
+        raise ValueError(tr("The snap {0} has unexpected contents.").format(name))
+    return package
+
+
+def missing_services(engine, info):
+    """Features the snap may lose here; a failed check never blocks installation."""
+    from multipak.snap import missing_service_features
+
+    try:
+        return missing_service_features(info)
+    except Exception as error:
+        engine._log(tr("Could not check the services the snap uses: {0}").format(error))
+        return []
+
+
 def inspect_installation(engine, path):
     # File-type preferences are a convenience. A failure here must never prevent
     # the package from being opened.
@@ -37,7 +136,24 @@ def inspect_installation(engine, path):
         FileAssociations().initialize_defaults()
     except Exception as error:
         engine._log(tr("Could not update file associations: {0}").format(error))
-    package = inspect_package(path, engine.runner)
+    if isinstance(path, str):
+        package = download_snap(engine, path, getattr(path, "channel", ""))
+    else:
+        package = inspect_package(path, engine.runner)
+    if package.kind == "snap":
+        import platform
+
+        from multipak.snap import already_installed, installed_snap, missing_runtime
+        from multipak.snap_meta import refusal
+
+        reason = refusal(package.snap, platform.machine())
+        if not reason and installed_snap(engine.store, package.snap.name) is not None:
+            reason = already_installed()
+        missing = () if reason else tuple(missing_runtime(engine.store, package.snap))
+        services = () if reason else tuple(missing_services(engine, package.snap))
+        return PackageInspection(
+            package, snap_refusal=reason, snap_missing=missing, snap_services=services
+        )
     if package.kind == "appimage":
         report = appimage_dependencies(engine, package)
         if report is None or not report.required:
@@ -46,6 +162,12 @@ def inspect_installation(engine, path):
         return PackageInspection(
             package, existing, profiles, dependencies=report, container_names=(name,)
         )
+    from multipak.package_icons import read_package_icon
+
+    icon, suffix = read_package_icon(package, getattr(engine, "cancelled", None))
+    if icon:
+        package = dataclasses.replace(package, icon_data=icon, icon_extension=suffix)
+
     profiles = load_catalog(engine.runner, engine.store.root / "image-catalog.json")
     try:
         existing = tuple(discover(engine.runner, profiles))
@@ -120,7 +242,7 @@ class LiveInstaller(Welcome):
     def __init__(self, path, *, store=None, worker_factory=Worker, inspector=inspect_installation):
         super().__init__()
         self.is_live = True
-        self.path = Path(path)
+        self.path = installer_target(path)
         self.store = store if store is not None else Store()
         self.worker_factory = worker_factory
         self.inspector = inspector
@@ -194,9 +316,12 @@ class LiveInstaller(Welcome):
             return
         self._mode, self._handler, self._outcome = mode, handler, None
         self._cancel_pending = False
-        self._percent = -1 if mode in ("inspect", "search", "cleanup", "distrobox", "reboot") else 0
+        self._percent = (
+            -1 if mode in ("inspect", "channel", "search", "cleanup", "distrobox", "reboot") else 0
+        )
         self._status = {
             "inspect": tr("Loading package information…"),
+            "channel": tr("Loading package information…"),
             "search": tr("Opening the app store…"),
             "install": tr("Preparing installation…"),
             "system": tr("Preparing to install directly on your system…"),
@@ -217,6 +342,7 @@ class LiveInstaller(Welcome):
         self._set_state(
             {
                 "inspect": "loading",
+                "channel": "switching",
                 "search": "searching",
                 "cleanup": "cleaning",
                 "install": "installing",
@@ -232,10 +358,28 @@ class LiveInstaller(Welcome):
     def inspect(self):
         self._run(lambda engine: self.inspector(engine, self.path), self._inspected, "inspect")
 
+    def _choose_channel(self, channel):
+        """Download the snap again from another channel, then show its review."""
+        shown = getattr(self.package, "snap_channel", "")
+        if isinstance(self.path, str) and channel != shown and self.worker is None:
+            # The review page stays open while the other channel downloads.
+            self._channel_previous = self.path
+            request = SnapRequest(str(self.path), channel)
+            self.path = request
+            self._run(lambda engine: self.inspector(engine, request), self._inspected, "channel")
+
     def _inspected(self, inspection):
         self.package = inspection.package
         self.name, self.version = self.package.name, self.package.version
         self.kind = self.package.kind.upper()
+        if self.isSnap:
+            self.method, self.mode = "snap", "standard"
+            self.environment, self._selection = None, None
+            self.set_snap_details(
+                inspection.snap_refusal, inspection.snap_missing, inspection.snap_services
+            )
+            self._set_state("ready")
+            return
         if self.isAppImage:
             from multipak.appimage_container import CONTAINER_NAME
 
@@ -259,9 +403,15 @@ class LiveInstaller(Welcome):
             self._set_state("ready")
             return
         self.existing = inspection.existing
-        self.profiles = tuple(
-            p for p in (inspection.environments or ENVIRONMENTS) if p.kind == self.package.kind
-        )
+        self.profiles = package_profiles(self.package, inspection.environments or ENVIRONMENTS)
+        if self.package.kind == "slitaz" and self.package.architecture != "any":
+            # Each SliTaz repository holds the programs of one architecture.
+            wanted = slitaz_environment(self.package.architecture)
+            self.profiles = tuple(p for p in self.profiles if p.id == wanted.id)
+        elif self.package.kind == "xbps" and self.package.architecture != "noarch":
+            # glibc, musl and 32-bit packages each have their own Void environment.
+            wanted = void_environment(self.package.architecture)
+            self.profiles = tuple(p for p in self.profiles if p.id == wanted.id)
         if not self.profiles:
             raise ValueError(tr("No compatible environment is available in the catalog."))
         self.environment = (
@@ -311,10 +461,13 @@ class LiveInstaller(Welcome):
             return
         package, selection = self.package, self._selection
         appimage_options = self.appimage_options()
+        snap_components = self.snap_component_choice() if self.isSnap else []
         self._logs = ""
         self.logsChanged.emit()
 
         def install(engine):
+            if package.kind == "snap":
+                return engine.install_snap(package, snap_components)
             if package.kind == "appimage":
                 try:
                     return engine.install_appimage(package, **appimage_options)
@@ -431,7 +584,9 @@ class LiveInstaller(Welcome):
         self.transaction = None
         self._result_title = tr("Installation completed")
         self._result_message = (
-            tr("The AppImage was installed and added to the application launcher.")
+            tr("The snap was installed and added to the application launcher.")
+            if tx.method == "snap"
+            else tr("The AppImage was installed and added to the application launcher.")
             if tx.method == "appimage"
             else tr("The application was installed in the {0} environment.").format(
                 self.environment.title
@@ -440,15 +595,18 @@ class LiveInstaller(Welcome):
         self._result_note = (
             tr("You can now open it from the application launcher.")
             if tx.launchers
+            else ""
+            if tx.method == "snap"  # Its warning already says there is no shortcut.
             else tr(
                 "This package does not include an application shortcut. You can "
                 "run it from a terminal inside the container."
             )
         )
         if tx.warnings:
-            self._result_note += "\n\n" + "\n".join(tx.warnings)
-        # Installed, but something it needs is still missing: shown as a warning.
-        self._result_warning = bool(tx.appimage_missing)
+            notes = [self._result_note] if self._result_note else []
+            self._result_note = "\n\n".join([*notes, "\n".join(tx.warnings)])
+        # Installed, but something it needs is still missing or could not be provided.
+        self._result_warning = bool(tx.appimage_missing or tx.limitations)
         self._set_state("success")
         if self._close_pending:
             self.closeRequested.emit()
@@ -496,6 +654,15 @@ class LiveInstaller(Welcome):
         self.worker = self._outcome = self._handler = None
         if outcome is None:
             outcome = ("error", tr("The operation ended without a result."), worker.engine.tx)
+        if self._mode == "channel" and outcome[0] != "success":
+            # The review of the channel shown before stays; nothing was installed.
+            self.path = getattr(self, "_channel_previous", self.path)
+            self._cancel_pending = False
+            self._set_state("ready")
+            if outcome[0] == "error":
+                self._log(outcome[1])
+                self.notice.emit(outcome[1].splitlines()[0][:400])
+            return
         if outcome[0] == "error":
             self._show_error(outcome[1], outcome[2])
         elif outcome[0] == "cancelled":
@@ -568,7 +735,7 @@ class LiveInstaller(Welcome):
                 "The managed copy and shortcuts for this installation were removed. The "
                 "original file and your personal data were preserved."
             )
-            if self.isAppImage
+            if self.isAppImage or self.isSnap
             else tr(
                 "The components owned by this installation were removed. Shared "
                 "environments and personal files were preserved."

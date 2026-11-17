@@ -1,6 +1,7 @@
 """About-window data and asynchronous, read-only backend version queries."""
 
 import configparser
+import json
 import platform
 import re
 from pathlib import Path
@@ -29,7 +30,74 @@ AUTHORS = (("Goulielmos", "https://github.com/goulielmos-linux"),)
 BACKEND_PROBES = {
     "Distrobox": ("distrobox", "--version"),
     "Podman": ("podman", "--version"),
+    "Bubblewrap": ("bwrap", "--version"),
 }
+
+
+BUNDLED_VERSIONS = "/app/share/multipak/bundled-versions.json"
+
+
+def bundled_tools():
+    """Tools shipped inside the Flatpak, with the version each one reports."""
+    import shutil
+    import subprocess
+
+    def run(command, pattern):
+        if not shutil.which(command[0]):
+            return ""
+        try:
+            out = subprocess.run(command, capture_output=True, text=True, timeout=5)
+        except (OSError, subprocess.SubprocessError):
+            return ""
+        found = re.search(pattern, out.stdout + out.stderr)
+        return found[1] if found else ""
+
+    # Libraries without a version of their own at run time: the Flatpak build records them.
+    try:
+        built = json.loads(Path(BUNDLED_VERSIONS).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        built = {}
+    try:
+        import zstandard
+
+        zstd = zstandard.__version__
+    except ImportError:
+        zstd = ""
+    rows = [
+        (
+            "squashfs-tools",
+            "https://github.com/plougher/squashfs-tools/blob/master/COPYING",
+            tr("Opens snap and AppImage files."),
+            run(["unsquashfs", "-version"], r"version (\d[\d.]*)"),
+        ),
+        (
+            "RPM",
+            "https://github.com/rpm-software-management/rpm/blob/master/COPYING",
+            tr("Reads RPM packages."),
+            run(["rpm", "--version"], r"(\d[\d.]*)"),
+        ),
+        (
+            "Lua",
+            "https://www.lua.org/license.html",
+            tr("Used by RPM for package scripts."),
+            built.get("lua", ""),
+        ),
+        (
+            "popt",
+            "https://github.com/rpm-software-management/popt/blob/master/COPYING",
+            tr("Used by RPM to read its options."),
+            built.get("popt", ""),
+        ),
+        (
+            "zstandard",
+            "https://github.com/indygreg/python-zstandard/blob/main/LICENSE",
+            tr("Decompresses zstd data."),
+            zstd,
+        ),
+    ]
+    return [
+        {"name": n, "licenseUrl": url, "description": d, "version": v} for n, url, d, v in rows if v
+    ]
 
 
 def license_text():
@@ -157,6 +225,12 @@ class AboutInfo(QObject):
     def flatpak(self):
         return host.is_flatpak()
 
+    @Property("QVariantList", constant=True)
+    def tools(self):
+        if not hasattr(self, "_tools"):
+            self._tools = bundled_tools()
+        return self._tools
+
     @Slot(str)
     def copyInformation(self, title):
         lines = [f"{title} — {self.version}", ""]
@@ -164,6 +238,8 @@ class AboutInfo(QObject):
         lines.extend(f"{row['name']} {row['version']}" for row in self.libraries)
         if self.flatpak:
             lines.append("Flatpak")
+        lines.extend(["", tr("Bundled tools")])
+        lines.extend(f"{row['name']} {row['version']}" for row in self.tools)
         lines.extend(["", tr("Backend")])
         lines.extend(f"{row['name']} {row['version']}\n{row['path']}" for row in self.backends)
         QGuiApplication.clipboard().setText("\n".join(lines))

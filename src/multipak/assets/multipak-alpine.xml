@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <!-- Android apps share the *.apk pattern; they are ZIP files. The gzip signature
+       tells Alpine packages apart when both patterns match. -->
+  <mime-type type="application/x-alpine-package">
+    <comment>Alpine Linux package</comment>
+    <comment xml:lang="pt_BR">Pacote do Alpine Linux</comment>
+    <sub-class-of type="application/gzip"/>
+    <glob pattern="*.apk"/>
+    <magic priority="60">
+      <match type="string" value="\x1f\x8b" offset="0"/>
+    </magic>
+    <icon name="package-x-generic"/>
+  </mime-type>
+</mime-info>

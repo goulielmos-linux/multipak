@@ -7,6 +7,7 @@ InformationWindow {
     id: dialog
     objectName: "dependenciesDialog"
     property string dependencies
+    property string emptyText: qsTr("The package declares no dependencies.")
     readonly property bool hasDependencies: dependencies.trim().length > 0
     title: qsTr("Dependencies")
     preferredWidth: Kirigami.Units.gridUnit * 28
@@ -23,7 +24,7 @@ InformationWindow {
         Controls.Label {
             objectName: "dependenciesDescription"
             visible: !dialog.hasDependencies
-            text: qsTr("The package declares no dependencies.")
+            text: dialog.emptyText
             textFormat: Text.PlainText
             wrapMode: Text.WordWrap
             Layout.fillWidth: true

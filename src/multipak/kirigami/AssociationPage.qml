@@ -8,6 +8,8 @@ Kirigami.ScrollablePage {
     objectName: "managerSettingsPage"
     signal aboutRequested()
     signal returnRequested()
+    // Inside the Application Manager's side bar: only the file types, no header.
+    property bool embedded: false
     readonly property real outerMargin: Kirigami.Units.largeSpacing * 2
     readonly property real preferredWindowWidth: Math.max(
         header.implicitWidth, Kirigami.Units.gridUnit * 29
@@ -18,7 +20,7 @@ Kirigami.ScrollablePage {
 
     Connections {
         target: manager
-        function onAssociationsSaved() { languages.save(manager.previewMode); }
+        function onAssociationsSaved() { if (!page.embedded) languages.save(manager.previewMode); }
     }
 
     component FormatChoice: Controls.CheckBox {
@@ -49,6 +51,7 @@ Kirigami.ScrollablePage {
         spacing: Kirigami.Units.largeSpacing * 2
         BrandHeader {
             id: header
+            visible: !page.embedded
             heading: qsTr("MultiPak Application Manager")
             logoSource: "assets/multipak-manager.svg"
             showAbout: true
@@ -56,13 +59,14 @@ Kirigami.ScrollablePage {
             onAboutRequested: page.aboutRequested()
         }
         Kirigami.Heading {
+            visible: !page.embedded
             text: qsTr("MultiPak settings")
             level: 2
             Layout.fillWidth: true
         }
         Kirigami.Heading {
-            text: qsTr("File types")
-            level: 3
+            text: page.embedded ? qsTr("File associations") : qsTr("File types")
+            level: page.embedded ? 2 : 3
             Layout.fillWidth: true
         }
         Controls.Label {
@@ -82,14 +86,16 @@ Kirigami.ScrollablePage {
                 }
             }
         }
-        Kirigami.Separator { Layout.fillWidth: true }
+        Kirigami.Separator { visible: !page.embedded; Layout.fillWidth: true }
         Kirigami.Heading {
+            visible: !page.embedded
             objectName: "languageHeading"
             text: qsTr("Language")
             level: 3
             Layout.fillWidth: true
         }
         Controls.ComboBox {
+            visible: !page.embedded
             objectName: "languageCombo"
             model: languages.options
             textRole: "label"
@@ -102,7 +108,7 @@ Kirigami.ScrollablePage {
         Controls.Label {
             objectName: "languageFallbackNotice"
             text: qsTr("English is used if no translation is available.")
-            visible: languages.selectedIndex === 0
+            visible: !page.embedded && languages.selectedIndex === 0
             color: Kirigami.Theme.negativeTextColor
             wrapMode: Text.WordWrap
             Layout.fillWidth: true
@@ -110,7 +116,7 @@ Kirigami.ScrollablePage {
         Controls.Label {
             objectName: "languageStatus"
             text: languages.status
-            visible: languages.hasError && text.length > 0
+            visible: !page.embedded && languages.hasError && text.length > 0
             textFormat: Text.PlainText
             color: languages.hasError ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.textColor
             wrapMode: Text.WordWrap
@@ -138,6 +144,7 @@ Kirigami.ScrollablePage {
             Item { Layout.fillWidth: true }
             Controls.Button {
                 objectName: "associationBackButton"
+                visible: !page.embedded
                 text: qsTr("Back")
                 enabled: !manager.busy
                 onClicked: page.returnRequested()

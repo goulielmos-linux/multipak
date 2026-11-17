@@ -20,11 +20,25 @@ from multipak.store import Store  # noqa: E402
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 
+@pytest.fixture(autouse=True)
+def private_tmp_root(tmp_path_factory, monkeypatch):
+    """Each snap's own /tmp, in the test's folder instead of the computer's /tmp."""
+    from multipak import snap
+
+    root = tmp_path_factory.mktemp("private-tmp") / "root"
+    monkeypatch.setattr(snap, "PRIVATE_TMP_ROOT", str(root))
+    return root
+
+
 @pytest.fixture
 def store(tmp_path, monkeypatch):
+    from multipak.store import _allow_owner
+
     monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path / "xdg-data"))
     monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "xdg-config"))
-    return Store(tmp_path / "data", tmp_path / "applications")
+    yield Store(tmp_path / "data", tmp_path / "applications")
+    # Snap bases hold a folder nobody may open; let pytest clean up after the test.
+    _allow_owner(tmp_path)
 
 
 def ar_member(name: str, content: bytes) -> bytes:
@@ -180,6 +194,11 @@ class FakeRunner:
         self.busy = False
         self.fail_temp_cleanup = False
         self.release = 'ID=debian\nVERSION_ID="13"\n'
+        self.slackware_result = {"added": [], "missing": []}
+        self.puppy_result = {"added": [], "missing": []}
+        self.apk_untrusted = False
+        # Output of rpm -Kv in the environment; None: rpm reports a missing key.
+        self.rpm_signature = ""
 
     def run(self, argv, **_kwargs):
         self.calls.append(argv)
@@ -230,6 +249,12 @@ class FakeRunner:
                 return "1000:41c0"
             if command == ["id", "-u"]:
                 return "1000"
+            if command[:2] == ["apk", "verify"] and self.apk_untrusted:
+                raise CommandError(argv, 99, command[-1] + ": UNTRUSTED signature")
+            if command[:2] == ["rpm", "-Kv"]:
+                if self.rpm_signature is None:
+                    raise CommandError(argv, 1, "Signature, key ID 12345678: NOKEY")
+                return self.rpm_signature
         if "python3" in argv and any(arg.endswith("/guest.py") for arg in argv):
             if "--state" in argv:
                 return MARKER + json.dumps({"present": self.package_present})
@@ -238,11 +263,18 @@ class FakeRunner:
             if "--remove" in argv:
                 self.package_present = False
                 return MARKER + json.dumps({"present": False})
+            if "--slackware-dependencies" in argv:
+                return MARKER + json.dumps(self.slackware_result)
+            if "--puppy-deb-dependencies" in argv:
+                return MARKER + json.dumps(self.puppy_result)
             if "--run" in argv:
                 if (
                     ("apt-get" in argv and "install" in argv)
                     or ("dnf" in argv and "--downloadonly" not in argv)
                     or ("pacman" in argv and "-U" in argv)
+                    or "/sbin/installpkg" in argv
+                    or ("apk" in argv and "add" in argv)
+                    or ("zypper" in argv and "install" in argv)
                 ):
                     self.package_present = True
                 return ""

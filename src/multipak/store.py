@@ -6,6 +6,8 @@ import json
 import os
 import re
 import shutil
+import stat
+import time
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -15,6 +17,45 @@ from . import host
 from .models import Transaction, valid_environment_name
 
 _TRANSACTION_FIELDS = frozenset(field.name for field in dataclasses.fields(Transaction))
+
+
+def _allow_owner(root) -> None:
+    """Give the owner full access to every folder under root, without following links."""
+    pending = [os.fspath(root)]
+    while pending:
+        current = pending.pop()
+        try:
+            mode = os.lstat(current).st_mode
+        except OSError:
+            continue
+        if not stat.S_ISDIR(mode):
+            continue
+        if mode & 0o700 != 0o700:
+            try:
+                os.chmod(current, stat.S_IMODE(mode) | 0o700)
+            except OSError:
+                continue
+        try:
+            with os.scandir(current) as entries:
+                pending.extend(e.path for e in entries if e.is_dir(follow_symlinks=False))
+        except OSError:
+            continue
+
+
+def remove_tree(path, *, ignore_errors: bool = False) -> None:
+    """shutil.rmtree that also removes folders their owner cannot read or change.
+
+    Snaps ship such folders: Ubuntu's bases have var/lib/snapd/void, which nobody may
+    open. Extracted as a normal user, it keeps that mode and plain rmtree stops on it.
+    """
+    try:
+        shutil.rmtree(path)
+    except PermissionError:
+        _allow_owner(path)
+        shutil.rmtree(path, ignore_errors=ignore_errors)
+    except OSError:
+        if not ignore_errors:
+            raise
 
 
 class Store:
@@ -63,6 +104,27 @@ class Store:
             raise ValueError(tr("The AppImage directory must not be a symbolic link."))
         return path
 
+    def snap_directory(self, transaction_id: str) -> Path:
+        self.directory(transaction_id)  # Validate the ID before constructing a managed path.
+        path = self.root.parent / "snaps" / transaction_id
+        if path.is_symlink():
+            raise ValueError(tr("The snap directory must not be a symbolic link."))
+        return path
+
+    def snap_runtime_directory(self) -> Path:
+        """Bases and content snaps shared by the installed snaps."""
+        path = self.root.parent / "snap-runtime"
+        if path.is_symlink():
+            raise ValueError(tr("The snap directory must not be a symbolic link."))
+        return path
+
+    def snap_download_directory(self) -> Path:
+        """Snaps downloaded from the Snap Store, until they are installed."""
+        path = self.root.parent / "snap-downloads"
+        if path.is_symlink():
+            raise ValueError(tr("The snap directory must not be a symbolic link."))
+        return path
+
     def other_references(self, tx: Transaction) -> list[Transaction]:
         return [
             item
@@ -101,15 +163,24 @@ class Store:
         return self.applications / name
 
     def remove_directory(self, tx: Transaction) -> None:
-        shutil.rmtree(self.directory(tx.id))
+        remove_tree(self.directory(tx.id))
 
     @contextmanager
-    def lock(self):
+    def lock(self, wait=0):
+        """The lock of every operation. wait: seconds to wait for another operation
+        to end, for requests from a running app that should not fail at once."""
         with (self.root / "operations.lock").open("a") as stream:
-            try:
-                fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            except BlockingIOError as exc:
-                raise RuntimeError(tr("Another installation is already in progress.")) from exc
+            deadline = time.monotonic() + wait
+            while True:
+                try:
+                    fcntl.flock(stream, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    break
+                except BlockingIOError as exc:
+                    if time.monotonic() >= deadline:
+                        raise RuntimeError(
+                            tr("Another installation is already in progress.")
+                        ) from exc
+                    time.sleep(0.5)
             try:
                 yield
             finally:

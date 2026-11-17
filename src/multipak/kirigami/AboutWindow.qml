@@ -173,6 +173,52 @@ InformationWindow {
         }
     }
 
+    FormCard.FormHeader {
+        visible: aboutInfo.tools.length > 0
+        title: qsTr("Bundled tools")
+    }
+    FormCard.FormCard {
+        visible: aboutInfo.tools.length > 0
+        Repeater {
+            model: aboutInfo.tools
+            delegate: ColumnLayout {
+                id: tool
+                required property var modelData
+                required property int index
+                spacing: 0
+                Layout.fillWidth: true
+                FormCard.FormDelegateSeparator { visible: tool.index > 0 }
+                FormCard.FormButtonDelegate {
+                    objectName: "aboutToolLicenseButton_" + tool.modelData.name
+                    text: tool.modelData.name
+                    description: tool.modelData.description
+                    contentItem: RowLayout {
+                        spacing: Kirigami.Units.largeSpacing
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: Kirigami.Units.smallSpacing
+                            Controls.Label { text: tool.modelData.name; Layout.fillWidth: true }
+                            Controls.Label {
+                                text: tool.modelData.description
+                                color: Kirigami.Theme.disabledTextColor
+                                wrapMode: Text.WordWrap
+                                Layout.fillWidth: true
+                            }
+                        }
+                        Controls.Label { text: tool.modelData.version }
+                        Kirigami.Icon {
+                            source: BreezeIcons.source("go-next-symbolic", Kirigami.Theme.backgroundColor)
+                            implicitWidth: Kirigami.Units.iconSizes.small
+                            implicitHeight: implicitWidth
+                            Accessible.ignored: true
+                        }
+                    }
+                    onClicked: Qt.openUrlExternally(tool.modelData.licenseUrl)
+                }
+            }
+        }
+    }
+
     FormCard.FormHeader { title: qsTr("Backend") }
     FormCard.FormCard {
         Repeater {

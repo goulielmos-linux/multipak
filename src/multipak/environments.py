@@ -1,6 +1,7 @@
 """Read-only discovery of reusable Distrobox environments in the same Podman store."""
 
 import json
+import re
 import shlex
 from dataclasses import replace
 from pathlib import Path
@@ -8,8 +9,14 @@ from tempfile import TemporaryDirectory
 
 from multipak.localization import tr
 
-from . import host
-from .models import ENVIRONMENTS, Environment, ExistingEnvironment
+from . import alpine, host
+from .models import (
+    ENVIRONMENTS,
+    FULL_LABEL,
+    Environment,
+    ExistingEnvironment,
+    void_variant,
+)
 from .process import Cancelled, CommandError, Runner
 
 OWNER_LABEL = "io.github.multipak.transaction"
@@ -21,10 +28,54 @@ def parse_os_release(value: str) -> dict[str, str]:
     result = {}
     for line in value.splitlines():
         key, separator, raw = line.partition("=")
-        if separator and key in ("ID", "VERSION_ID"):
+        if separator and key in ("ID", "VERSION_ID", "ALT_BRANCH_ID"):
             words = shlex.split(raw, comments=True)
             result[key] = words[0] if words else ""
     return result
+
+
+# Distributions MultiPak can reuse, by MultiPak's name; os-release IDs that differ.
+FAMILIES = (
+    "fedora",
+    "ubuntu",
+    "debian",
+    "arch",
+    "slackware",
+    "pisilinux",
+    "slitaz",
+    "gentoo",
+    "alpine",
+    "void",
+    "solus",
+    "mageia",
+    "opensuse",
+    "alt",
+)
+OS_RELEASE_FAMILIES = {
+    "opensuse-leap": "opensuse",
+    "opensuse-tumbleweed": "opensuse",
+    "altlinux": "alt",
+}
+
+
+def release_identity(release: dict[str, str]) -> tuple[str, str]:
+    """MultiPak's distribution and release for an os-release record: (opensuse, 16.1)."""
+    release_id = release.get("ID", "")
+    version = release.get("VERSION_ID", "")
+    if release_id == "alpine":
+        # Alpine's VERSION_ID adds the patch level (3.24.3), or is the next
+        # release's alpha on edge (3.25.0_alpha20260805): 3.24 or edge.
+        version = alpine.release_version(version)
+    elif release_id == "opensuse-tumbleweed":
+        # Tumbleweed's VERSION_ID is the date of its snapshot.
+        version = "tumbleweed"
+    elif release_id == "altlinux":
+        # ALT names its branch (p11, sisyphus); VERSION_ID is 11 or a date on Sisyphus.
+        version = release.get("ALT_BRANCH_ID", "")
+        if not re.fullmatch(r"p[0-9]+|sisyphus", version):
+            major = release.get("VERSION_ID", "").partition(".")[0]
+            version = f"p{major}" if major.isdigit() and len(major) <= 2 else "sisyphus"
+    return OS_RELEASE_FAMILIES.get(release_id, release_id), version
 
 
 def read_os_release(runner: Runner, container: str) -> dict[str, str]:
@@ -33,7 +84,12 @@ def read_os_release(runner: Runner, container: str) -> dict[str, str]:
         prefix="multipak-inspect-", dir=host.temporary_directory()
     ) as directory:
         path = Path(directory) / "os-release"
-        runner.run(["podman", "cp", f"{container}:/usr/lib/os-release", str(path)], timeout=30)
+        try:
+            runner.run(["podman", "cp", f"{container}:/usr/lib/os-release", str(path)], timeout=30)
+        except CommandError:
+            # Slackware, Pisi Linux and SliTaz keep the file only in /etc.
+            path.unlink(missing_ok=True)
+            runner.run(["podman", "cp", f"{container}:/etc/os-release", str(path)], timeout=30)
         if path.is_symlink() or not path.is_file() or path.stat().st_size > 65536:
             raise ValueError(
                 tr(
@@ -93,20 +149,25 @@ def discover(
             if OWNER_LABEL in labels and labels.get(SHARED_LABEL) != "1":
                 continue
             release = read_os_release(runner, name)
-            if release.get("ID") not in ("fedora", "ubuntu", "debian", "arch"):
+            family, version = release_identity(release)
+            if family not in FAMILIES:
                 continue
             image_id = data.get("Image", "").removeprefix("sha256:")
+            if family == "void":
+                # Void's os-release names no variant; the container's image does.
+                version = void_variant((data.get("ImageName", ""), *image_names.get(image_id, ())))
             environments.append(
                 ExistingEnvironment(
                     name,
                     data["Id"],
-                    release["ID"],
-                    release.get("VERSION_ID", ""),
+                    family,
+                    version,
                     image_id,
                     image_names.get(image_id, ()),
                     labels.get(SHARED_LABEL) == "1",
                     custom_named=labels.get(CUSTOM_LABEL) == "1",
                     owned=OWNER_LABEL in labels,
+                    full_variant=labels.get(FULL_LABEL) == "1",
                 )
             )
         except Cancelled:

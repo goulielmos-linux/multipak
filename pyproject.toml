@@ -23,6 +23,7 @@ dev = ["pytest>=8", "ruff>=0.9", "build>=1"]
 multipak-installer = "multipak.launcher:main"
 multipak-manager = "multipak.launcher:manager_main"
 multipak-appimage = "multipak.appimage_launcher:main"
+multipak-snap = "multipak.snap_launcher:main"
 
 [tool.hatch.version]
 path = "src/multipak/__init__.py"

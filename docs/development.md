@@ -31,11 +31,26 @@ QT_QPA_PLATFORM=offscreen .venv/bin/python -m pytest
 ## Interface
 
 QML files and Python controllers live in `src/multipak/kirigami/`.
-`Welcome.qml` opens the wizard and `Manager.qml` opens the application manager.
+`Welcome.qml` opens the wizard and `Manager.qml` opens the application manager, whose
+header and side bar are in `ManagerShell.qml` and whose tools are in `ManagerPage.qml`,
+`AssociationPage.qml` and `LanguagePage.qml`.
 Both share `AboutWindow.qml`.
 
-Use the [native interface checks and previews](../checks/native_ui/README.md)
-to verify light and dark themes, text wrapping and small windows.
+`tests/test_interface.py` opens the real windows with sample data and clicks through
+them, so it runs with the other tests. To look at a screen, open a preview:
+`python3 src/multipak/kirigami/bootstrap.py --manager --preview --page update` (or
+without `--manager` for the wizard); `--screenshot FILE` saves it as an image.
+
+## Icons
+
+The icons live in `src/multipak/kirigami/assets`: `multipak.svg` (the application),
+`multipak-installer.svg` and `multipak-manager.svg`. The installer and manager also have
+a PNG copy for launchers and icon caches; when one of these icons changes, edit the SVG
+and export the PNG again.
+
+The launchers in `data` use the IDs `io.github.multipak.installer` and
+`io.github.multipak.manager`. The Flatpak renames them to
+`io.github.goulielmos_linux.multipak.installer` and `io.github.goulielmos_linux.multipak`.
 
 ## Translations
 
@@ -58,10 +73,16 @@ flatpak install --user flathub org.flatpak.Builder org.kde.Sdk//6.11 io.qt.PySid
 python3 scripts/build_flatpak.py
 ```
 
+The build also creates `multipak-1.1.0-sources.flatpak`: the exact source archives of
+the third-party components bundled in the Flatpak (RPM, Lua, popt, squashfs-tools
+and python-zstandard). RPM and squashfs-tools are GPL, so publish this file next to
+the application bundle whenever you distribute the bundle, together with MultiPak's
+own source for the same version.
+
 To install and open the test build on x86-64:
 
 ```bash
-flatpak install --user dist/flatpak/multipak-1.0.2-x86_64.flatpak
+flatpak install --user dist/flatpak/multipak-1.1.0-x86_64.flatpak
 flatpak run io.github.goulielmos_linux.multipak
 ```
 

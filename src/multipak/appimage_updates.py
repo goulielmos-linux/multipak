@@ -643,6 +643,17 @@ def managed(store):
     )
 
 
+def cached(store, *, now=time.time):
+    """The recent checks of the managed AppImages, without consulting any server."""
+    cache = UpdateCache(store, now)
+    results = {}
+    for tx in managed(store):
+        result = cache.get(tx)
+        if cache.fresh(result):
+            results[tx.id] = result
+    return results
+
+
 def installed_copy(store, tx):
     path = store.appimage_directory(tx.id) / "application.AppImage"
     if path.is_symlink() or not path.is_file():
@@ -945,6 +956,7 @@ __all__ = [
     "Source",
     "UpdateError",
     "appstream_sources",
+    "cached",
     "check",
     "check_link",
     "close",

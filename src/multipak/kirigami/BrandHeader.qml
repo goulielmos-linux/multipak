@@ -7,6 +7,8 @@ import "BreezeIcons.js" as BreezeIcons
 RowLayout {
     id: header
     property string heading
+    // Optional line under the heading, beside the logo.
+    property string subtitle: ""
     property bool showAbout: false
     property url logoSource: "assets/multipak-installer.svg"
     property string aboutText: qsTr("About the Application Installer — MultiPak")
@@ -23,27 +25,35 @@ RowLayout {
         fillMode: Image.PreserveAspectFit
     }
 
-    RowLayout {
-        spacing: 0
-        Kirigami.Heading {
-            text: header.heading
-            level: 1
-            wrapMode: Text.WordWrap
-        }
-        Controls.ToolButton {
-            objectName: "aboutButton"
-            visible: header.showAbout
-            icon.source: BreezeIcons.source("help-about", Kirigami.Theme.backgroundColor)
-            text: header.aboutText
-            display: Controls.AbstractButton.IconOnly
-            onClicked: header.aboutRequested()
-            Controls.ToolTip.visible: hovered
-            Controls.ToolTip.text: text
-            Accessible.name: text
-        }
-    }
-
-    Item {
+    ColumnLayout {
+        // The subtitle sits a little apart from the title, as in the About window.
+        spacing: Kirigami.Units.smallSpacing
         Layout.fillWidth: true
+        RowLayout {
+            spacing: 0
+            Kirigami.Heading {
+                text: header.heading
+                level: 1
+                wrapMode: Text.WordWrap
+            }
+            Controls.ToolButton {
+                objectName: "aboutButton"
+                visible: header.showAbout
+                icon.source: BreezeIcons.source("help-about", Kirigami.Theme.backgroundColor)
+                text: header.aboutText
+                display: Controls.AbstractButton.IconOnly
+                onClicked: header.aboutRequested()
+                Controls.ToolTip.visible: hovered
+                Controls.ToolTip.text: text
+                Accessible.name: text
+            }
+        }
+        Controls.Label {
+            objectName: "brandSubtitle"
+            visible: text.length > 0
+            text: header.subtitle
+            wrapMode: Text.WordWrap
+            Layout.fillWidth: true
+        }
     }
 }

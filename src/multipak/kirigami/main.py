@@ -14,10 +14,26 @@ from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtQuick import QQuickWindow
 from PySide6.QtWidgets import QApplication, QStyleFactory
 
-from multipak import DISPLAY_VERSION
+from multipak import DISPLAY_VERSION, alpine, gentoo
 from multipak.catalog import package_environment  # noqa: E402
 from multipak.localization import tr
-from multipak.models import Environment, Package  # noqa: E402
+from multipak.metadata import rpm_release_hints  # noqa: E402
+from multipak.models import (  # noqa: E402
+    ALPINE_ENVIRONMENTS,
+    GENTOO_ENVIRONMENT,
+    PISI_ENVIRONMENT,
+    RPM_FAMILIES,
+    RPM_FAMILY_ENVIRONMENTS,
+    SLACKWARE_ENVIRONMENTS,
+    SLITAZ_ENVIRONMENT,
+    SLITAZ_ENVIRONMENTS,
+    SOLUS_ENVIRONMENT,
+    VOID_ENVIRONMENT,
+    Environment,
+    Package,
+    package_profiles,
+    rpm_environment,
+)
 from multipak.suggestions import suggestion_details  # noqa: E402
 
 from .about import bind_about
@@ -25,6 +41,7 @@ from .configuration import Configuration
 from .identity import configure_application
 from .languages import bind_languages
 from .legacy_migration import bind_legacy_migration
+from .shutdown import release_engine
 from .update_notice import bind_update_notice
 
 # Preview fixtures only; the live installer obtains these versions from its catalog.
@@ -39,7 +56,23 @@ PREVIEW_ENVIRONMENTS = (
     Environment(
         "arch-rolling", "Arch Linux (rolling release)", "arch", "docker.io/library/archlinux:latest"
     ),
+    *RPM_FAMILY_ENVIRONMENTS,
+    *SLACKWARE_ENVIRONMENTS,
+    PISI_ENVIRONMENT,
+    *SLITAZ_ENVIRONMENTS,
+    GENTOO_ENVIRONMENT,
+    *ALPINE_ENVIRONMENTS,
+    VOID_ENVIRONMENT,
+    SOLUS_ENVIRONMENT,
 )
+
+
+def _message_html(text):
+    """Text for Kirigami's InlineMessage, which reads markup on its own: escaped, so
+    that names and paths taken from a package are shown exactly as they are."""
+    if not text:
+        return ""
+    return "<p>" + escape(text).replace("\n", "<br>") + "</p>"
 
 
 class Welcome(QObject):
@@ -65,15 +98,31 @@ class Welcome(QObject):
     ):
         super().__init__()
         if package is None:
-            hint = re.search(r"\.fc(\d+)(?:\.|$)", version) if packaging == "RPM" else None
+            # Fedora 1.fc45, Mageia 1.mga10, openSUSE Leap bp161, ALT alt1.
+            hints = rpm_release_hints(version.partition("-")[2]) if packaging == "RPM" else []
+            hint = hints[0] if hints else ""
             package = Package(
                 Path(f"{name}.{packaging.lower()}"),
                 packaging.lower(),
                 name,
                 version,
                 "x86_64",
-                distro_hint=f"fedora-{hint[1]}" if hint else "",
-                distro_hint_source="metadata" if hint else "",
+                distro_hint=hint
+                if hint
+                else {
+                    "SLACKWARE": "slackware-15.0",
+                    "PISI": PISI_ENVIRONMENT.id,
+                    "SLITAZ": SLITAZ_ENVIRONMENT.id,
+                    "GENTOO": GENTOO_ENVIRONMENT.id,
+                    "PUPPY": "debian-12",
+                    # As estimated from abuild 3.13: a release past its support.
+                    "APK": "alpine-3.20",
+                    "XBPS": VOID_ENVIRONMENT.id,
+                    "EOPKG": SOLUS_ENVIRONMENT.id,
+                }.get(packaging, ""),
+                distro_hint_source=(
+                    "metadata" if hint or packaging in ("PUPPY", "APK", "XBPS", "EOPKG") else ""
+                ),
             )
         self.package = package
         self.name = package.name
@@ -82,11 +131,11 @@ class Welcome(QObject):
         self.environment = (
             environment
             or package_environment(package.distro_hint, list(PREVIEW_ENVIRONMENTS))
-            or next((item for item in PREVIEW_ENVIRONMENTS if item.kind == package.kind), None)
+            or next(iter(package_profiles(package, PREVIEW_ENVIRONMENTS)), None)
         )
         self.strength, explanation = (
             ("", "")
-            if self.kind == "APPIMAGE"
+            if self.kind in ("APPIMAGE", "SNAP")
             else suggestion_details(package, self.environment, self.environment.title)
         )
         self.explanation = explanation
@@ -94,7 +143,7 @@ class Welcome(QObject):
         self.worker = None
         self.transaction = None
         self.choice = ""
-        self.method = "appimage" if self.kind == "APPIMAGE" else "container"
+        self.method = {"APPIMAGE": "appimage", "SNAP": "snap"}.get(self.kind, "container")
         self.mode = "standard"
         self.existing = ()
         self.container_names = ()
@@ -103,6 +152,11 @@ class Welcome(QObject):
         self._appimage_verify = True
         self._appimage_environment = ""
         self._appimage_container_exists = False
+        self._snap_refusal = ""
+        self._snap_missing = ()
+        # Optional components chosen on the review page.
+        self._snap_components = set()
+        self._snap_services = ()
         self._configuration = Configuration(self)
         self._configuration.changed.connect(self._configuration_changed)
         self._selection = None
@@ -128,6 +182,8 @@ class Welcome(QObject):
         return bool(self._selection and self._selection.manual)
 
     def installation_allowed(self):
+        if self.isSnap:
+            return self.method == "snap" and self.package is not None and not self._snap_refusal
         if self.isAppImage:
             return self.method == "appimage" and self.package is not None
         return (
@@ -169,11 +225,172 @@ class Welcome(QObject):
 
     @Property(str, notify=dataChanged)
     def packaging(self):
-        return {"ARCH": "Arch Linux", "APPIMAGE": "AppImage"}.get(self.kind, self.kind)
+        if self.kind == "SNAP" and self.snapClassic:
+            return tr("Snap (classic)")
+        return {
+            "ARCH": "Arch Linux",
+            "APPIMAGE": "AppImage",
+            "SNAP": "Snap",
+            "SLACKWARE": "Slackware",
+            "PISI": "Pisi Linux",
+            "SLITAZ": "SliTaz",
+            "GENTOO": "Gentoo",
+            "PUPPY": "Puppy Linux",
+            "APK": "Alpine Linux",
+            "XBPS": "Void Linux",
+            "EOPKG": "Solus",
+        }.get(self.kind, self.kind)
 
     @Property(bool, notify=dataChanged)
     def isAppImage(self):
         return self.kind == "APPIMAGE"
+
+    @Property(bool, notify=dataChanged)
+    def isSnap(self):
+        return self.kind == "SNAP"
+
+    @Property("QVariantList", notify=dataChanged)
+    def snapChannels(self):
+        """The Snap Store channels to choose from, as a store's app page offers them."""
+        return [
+            {"name": name, "label": f"{name} · {version}" if version else name}
+            for name, version in getattr(self.package, "snap_channels", ())
+        ]
+
+    @Property(int, notify=dataChanged)
+    def snapChannelIndex(self):
+        current = getattr(self.package, "snap_channel", "")
+        names = [item["name"] for item in self.snapChannels]
+        return names.index(current) if current in names else 0
+
+    @Slot(str)
+    def chooseSnapChannel(self, channel):
+        if any(item["name"] == channel for item in self.snapChannels):
+            self._choose_channel(channel)
+
+    def _choose_channel(self, channel):
+        """Only the live installer can download again."""
+
+    def set_snap_details(self, refusal, missing, services=()):
+        self._snap_refusal, self._snap_missing = refusal, tuple(missing)
+        self._snap_services = tuple(services)
+        self._snap_components = set()
+        self.dataChanged.emit()
+
+    def _installable_components(self):
+        from multipak.snap_components import installable
+
+        info = getattr(self.package, "snap", None)
+        if info is None:
+            return []
+        return installable(info, getattr(self.package, "snap_resources", ()))
+
+    @Property("QVariantList", notify=dataChanged)
+    def snapComponents(self):
+        """Each optional component: its name, summary, and whether it can be chosen."""
+        info = getattr(self.package, "snap", None)
+        if info is None:
+            return []
+        available = self._installable_components()
+        return [
+            {
+                "name": item.name,
+                "summary": item.summary,
+                "available": item.name in available,
+                "selected": item.name in self._snap_components,
+            }
+            for item in info.component_details
+        ]
+
+    @Slot(str, bool)
+    def setSnapComponent(self, name, selected):
+        if name in self._installable_components():
+            (self._snap_components.add if selected else self._snap_components.discard)(name)
+            self.dataChanged.emit()
+
+    def snap_component_choice(self):
+        return sorted(self._snap_components & set(self._installable_components()))
+
+    @Property(str, notify=dataChanged)
+    def snapRefusal(self):
+        return _message_html(self._snap_refusal)
+
+    @Property(bool, notify=dataChanged)
+    def snapClassic(self):
+        info = getattr(self.package, "snap", None)
+        return bool(info and info.classic)
+
+    @Property(str, notify=dataChanged)
+    def snapBaseTitle(self):
+        from multipak.snap_meta import base_title
+
+        info = getattr(self.package, "snap", None)
+        return base_title(info.base) if info is not None else ""
+
+    @Property(str, notify=dataChanged)
+    def snapEnvironmentExplanation(self):
+        info = getattr(self.package, "snap", None)
+        if info is None:
+            return ""
+        from multipak.snap_meta import base_title
+
+        text = tr("The snap's metadata indicates that it was built for {0} ({1}).").format(
+            base_title(info.base), info.base
+        )
+        if info.base and info.base != "bare":
+            text += " " + tr(
+                "MultiPak will download the base from the Snap Store if it does not already have it."  # noqa: E501
+            )
+        return text
+
+    @Property(str, notify=dataChanged)
+    def snapRequirementsText(self):
+        """Plain text: the content snaps, and which are still to download.
+
+        The base is left out: it is the environment itself, named in the title.
+        """
+        info = getattr(self.package, "snap", None)
+        if info is None:
+            return ""
+        from multipak.snap import runtime_names
+
+        lines = []
+        for name in runtime_names(info):
+            if name == info.base:
+                continue
+            label = name
+            if name not in self._snap_missing:
+                label += " " + tr("(already available)")
+            lines.append("• " + label)
+        for content in info.unprovided:
+            lines.append("• " + content + " " + tr("(could not be found automatically)"))
+        return "\n".join(lines)
+
+    @Property("QVariantList", notify=dataChanged)
+    def snapAlerts(self):
+        """What MultiPak cannot provide for this snap, grouped: title, text, items, note."""
+        info = getattr(self.package, "snap", None)
+        if info is None:
+            return []
+        from multipak.snap_meta import limitation_sections
+
+        alerts = limitation_sections(info, self.snap_component_choice(), self._snap_services)
+        channel = getattr(self.package, "snap_channel", "")
+        if channel and channel != "latest/stable":
+            # Asked for by the link from the Snap Store website.
+            stable = channel.endswith("/stable")
+            alerts.insert(
+                0,
+                {
+                    "title": tr("Channel") if stable else tr("Unstable channel"),
+                    "text": tr("From the {0} channel.").format(channel)
+                    if stable
+                    else tr("{0} can have problems and change often.").format(channel),
+                    "items": [],
+                    "note": "",
+                },
+            )
+        return alerts
 
     def set_dependency_report(self, report):
         """Missing required components select the container option by default."""
@@ -241,6 +458,13 @@ class Welcome(QObject):
     def appImageContainerSelected(self):
         return self.appImageNeedsDependencies and self._appimage_container
 
+    @Property(int, constant=True)
+    def appImageCheckSeconds(self):
+        """How long the isolated check runs the AppImage."""
+        from multipak.appimage_container import CHECK_SECONDS
+
+        return CHECK_SECONDS
+
     @Property(bool, notify=dataChanged)
     def appImageVerify(self):
         return self._appimage_verify
@@ -268,7 +492,28 @@ class Welcome(QObject):
 
     @Property(str, notify=dataChanged)
     def packageManager(self):
-        return {"RPM": "DNF", "DEB": "APT", "ARCH": "Pacman"}.get(self.kind, "")
+        if self.kind == "PUPPY":
+            # The PET is converted to a package of the chosen environment's distribution.
+            kind = self.environment.kind if self.environment is not None else "deb"
+            return "slackpkg" if kind == "slackware" else "APT"
+        if self.kind == "RPM" and self.environment is not None:
+            # Mageia uses DNF like Fedora; openSUSE and ALT Linux have their own.
+            family = self.environment.id.partition("-")[0]
+            manager = {"opensuse": "zypper", "alt": "APT-RPM"}.get(family)
+            if manager:
+                return manager
+        return {
+            "RPM": "DNF",
+            "DEB": "APT",
+            "ARCH": "Pacman",
+            "SLACKWARE": "slackpkg",
+            "PISI": "pisi",
+            "SLITAZ": "tazpkg",
+            "GENTOO": "Portage",
+            "APK": "apk",
+            "XBPS": "XBPS",
+            "EOPKG": "eopkg",
+        }.get(self.kind, "")
 
     @Property(bool, constant=True)
     def live(self):
@@ -291,7 +536,9 @@ class Welcome(QObject):
         return getattr(
             self,
             "_result_message",
-            tr("The AppImage was installed and added to the application launcher.")
+            tr("The snap was installed and added to the application launcher.")
+            if self.isSnap
+            else tr("The AppImage was installed and added to the application launcher.")
             if self.isAppImage
             else tr("The application was installed in the environment ")
             + self.environment.title
@@ -330,7 +577,7 @@ class Welcome(QObject):
 
     @Slot(str)
     def chooseMethod(self, method):
-        if self.isAppImage:
+        if self.isAppImage or self.isSnap:
             return
         if method not in ("container", "system"):
             return
@@ -351,7 +598,7 @@ class Welcome(QObject):
 
     @Slot(str)
     def chooseConfiguration(self, mode):
-        if self.isAppImage:
+        if self.isAppImage or self.isSnap:
             return
         if mode not in ("standard", "advanced"):
             return
@@ -380,7 +627,39 @@ class Welcome(QObject):
             return ""
         if self._selection.existing:
             existing = self._selection.existing
+            if existing.family in ("slackware", "slitaz"):
+                # Slackware: light and full share a release; the matching title tells
+                # them apart. SliTaz: the title names the architecture.
+                return tr(self.environment.title)
+            if existing.family == "pisilinux":
+                return "Pisi Linux"
+            if existing.family == "gentoo":
+                return "Gentoo Linux"
+            if existing.family == "void":
+                # The musl and 32-bit environments are named by their titles.
+                if existing.version in ("", "rolling"):
+                    return "Void Linux"
+                return tr(self.environment.title)
+            if existing.family == "solus":
+                return "Solus"
+            if existing.family == "alpine":
+                return f"Alpine Linux {existing.version}"
+            if existing.family in RPM_FAMILIES:
+                try:
+                    return tr(rpm_environment(existing.family, existing.version).title)
+                except ValueError:
+                    pass
             return f"{existing.family.title()} {existing.version}"
+        if self.environment.id == "arch-rolling":
+            return "Arch Linux"
+        if self.environment.id == PISI_ENVIRONMENT.id:
+            return "Pisi Linux"
+        if self.environment.id == GENTOO_ENVIRONMENT.id:
+            return "Gentoo Linux"
+        if self.environment.id == VOID_ENVIRONMENT.id:
+            return "Void Linux"
+        if self.environment.id == SOLUS_ENVIRONMENT.id:
+            return "Solus"
         return tr(self.environment.title)
 
     @Property(str, notify=dataChanged)
@@ -405,7 +684,31 @@ class Welcome(QObject):
 
     @Property(str, notify=dataChanged)
     def dependencies(self):
-        return self.package.dependencies if self.package is not None else ""
+        if self.package is None:
+            return ""
+        dependencies = self.package.dependencies
+        if self.package.kind == "deb":
+            separator = f" {tr('or')} "
+            requirements = (
+                separator.join(alternative.strip() for alternative in requirement.split("|"))
+                for requirement in dependencies.split(",")
+            )
+        elif self.package.kind == "slackware":
+            requirements = (item.strip() for item in dependencies.split(","))
+        elif self.package.kind in ("pisi", "eopkg"):
+            separator = f" {tr('or')} "
+            requirements = (separator.join(line.split(" | ")) for line in dependencies.splitlines())
+        elif self.package.kind == "gentoo":
+            requirements = gentoo.dependency_lines(dependencies, f" {tr('or')} ")
+        elif self.package.kind == "puppy":
+            requirements = (line.strip().lstrip("+") for line in dependencies.splitlines())
+        elif self.package.kind == "apk":
+            requirements = alpine.dependency_lines(dependencies)
+        elif self.package.kind in ("rpm", "arch", "slitaz", "xbps"):
+            requirements = (line.strip() for line in dependencies.splitlines())
+        else:
+            return dependencies
+        return "\n".join(f"• {requirement}" for requirement in requirements if requirement)
 
     @Property(bool, notify=dataChanged)
     def hasPackage(self):
@@ -476,10 +779,27 @@ def create_window(app, bridge):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("package", nargs="?", type=Path)
+    # A file, or a Snap Store name or link (snap:NAME, https://snapcraft.io/NAME).
+    parser.add_argument("package", nargs="?")
     parser.add_argument("--name", default="Strawberry")
     parser.add_argument("--version", default=None)
-    parser.add_argument("--packaging", choices=("RPM", "DEB", "ARCH", "APPIMAGE"), default="RPM")
+    parser.add_argument(
+        "--packaging",
+        choices=(
+            "RPM",
+            "DEB",
+            "ARCH",
+            "APPIMAGE",
+            "SLACKWARE",
+            "PISI",
+            "SLITAZ",
+            "GENTOO",
+            "APK",
+            "XBPS",
+            "EOPKG",
+        ),
+        default="RPM",
+    )
     parser.add_argument(
         "--missing-dependencies",
         action="store_true",
@@ -577,7 +897,10 @@ def main():
 
         QTimer.singleShot(1000, capture)
 
-    return app.exec()
+    try:
+        return app.exec()
+    finally:
+        release_engine(app, engine, window)
 
 
 if __name__ == "__main__":

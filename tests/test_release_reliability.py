@@ -22,6 +22,8 @@ def test_file_association_failure_does_not_block_package_inspection(deb, monkeyp
     monkeypatch.setattr(live, "FileAssociations", Broken)
     monkeypatch.setattr(live, "load_catalog", lambda *_: ())
     monkeypatch.setattr(live, "discover", lambda *_: [])
+    # Without this, a computer with podman would ask it for its containers.
+    monkeypatch.setattr(live, "container_names", lambda *_: ())
     logs = []
     engine = SimpleNamespace(runner=None, store=SimpleNamespace(root=Path("/nonexistent")))
     engine._log = logs.append

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Install the application and desktop exports into the Flatpak build tree."""
 
+import json
+import re
 import shutil
 import sysconfig
 from pathlib import Path
@@ -16,6 +18,26 @@ def install(source, destination):
     shutil.copyfile(source, destination)
 
 
+def bundled_versions():
+    """Versions of the libraries the manifest builds, shown in the About window."""
+    manifest = json.loads((ROOT / "packaging" / f"{APP_ID}.json").read_text(encoding="utf-8"))
+    found = {}
+
+    def walk(modules):
+        for module in modules:
+            if not isinstance(module, dict):
+                continue
+            for source in module.get("sources", []):
+                url = source.get("url", "") if isinstance(source, dict) else ""
+                version = re.search(r"[v-](\d+(?:\.\d+)+)\.tar\.", url)
+                if version:
+                    found.setdefault(module["name"], version[1])
+            walk(module.get("modules", []))
+
+    walk(manifest.get("modules", []))
+    return found
+
+
 def main():
     packages = Path(sysconfig.get_path("purelib", vars={"base": str(PREFIX)}))
     shutil.copytree(
@@ -28,6 +50,7 @@ def main():
         ("multipak-manager", "launcher", "manager_main"),
         ("multipak-installer", "launcher", "main"),
         ("multipak-appimage", "appimage_launcher", "main"),
+        ("multipak-snap", "snap_launcher", "main"),
     ):
         target = PREFIX / "bin" / name
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -61,9 +84,16 @@ def main():
         PREFIX / "share/mime/packages" / f"{APP_ID}.packages.xml",
     )
     install(
+        ROOT / "src/multipak/assets/multipak-snap.xml",
+        PREFIX / "share/mime/packages" / f"{APP_ID}.snap.xml",
+    )
+    install(
         ROOT / "packaging" / f"{APP_ID}.metainfo.xml",
         PREFIX / "share/metainfo" / f"{APP_ID}.metainfo.xml",
     )
+    versions = PREFIX / "share/multipak/bundled-versions.json"
+    versions.parent.mkdir(parents=True, exist_ok=True)
+    versions.write_text(json.dumps(bundled_versions(), indent=2) + "\n", encoding="utf-8")
     for name in ("LICENSE", "NOTICE"):
         install(ROOT / name, PREFIX / "share/licenses" / APP_ID / name)
 

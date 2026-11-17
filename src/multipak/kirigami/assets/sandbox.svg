@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#1E293B" />
+    </linearGradient>
+
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="50%" stop-color="#0284C7" />
+      <stop offset="100%" stop-color="#2563EB" />
+    </linearGradient>
+
+    <radialGradient id="bubbleGrad" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#E0F2FE" stop-opacity="0.9" />
+      <stop offset="35%" stop-color="#38BDF8" stop-opacity="0.55" />
+      <stop offset="85%" stop-color="#0284C7" stop-opacity="0.75" />
+      <stop offset="100%" stop-color="#0369A1" stop-opacity="0.9" />
+    </radialGradient>
+
+    <radialGradient id="coreBubbleGrad" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="1" />
+      <stop offset="30%" stop-color="#7DD3FC" stop-opacity="0.9" />
+      <stop offset="80%" stop-color="#0EA5E9" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#1D4ED8" stop-opacity="1" />
+    </radialGradient>
+
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000000" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <polygon points="256,36 452,148 452,364 256,476 60,364 60,148" fill="url(#bgGrad)" stroke="url(#borderGrad)" stroke-width="14" stroke-linejoin="round" filter="url(#dropShadow)" />
+
+  <polygon points="256,62 430,161 430,351 256,450 82,351 82,161" fill="none" stroke="#38BDF8" stroke-width="2" stroke-opacity="0.25" stroke-dasharray="8 6" />
+
+  <g id="bubbles">
+    <circle cx="256" cy="144" r="44" fill="url(#bubbleGrad)" stroke="#7DD3FC" stroke-width="2" stroke-opacity="0.6" />
+    <ellipse cx="242" cy="128" rx="12" ry="7" transform="rotate(-30 242 128)" fill="#FFFFFF" fill-opacity="0.7" />
+
+    <circle cx="353" cy="200" r="44" fill="url(#bubbleGrad)" stroke="#7DD3FC" stroke-width="2" stroke-opacity="0.6" />
+    <ellipse cx="339" cy="184" rx="12" ry="7" transform="rotate(-30 339 184)" fill="#FFFFFF" fill-opacity="0.7" />
+
+    <circle cx="353" cy="312" r="44" fill="url(#bubbleGrad)" stroke="#7DD3FC" stroke-width="2" stroke-opacity="0.6" />
+    <ellipse cx="339" cy="296" rx="12" ry="7" transform="rotate(-30 339 296)" fill="#FFFFFF" fill-opacity="0.7" />
+
+    <circle cx="256" cy="368" r="44" fill="url(#bubbleGrad)" stroke="#7DD3FC" stroke-width="2" stroke-opacity="0.6" />
+    <ellipse cx="242" cy="352" rx="12" ry="7" transform="rotate(-30 242 352)" fill="#FFFFFF" fill-opacity="0.7" />
+
+    <circle cx="159" cy="312" r="44" fill="url(#bubbleGrad)" stroke="#7DD3FC" stroke-width="2" stroke-opacity="0.6" />
+    <ellipse cx="145" cy="296" rx="12" ry="7" transform="rotate(-30 145 296)" fill="#FFFFFF" fill-opacity="0.7" />
+
+    <circle cx="159" cy="200" r="44" fill="url(#bubbleGrad)" stroke="#7DD3FC" stroke-width="2" stroke-opacity="0.6" />
+    <ellipse cx="145" cy="184" rx="12" ry="7" transform="rotate(-30 145 184)" fill="#FFFFFF" fill-opacity="0.7" />
+
+    <circle cx="256" cy="256" r="50" fill="url(#coreBubbleGrad)" stroke="#FFFFFF" stroke-width="3" stroke-opacity="0.85" />
+    <ellipse cx="239" cy="238" rx="15" ry="9" transform="rotate(-30 239 238)" fill="#FFFFFF" fill-opacity="0.9" />
+    <circle cx="228" cy="253" r="4" fill="#FFFFFF" fill-opacity="0.7" />
+  </g>
+</svg>

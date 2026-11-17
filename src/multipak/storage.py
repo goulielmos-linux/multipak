@@ -20,6 +20,20 @@ def require_copy_space(directory, size):
         raise InsufficientSpace(tr("There is not enough free space to copy the package."))
 
 
+def require_space(directory, size):
+    """Stop before writing size bytes to a filesystem that does not have them."""
+    try:
+        available = shutil.disk_usage(directory).free
+    except OSError:
+        return
+    if available < size:
+        raise InsufficientSpace(
+            tr("There is not enough free space: {0} MB are needed, {1} MB are free.").format(
+                -(-size // 1024**2), available // 1024**2
+            )
+        )
+
+
 def _is_disk_full(error):
     if isinstance(error, OSError):
         return error.errno in (errno.ENOSPC, errno.EDQUOT)

@@ -12,7 +12,7 @@ Kirigami.ApplicationWindow {
     flags: Qt.Window | Qt.CustomizeWindowHint | Qt.WindowTitleHint
            | (manager.canClose ? Qt.WindowCloseButtonHint : 0) | Qt.WindowMinimizeButtonHint
     readonly property var currentPage: legacyPage.item || pageStack.currentItem
-    readonly property int fittedWidth: Math.ceil(Math.min(700, Screen.desktopAvailableWidth,
+    readonly property int fittedWidth: Math.ceil(Math.min(1100, Screen.desktopAvailableWidth,
         currentPage ? currentPage.preferredWindowWidth : Kirigami.Units.gridUnit * 31))
     readonly property int fittedHeight: Math.ceil(Math.min(
         Screen.desktopAvailableHeight - Kirigami.Units.gridUnit * 2,
@@ -55,40 +55,15 @@ Kirigami.ApplicationWindow {
         function onUpdateLinkRequested() { updateLinkDialog.open(); }
         function onUpdateClosingRequested() { updateClosingDialog.open(); }
         function onUpdateDependenciesRequested() { updateDependenciesDialog.open(); }
+        function onGroupUpdateRequested() { groupUpdateDialog.open(); }
+        function onSnapPermissionsRequested(message) {
+            snapPermissionsDialog.message = message;
+            snapPermissionsDialog.open();
+        }
         function onContainerRemovalRequested() { containerRemovalDialog.open(); }
         function onCompanionWarning(message) {
             companionWarningText.text = message;
             companionWarningDialog.open();
-        }
-        function onLanguageSettingsRequested() {
-            languages.reset();
-            if (currentPage.objectName !== "languagePage") pageStack.push(languagePage);
-        }
-        function onAssociationSettingsRequested() {
-            languages.reset();
-            if (currentPage.objectName !== "managerSettingsPage") pageStack.push(associationPage);
-        }
-    }
-
-    Component {
-        id: associationPage
-        AssociationPage {
-            onAboutRequested: aboutDialog.open()
-            onReturnRequested: {
-                manager.goHome();
-                root.pageStack.pop();
-            }
-        }
-    }
-
-    Component {
-        id: languagePage
-        LanguagePage {
-            onAboutRequested: aboutDialog.open()
-            onReturnRequested: {
-                manager.goHome();
-                root.pageStack.pop();
-            }
         }
     }
 
@@ -113,10 +88,69 @@ Kirigami.ApplicationWindow {
 
     pageStack.globalToolBar.style: Kirigami.ApplicationHeaderStyle.None
     pageStack.initialPage: Component {
-        ManagerPage {
+        ManagerShell {
             onAboutRequested: aboutDialog.open()
             onCloseRequested: root.close()
-            onSettingsRequested: manager.openAssociations()
+            onAdminCommandRequested: arguments => {
+                adminDialog.arguments = arguments;
+                adminDialog.command = manager.adminCommandName;
+                adminDialog.open();
+            }
+        }
+    }
+
+    InformationWindow {
+        id: adminDialog
+        objectName: "adminDialog"
+        property string arguments: ""
+        property string command: ""
+        transientParent: root
+        title: qsTr("Run as administrator?")
+        onShown: cancelAdminButton.forceActiveFocus()
+        Controls.Label {
+            objectName: "adminCommandText"
+            text: (adminDialog.command + " " + adminDialog.arguments).trim()
+            font.family: "monospace"
+            textFormat: Text.PlainText
+            wrapMode: Text.WrapAnywhere
+            Layout.fillWidth: true
+        }
+        RowLayout {
+            spacing: Kirigami.Units.largeSpacing
+            Layout.fillWidth: true
+            Kirigami.Icon {
+                source: BreezeIcons.source("dialog-warning", Kirigami.Theme.backgroundColor)
+                Accessible.ignored: true
+                Layout.preferredWidth: Kirigami.Units.iconSizes.large
+                Layout.preferredHeight: Kirigami.Units.iconSizes.large
+                Layout.alignment: Qt.AlignTop
+            }
+            Controls.Label {
+                objectName: "adminWarning"
+                text: qsTr("The command runs as root inside the snap's sandbox. It can read, change and delete all of this snap's data, and run any program of the snap. It does not get administrator rights on your computer. Run only commands you trust, such as those in the snap's documentation.")
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+        }
+        footer: Controls.ToolBar {
+            padding: Kirigami.Units.largeSpacing * 2
+            contentItem: RowLayout {
+                Item { Layout.fillWidth: true }
+                Controls.Button {
+                    id: cancelAdminButton
+                    objectName: "cancelAdminButton"
+                    text: qsTr("Cancel")
+                    onClicked: adminDialog.close()
+                }
+                Controls.Button {
+                    objectName: "confirmAdminButton"
+                    text: qsTr("Run as administrator")
+                    onClicked: {
+                        adminDialog.close();
+                        manager.runAdminCommand(adminDialog.arguments);
+                    }
+                }
+            }
         }
     }
 
@@ -305,7 +339,7 @@ Kirigami.ApplicationWindow {
             proceeding = false;
             backClosingButton.forceActiveFocus();
         }
-        onClosing: if (!proceeding) manager.cancelAppImageUpdate()
+        onClosing: if (!proceeding) manager.cancelUpdateClosing()
         Controls.Label {
             objectName: "updateClosingText"
             text: qsTr("%1 needs to be closed.\n\nIf MultiPak closes it for you, unsaved work in it may be lost.").arg(manager.updateName)
@@ -330,6 +364,96 @@ Kirigami.ApplicationWindow {
                         updateClosingDialog.proceeding = true;
                         manager.closeUpdatedApplication();
                         updateClosingDialog.close();
+                    }
+                }
+            }
+        }
+    }
+
+    // Applications sharing a container are updated with it, together.
+    InformationWindow {
+        id: groupUpdateDialog
+        objectName: "groupUpdateDialog"
+        property bool proceeding: false
+        transientParent: root
+        title: qsTr("Update %1?").arg(manager.groupUpdateName)
+        onShown: {
+            proceeding = false;
+            cancelGroupUpdateButton.forceActiveFocus();
+        }
+        onClosing: if (!proceeding) manager.cancelGroupUpdate()
+        Controls.Label {
+            objectName: "groupUpdateText"
+            text: qsTr("%1 is installed in a container, so MultiPak updates the whole container, including these applications:\n\n%2\n\nThe container's dependencies and system components are also updated. Your system outside the container is not changed.").arg(manager.groupUpdateName).arg(manager.groupUpdateOthers)
+            textFormat: Text.PlainText
+            wrapMode: Text.Wrap
+            Layout.fillWidth: true
+        }
+        footer: Controls.ToolBar {
+            padding: Kirigami.Units.largeSpacing * 2
+            contentItem: RowLayout {
+                Item { Layout.fillWidth: true }
+                Controls.Button {
+                    id: cancelGroupUpdateButton
+                    objectName: "cancelGroupUpdateButton"
+                    text: qsTr("Cancel")
+                    onClicked: groupUpdateDialog.close()
+                }
+                Controls.Button {
+                    objectName: "confirmGroupUpdateButton"
+                    text: qsTr("Update all of them")
+                    highlighted: true
+                    onClicked: {
+                        groupUpdateDialog.proceeding = true;
+                        manager.confirmGroupUpdate();
+                        groupUpdateDialog.close();
+                    }
+                }
+            }
+        }
+    }
+
+    InformationWindow {
+        id: snapPermissionsDialog
+        objectName: "snapPermissionsDialog"
+        property string message: ""
+        property bool proceeding: false
+        transientParent: root
+        title: qsTr("Snap update permissions")
+        onShown: {
+            proceeding = false;
+            cancelSnapPermissionsButton.forceActiveFocus();
+        }
+        onClosing: if (!proceeding) manager.answerSnapPermissions(false)
+        Controls.ScrollView {
+            contentWidth: availableWidth
+            Layout.fillWidth: true
+            Layout.preferredHeight: Math.min(newSnapPermissions.implicitHeight,
+                                            Kirigami.Units.gridUnit * 14)
+            Controls.Label {
+                id: newSnapPermissions
+                width: parent.width
+                text: snapPermissionsDialog.message
+                textFormat: Text.PlainText
+                wrapMode: Text.Wrap
+            }
+        }
+        footer: Controls.ToolBar {
+            padding: Kirigami.Units.largeSpacing * 2
+            contentItem: RowLayout {
+                Item { Layout.fillWidth: true }
+                Controls.Button {
+                    id: cancelSnapPermissionsButton
+                    text: qsTr("Cancel")
+                    onClicked: snapPermissionsDialog.close()
+                }
+                Controls.Button {
+                    text: qsTr("Update")
+                    highlighted: true
+                    onClicked: {
+                        snapPermissionsDialog.proceeding = true;
+                        manager.answerSnapPermissions(true);
+                        snapPermissionsDialog.close();
                     }
                 }
             }

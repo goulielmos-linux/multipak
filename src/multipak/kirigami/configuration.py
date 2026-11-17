@@ -69,7 +69,15 @@ class Configuration(QObject):
     def reset(self, profiles, existing, suggested, occupied=()):
         self.occupied = tuple(occupied)
         candidates = tuple(item for item in profiles if item.kind == suggested.kind)
-        if suggested not in candidates:
+        if suggested not in candidates and suggested.kind == "apk":
+            # An Alpine release past its support, for a package built for it: listed with
+            # the others, newest first, before edge.
+            at = next(
+                (i for i, item in enumerate(candidates) if item.id.endswith("-edge")),
+                len(candidates),
+            )
+            candidates = (*candidates[:at], suggested, *candidates[at:])
+        elif suggested not in candidates:
             candidates = (suggested, *candidates)
         choices = {}
         for profile in candidates:
@@ -122,7 +130,7 @@ class Configuration(QObject):
 
     @Property("QVariantList", notify=changed)
     def profileOptions(self):
-        return [{"title": item.title} for item in self.profiles]
+        return [{"title": tr(item.title)} for item in self.profiles]
 
     @Property(int, notify=changed)
     def profileIndex(self):
@@ -132,7 +140,7 @@ class Configuration(QObject):
 
     @Property(str, notify=changed)
     def suggestedTitle(self):
-        return self.suggested.title if self.suggested else ""
+        return tr(self.suggested.title) if self.suggested else ""
 
     @Property(bool, notify=changed)
     def useSuggested(self):

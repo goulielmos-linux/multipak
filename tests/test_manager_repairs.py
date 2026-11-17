@@ -110,3 +110,15 @@ def test_delete_removes_the_copy_and_shortcut_but_not_the_container(manager, mon
     assert not store.appimage_directory(tx.id).exists()
     assert not store.launcher(tx, tx.launchers[0]).exists()
     assert manager.repairs == []
+
+
+def test_the_uninstall_button_of_a_row_asks_about_that_application(manager):
+    tx = manager.store.transactions()[0]
+    manager._mode, manager._items, manager._selected = "remove", [tx], -1
+    assert manager.rows[0]["removable"]
+    asked = []
+    manager.confirmationRequested.connect(lambda: asked.append(True))
+    manager.removeRow(0)
+    assert asked == [True]
+    assert manager.selectedIndex == 0
+    assert manager.confirmationName == "Flatpak-Builder2"

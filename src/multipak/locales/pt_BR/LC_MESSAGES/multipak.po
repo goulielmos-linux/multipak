@@ -351,7 +351,7 @@ msgid "Distribution detection confidence:"
 msgstr "Confiança da identificação:"
 
 msgid "Distribution detection confidence: {0}.\n\n{1}"
-msgstr "Confiança na identificação: {0}.\n\n{1}"
+msgstr "Confiança da identificação: {0}.\n\n{1}"
 
 msgid "Distribution format."
 msgstr "Formato de distribuição."
@@ -454,6 +454,9 @@ msgstr "A instalação terminou sem confirmar que o pacote foi instalado."
 
 msgid "Installation in progress"
 msgstr "Instalação em andamento"
+
+msgid "Installation method"
+msgstr "Método de instalação"
 
 msgid "Installation method and settings"
 msgstr "Método e configuração da instalação"
@@ -593,8 +596,8 @@ msgstr "Gerenciador de Aplicativos MultiPak"
 msgid "MultiPak Installation Wizard"
 msgstr "Assistente de Instalação MultiPak"
 
-msgid "MultiPak could not determine which RPM-based distribution this package was built for, so it will use the latest Fedora version as the default environment: {0}.\n\nIf the application does not work after installation, it may have been built for a different Fedora version or another distribution, such as Nobara, Rocky Linux, AlmaLinux or openSUSE. Uninstall it through Application Manager — MultiPak and look for a package built for your chosen distribution."
-msgstr "Como não foi possível determinar se o pacote foi preparado para Fedora ou para outra distribuição que utiliza RPM, o MultiPak utilizará a versão mais recente do Fedora como ambiente padrão: {0}.\n\nSe o aplicativo não funcionar após a instalação, ele pode ter sido preparado para outra versão do Fedora ou para outra distribuição, como Nobara, Rocky Linux, AlmaLinux ou openSUSE. Desinstale-o pelo Gerenciador de Aplicativos — MultiPak e procure uma versão do pacote mais apropriada."
+msgid "MultiPak could not determine which RPM-based distribution this package was built for, so it will use the latest Fedora version as the default environment: {0}.\n\nIf the application does not work after installation, it may have been built for a different Fedora version or another distribution, such as Nobara, Rocky Linux or AlmaLinux. Uninstall it through Application Manager — MultiPak and look for a package built for your chosen distribution."
+msgstr "Como não foi possível determinar se o pacote foi preparado para Fedora ou para outra distribuição que utiliza RPM, o MultiPak utilizará a versão mais recente do Fedora como ambiente padrão: {0}.\n\nSe o aplicativo não funcionar após a instalação, ele pode ter sido preparado para outra versão do Fedora ou para outra distribuição, como Nobara, Rocky Linux ou AlmaLinux. Desinstale-o pelo Gerenciador de Aplicativos — MultiPak e procure uma versão do pacote mais apropriada."
 
 msgid "MultiPak could not load its interface: {0}"
 msgstr "O MultiPak não conseguiu carregar sua interface: {0}"
@@ -1158,7 +1161,7 @@ msgid "Wait for the operation to finish before closing the manager."
 msgstr "Aguarde a operação terminar antes de fechar o gerenciador."
 
 msgid "Welcome to the MultiPak Installation Wizard"
-msgstr "Bem-vindo ao Assistente de Instalação MultiPak"
+msgstr "Bem-vindo(a) ao Assistente de Instalação MultiPak"
 
 msgid "You can now open it from the application launcher."
 msgstr "Você já pode abri-lo pelo lançador de aplicativos."
@@ -1425,8 +1428,8 @@ msgstr "Criando o contêiner para AppImages…"
 msgid "GNU C Library {0} or newer"
 msgstr "Biblioteca C GNU (glibc) {0} ou mais recente"
 
-msgid "Install the application and its dependencies in a container (recommended)"
-msgstr "Instalar o aplicativo e as dependências em um contêiner (recomendado)"
+msgid "Install the application and its dependencies (recommended)"
+msgstr "Instalar o aplicativo e suas dependências (recomendado)"
 
 msgid "Installing the dependencies found by the check…"
 msgstr "Instalando as dependências encontradas na verificação…"
@@ -1443,8 +1446,8 @@ msgstr "Biblioteca {0}"
 msgid "Missing dependencies"
 msgstr "Dependências ausentes"
 
-msgid "Note: this list was obtained without running the application and may be incomplete."
-msgstr "Obs.: esta lista foi obtida sem executar o aplicativo e pode estar incompleta."
+msgid "The AppImage was analyzed without running it. Some dependencies can only be identified when it is opened."
+msgstr "O AppImage foi analisado sem ser executado. Algumas dependências só podem ser identificadas quando ele for aberto."
 
 msgid "Preparing the container for the application…"
 msgstr "Preparando o contêiner para o aplicativo…"
@@ -1464,8 +1467,11 @@ msgstr "Ver quais dependências estão ausentes"
 msgid "The AppImage container identity or ownership has changed. It was not used."
 msgstr "A identidade ou a propriedade do contêiner de AppImages mudou. Ele não foi usado."
 
-msgid "The application will be installed, but you will need to install the missing dependencies later."
-msgstr "O aplicativo será instalado, mas você precisará instalar depois as dependências que faltam."
+msgid "Install only the application"
+msgstr "Instalar apenas o aplicativo"
+
+msgid "Any missing dependencies will need to be installed manually later."
+msgstr "As dependências que faltarem precisarão ser instaladas manualmente depois."
 
 msgid "The check installed additional dependencies: {0}."
 msgstr "A verificação instalou dependências adicionais: {0}."
@@ -1476,8 +1482,8 @@ msgstr "O contêiner deste AppImage não está disponível. Instale o AppImage n
 msgid "The isolated check could not be completed: {0}"
 msgstr "Não foi possível concluir a verificação isolada: {0}"
 
-msgid "The system will not be changed."
-msgstr "O sistema não será alterado."
+msgid "The dependencies will be installed in a container. The system will not be changed."
+msgstr "As dependências serão instaladas em um contêiner. O sistema não será alterado."
 
 msgid "These dependencies could not be installed automatically: {0}."
 msgstr "Não foi possível instalar automaticamente estas dependências: {0}."
@@ -1485,17 +1491,11 @@ msgstr "Não foi possível instalar automaticamente estas dependências: {0}."
 msgid "This AppImage does not include all the dependencies it needs."
 msgstr "Este AppImage não inclui todas as dependências de que precisa."
 
-msgid "When finished, open the application for a few seconds in an isolated environment to find other missing dependencies and install them."
-msgstr "Ao final, abrir o aplicativo por alguns segundos em um ambiente isolado para procurar outras dependências ausentes e instalá-las."
-
 msgid "Another container is now using the name {0}. It was not updated. Reload the list before updating."
 msgstr "Outro contêiner está usando o nome {0} agora. Ele não foi atualizado. Recarregue a lista antes de atualizar."
 
 msgid "Fedora can locate the correct package from the name of each missing library, which makes it possible to install the dependencies automatically. All AppImages installed in a container will share this same environment."
 msgstr "O Fedora permite localizar o pacote correto a partir do nome de cada biblioteca ausente, o que torna possível instalar as dependências automaticamente. Todos os AppImages instalados em contêiner compartilharão este mesmo ambiente."
-
-msgid "MultiPak will install in the container the dependencies it does not already have."
-msgstr "O MultiPak instalará no contêiner as dependências que ainda não estiverem nele."
 
 msgid "Required dependencies"
 msgstr "Dependências exigidas"
@@ -1736,3 +1736,1558 @@ msgstr "{0} está atualizado."
 
 msgid "{0} was updated."
 msgstr "{0} foi atualizado."
+
+msgid "A component this snap needs ({0}) is missing. Install the snap again."
+msgstr "Um componente de que este snap precisa ({0}) está faltando. Instale o snap novamente."
+
+msgid "Copying the snap…"
+msgstr "Copiando o snap…"
+
+msgid "Could not find unsquashfs to read the snap."
+msgstr "Não foi possível encontrar o unsquashfs para ler o snap."
+
+msgid "Could not read the content snap {0}: {1}"
+msgstr "Não foi possível ler o snap de conteúdo {0}: {1}"
+
+msgid "Downloading {0} from the Snap Store: {1} of {2} MB…"
+msgstr "Baixando {0} da Snap Store: {1} de {2} MB…"
+
+msgid "Enter the name or the snapcraft.io link of a snap."
+msgstr "Digite o nome ou o link snapcraft.io de um snap."
+
+msgid "Extracting the snap…"
+msgstr "Extraindo o snap…"
+
+msgid "For example: hello-world or https://snapcraft.io/hello-world"
+msgstr "Por exemplo: hello-world ou https://snapcraft.io/hello-world"
+
+msgid "Ignoring the content target {0}."
+msgstr "Ignorando o destino de conteúdo {0}."
+
+msgid "Install bubblewrap on the system to open snaps."
+msgstr "Instale o bubblewrap no sistema para abrir snaps."
+
+msgid "Install from the Snap Store"
+msgstr "Instalar da Snap Store"
+
+msgid "Invalid snap name: {0}"
+msgstr "Nome de snap inválido: {0}"
+
+msgid "Looking for {0} in the Snap Store…"
+msgstr "Procurando {0} na Snap Store…"
+
+msgid "MultiPak's copy of the snap and its shortcuts will be removed. The application's data in the snap folder of your home will be preserved."
+msgstr "A cópia do snap mantida pelo MultiPak e seus atalhos serão removidos. Os dados do aplicativo na pasta snap da sua pasta pessoal serão preservados."
+
+msgid "Preparing the components the snap needs…"
+msgstr "Preparando os componentes de que o snap precisa…"
+
+msgid "Preparing {0}…"
+msgstr "Preparando {0}…"
+
+msgid "Snap managed by MultiPak"
+msgstr "Snap gerenciado pelo MultiPak"
+
+msgid "Snap uninstalled. Personal data was preserved."
+msgstr "Snap desinstalado. Os dados pessoais foram preservados."
+
+msgid "Snap with classic confinement"
+msgstr "Snap com confinamento clássico"
+
+msgid "The Snap Store could not be reached: {0}"
+msgstr "Não foi possível acessar a Snap Store: {0}"
+
+msgid "The Snap Store has no snap named {0}."
+msgstr "A Snap Store não tem nenhum snap chamado {0}."
+
+msgid "The Snap Store has no stable release of {0} for this computer."
+msgstr "A Snap Store não tem uma versão estável de {0} para este computador."
+
+msgid "The Snap Store returned incomplete information for {0}."
+msgstr "A Snap Store retornou informações incompletas sobre {0}."
+
+msgid "The content snap {0} does not provide {1}."
+msgstr "O snap de conteúdo {0} não fornece {1}."
+
+msgid "The downloaded snap is larger than expected."
+msgstr "O snap baixado é maior do que o esperado."
+
+msgid "The downloaded snap {0} failed verification."
+msgstr "O snap {0} baixado não passou na verificação."
+
+msgid "The file contents do not match a valid RPM, DEB, Arch, AppImage or snap package. {0}"
+msgstr "O conteúdo do arquivo não corresponde a um pacote RPM, DEB, Arch, AppImage ou snap válido. {0}"
+
+msgid "The file has changed. Open the snap again."
+msgstr "O arquivo foi alterado. Abra o snap novamente."
+
+msgid "The package is not a snap."
+msgstr "O pacote não é um snap."
+
+msgid "The shortcut {0} was skipped."
+msgstr "O atalho {0} foi ignorado."
+
+msgid "The snap copy has changed. Open the snap again."
+msgstr "A cópia do snap foi alterada. Abra o snap novamente."
+
+msgid "The snap copy is missing. Open the snap again."
+msgstr "A cópia do snap não foi encontrada. Abra o snap novamente."
+
+msgid "The snap directory must not be a symbolic link."
+msgstr "A pasta do snap não pode ser um link simbólico."
+
+msgid "The snap does not contain {0}."
+msgstr "O snap não contém {0}."
+
+msgid "The snap files are missing. Install the snap again."
+msgstr "Os arquivos do snap não foram encontrados. Instale o snap novamente."
+
+msgid "The snap layout {0} is not valid."
+msgstr "O layout {0} do snap não é válido."
+
+msgid "The snap metadata could not be read: {0}"
+msgstr "Não foi possível ler os metadados do snap: {0}"
+
+msgid "The snap metadata has an invalid {0} field."
+msgstr "Os metadados do snap têm um campo {0} inválido."
+
+msgid "The snap was installed and added to the application launcher."
+msgstr "O snap foi instalado e adicionado ao lançador de aplicativos."
+
+msgid "The snap {0} could not be downloaded: {1}"
+msgstr "Não foi possível baixar o snap {0}: {1}"
+
+msgid "The snap {0} has unexpected contents."
+msgstr "O snap {0} tem um conteúdo inesperado."
+
+msgid "The store redirected to an insecure address."
+msgstr "A loja redirecionou para um endereço inseguro."
+
+msgid "This application is packaged in Snap format, used by distributions such as Ubuntu."
+msgstr "Este aplicativo está empacotado no formato Snap, usado por distribuições como o Ubuntu."
+
+msgid "This file is not a snap."
+msgstr "Este arquivo não é um snap."
+
+msgid "This snap cannot be installed"
+msgstr "Este snap não pode ser instalado"
+
+msgid "This snap does not contain an application to open."
+msgstr "Este snap não contém um aplicativo para abrir."
+
+msgid "This snap does not have an application named {0}."
+msgstr "Este snap não tem um aplicativo chamado {0}."
+
+msgid "This snap does not include an application shortcut."
+msgstr "Este snap não inclui um atalho de aplicativo."
+
+msgid "This snap installation is unavailable."
+msgstr "Esta instalação de snap não está disponível."
+
+msgid "This snap is a system component ({0}), not an application."
+msgstr "Este snap é um componente de sistema ({0}), não um aplicativo."
+
+msgid "This snap needs system-level permissions ({0}) that MultiPak does not grant."
+msgstr "Este snap precisa de permissões de sistema ({0}) que o MultiPak não concede."
+
+msgid "This snap runs background services ({0}). MultiPak installs applications only; services need the system's own snap support."
+msgstr "Este snap roda serviços em segundo plano ({0}). O MultiPak instala apenas aplicativos; serviços precisam do suporte a snap do próprio sistema."
+
+msgid "This snap was built for {0} and cannot run on this computer ({1})."
+msgstr "Este snap foi feito para {0} e não pode rodar neste computador ({1})."
+
+msgid "Using {0} revision {1} ({2} of {3})."
+msgstr "Usando {0}, revisão {1} ({2} de {3})."
+
+msgid "an empty base"
+msgstr "uma base vazia"
+
+
+msgid "The package and its dependencies will be installed in an environment created with bubblewrap, without changing the base system image.\n\nAny available shortcuts will appear in your application launcher."
+msgstr "O pacote e suas dependências serão instalados em um ambiente criado com o bubblewrap, sem alterar a imagem-base do sistema.\n\nAtalhos disponíveis aparecerão no lançador de aplicativos."
+
+msgid "The package and its dependencies will be installed in an environment created with bubblewrap. As a classic snap, the application sees the whole system there, with your user's permissions: bubblewrap only adds the /snap folder, with the snap and the %1 it needs, without isolating it. The base system image is not changed.\n\nAny available shortcuts will appear in your application launcher."
+msgstr "O pacote e suas dependências serão instalados em um ambiente criado com o bubblewrap. Por ser um snap clássico, nesse ambiente o aplicativo vê o sistema inteiro, com as permissões do seu usuário: o bubblewrap só acrescenta a pasta /snap, com o snap e o %1 de que ele precisa, sem isolá-lo. A imagem-base do sistema não é alterada.\n\nAtalhos disponíveis aparecerão no lançador de aplicativos."
+
+msgid "Snap (classic)"
+msgstr "Snap (clássico)"
+
+msgid "The snap's metadata indicates that it was built for {0} ({1})."
+msgstr "Os metadados do snap indicam que ele foi feito para {0} ({1})."
+
+msgid "(already available)"
+msgstr "(já disponível)"
+
+msgid "MultiPak will download from the Snap Store the dependencies it does not already have."
+msgstr "O MultiPak vai baixar da Snap Store as dependências que ainda não tiver."
+
+msgid "(could not be found automatically)"
+msgstr "(não foi encontrada automaticamente)"
+
+msgid "These dependencies could not be found automatically: {0}. The application may not work completely."
+msgstr "Não foi possível encontrar automaticamente estas dependências: {0}. O aplicativo pode não funcionar por completo."
+
+msgid "These optional components are not installed: {0}. Features that depend on them may not work."
+msgstr "Estes componentes opcionais não estão instalados: {0}. Os recursos que dependem deles podem não funcionar."
+
+
+msgid "This snap needs system user accounts ({0}) that MultiPak does not create."
+msgstr "Este snap precisa de contas de usuário do sistema ({0}) que o MultiPak não cria."
+
+msgid "components cannot be installed now"
+msgstr "componentes não podem ser instalados agora"
+
+msgid "MultiPak has no equivalent for snapctl {0}"
+msgstr "o MultiPak não tem equivalente para snapctl {0}"
+
+msgid "Running the snap's installation scripts…"
+msgstr "Executando os scripts de instalação do snap…"
+
+msgid "The snap's {0} script failed:\n{1}"
+msgstr "O script {0} do snap falhou:\n{1}"
+
+msgid "This snap does not have a {0} script."
+msgstr "Este snap não tem um script {0}."
+
+msgid "error: which command?"
+msgstr "erro: qual comando?"
+
+msgid "invalid JSON value: {0}"
+msgstr "valor JSON inválido: {0}"
+
+msgid "invalid configuration: {0} (want key=value)"
+msgstr "configuração inválida: {0} (use chave=valor)"
+
+msgid "invalid health status"
+msgstr "estado de saúde inválido"
+
+msgid "invalid option name: {0}"
+msgstr "nome de opção inválido: {0}"
+
+msgid "is-connected needs the name of one plug or slot"
+msgstr "is-connected precisa do nome de um plug ou slot"
+
+msgid "previous values are only available while a configuration changes"
+msgstr "valores anteriores só estão disponíveis durante uma mudança de configuração"
+
+msgid "set which option?"
+msgstr "definir qual opção?"
+
+msgid "unknown option {0}"
+msgstr "opção desconhecida {0}"
+
+msgid "unset which option?"
+msgstr "remover qual opção?"
+
+msgid "(not available)"
+msgstr "(não disponível)"
+
+msgid "Downloading the component {0}…"
+msgstr "Baixando o componente {0}…"
+
+msgid "Optional components:"
+msgstr "Componentes opcionais:"
+
+msgid "The component {0} cannot be installed by MultiPak."
+msgstr "O componente {0} não pode ser instalado pelo MultiPak."
+
+msgid "The component {0} does not belong to {1}."
+msgstr "O componente {0} não pertence a {1}."
+
+msgid "The snap {0} has no component named {1}."
+msgstr "O snap {0} não tem um componente chamado {1}."
+
+msgid "name a component as +component"
+msgstr "indique o componente como +componente"
+
+msgid "The snap does not contain meta/snap.yaml."
+msgstr "O snap não contém meta/snap.yaml."
+
+msgid "Bluetooth"
+msgstr "Bluetooth"
+
+msgid "Could not check the services the snap uses: {0}"
+msgstr "Não foi possível verificar os serviços que o snap usa: {0}"
+
+msgid "GNOME online accounts"
+msgstr "contas online do GNOME"
+
+msgid "These features may not work, because this system does not have the service they use: {0}."
+msgstr "Estes recursos podem não funcionar, porque o sistema não tem o serviço que eles usam: {0}."
+
+msgid "Ubuntu online accounts"
+msgstr "contas online do Ubuntu"
+
+msgid "battery status"
+msgstr "estado da bateria"
+
+msgid "calendars (GNOME's evolution-data-server)"
+msgstr "agendas (evolution-data-server do GNOME)"
+
+msgid "contacts (GNOME's evolution-data-server)"
+msgstr "contatos (evolution-data-server do GNOME)"
+
+msgid "disks and removable media"
+msgstr "discos e mídias removíveis"
+
+msgid "file chooser and other desktop integration"
+msgstr "seletor de arquivos e outras integrações com a área de trabalho"
+
+msgid "finding devices on the local network"
+msgstr "encontrar dispositivos na rede local"
+
+msgid "icon in the system tray"
+msgstr "ícone na bandeja do sistema"
+
+msgid "keeping the screen on"
+msgstr "manter a tela ligada"
+
+msgid "location (Ubuntu's location service)"
+msgstr "localização (serviço de localização do Ubuntu)"
+
+msgid "mobile modems"
+msgstr "modems móveis"
+
+msgid "network status"
+msgstr "estado da rede"
+
+msgid "printing"
+msgstr "impressão"
+
+msgid "saved passwords"
+msgstr "senhas salvas"
+
+msgid "sound"
+msgstr "som"
+
+msgid "The snap's file list could not be read."
+msgstr "Não foi possível ler a lista de arquivos do snap."
+
+msgid "The snap contains special files outside /dev, which MultiPak cannot create: {0}"
+msgstr "O snap contém arquivos especiais fora de /dev, que o MultiPak não consegue criar: {0}"
+
+msgid "Bubblewrap based on %1"
+msgstr "Bubblewrap baseado em %1"
+
+msgid "MultiPak will download the base from the Snap Store if it does not already have it."
+msgstr "O MultiPak baixará a base da Snap Store se ainda não a tiver."
+
+msgid "MultiPak does not mount or unmount anything for snaps; nothing was changed"
+msgstr "O MultiPak não monta nem desmonta nada para snaps; nada foi alterado"
+
+msgid "This snap names system files that snapd itself would not accept: {0}"
+msgstr "Este snap indica arquivos do sistema que o próprio snapd não aceitaria: {0}"
+
+msgid "The snap asks to change these system files, which MultiPak shows read-only: {0}. Features that write to them may not work."
+msgstr "O snap pede para alterar estes arquivos do sistema, que o MultiPak mostra somente para leitura: {0}. Recursos que gravam neles podem não funcionar."
+
+msgid "Ignoring the content source {0}."
+msgstr "Ignorando a origem de conteúdo {0}."
+
+msgid "These background services of the snap will not run: {0}. Features that depend on them may not work."
+msgstr "Estes serviços em segundo plano do snap não serão executados: {0}. Os recursos que dependem deles podem não funcionar."
+
+msgid "MultiPak does not run the snap's background services; nothing was started"
+msgstr "O MultiPak não executa os serviços em segundo plano do snap; nada foi iniciado"
+
+msgid "This snap is already installed. MultiPak will not overwrite the existing installation."
+msgstr "Este snap já está instalado. O assistente não vai sobrescrever a instalação existente."
+
+msgid "The app's data in {0} was moved to the trash."
+msgstr "Os dados do aplicativo em {0} foram movidos para a lixeira."
+
+msgid "Could not move {0} to the trash: {1}"
+msgstr "Não foi possível mover {0} para a lixeira: {1}"
+
+msgid "This cannot be opened: {0}"
+msgstr "Isto não pode ser aberto: {0}"
+
+msgid "Links of this kind are not opened for snaps: {0}"
+msgstr "Links deste tipo não são abertos para snaps: {0}"
+
+msgid "Only files in the home folder can be opened: {0}"
+msgstr "Só arquivos da pasta pessoal podem ser abertos: {0}"
+
+msgid "The snap metadata is too large."
+msgstr "Os metadados do snap são grandes demais."
+
+msgid "the configuration is too large"
+msgstr "a configuração é grande demais"
+
+msgid "There is not enough free space: {0} MB are needed, {1} MB are free."
+msgstr "Não há espaço livre suficiente: são necessários {0} MB, há {1} MB livres."
+
+msgid "Preliminary dependencies:"
+msgstr "Dependências preliminares:"
+
+msgid "Preliminary dependencies"
+msgstr "Dependências preliminares"
+
+msgid "Not found on your system:"
+msgstr "Não encontradas no seu sistema:"
+
+msgid "To run the AppImage in the container:"
+msgstr "Para executar o AppImage no contêiner:"
+
+msgid "Before the installation finishes, the application will run for %1 seconds in an isolated environment to look for other dependencies."
+msgstr "Antes da conclusão da instalação, o aplicativo será executado por %1 segundos em um ambiente isolado para buscar outras dependências."
+
+msgid "PyPI only offers the source code of {0}, which needs to be compiled; MultiPak builds only packages made of Python code."
+msgstr "O PyPI só oferece o código-fonte de {0}, que precisa ser compilado; o MultiPak só monta pacotes feitos de código Python."
+
+msgid "The source code of {0} could not be built into a package."
+msgstr "Não foi possível montar um pacote a partir do código-fonte de {0}."
+
+msgid "The source code does not say clearly how it is built."
+msgstr "O código-fonte não indica claramente como deve ser montado."
+
+msgid "Building {0} in an isolated environment…"
+msgstr "Montando {0} em um ambiente isolado…"
+
+msgid "Could not prepare a virtual display for the check: {0}"
+msgstr "Não foi possível preparar uma tela virtual para a verificação: {0}"
+
+msgid "The build system could not say what it needs: {0}"
+msgstr "O sistema de montagem não conseguiu informar do que precisa: {0}"
+
+msgid "The build also needs: {0}"
+msgstr "A montagem também precisa de: {0}"
+
+msgid "AppImages"
+msgstr "AppImages"
+
+msgid "Applications installed directly on the system (rpm-ostree) are updated together with the system."
+msgstr "Aplicativos instalados diretamente no sistema (rpm-ostree) são atualizados junto com o sistema."
+
+msgid "Applications: {0}"
+msgstr "Aplicativos: {0}"
+
+msgid "Check for updates"
+msgstr "Verificar atualizações"
+
+msgid "Checking for updates…"
+msgstr "Verificando atualizações…"
+
+msgid "Choose an item to update, or update everything. A container is updated with everything installed in it, including applications and their dependencies. Your system itself is not changed."
+msgstr "Escolha um item para atualizar ou atualize tudo. Um contêiner é atualizado com tudo o que está instalado nele, inclusive aplicativos e suas dependências. O sistema em si não é alterado."
+
+msgid "Choose file…"
+msgstr "Escolher arquivo…"
+
+msgid "Containers"
+msgstr "Contêineres"
+
+msgid "Could not update:"
+msgstr "Não foi possível atualizar:"
+
+msgid "Dependencies of AppImages"
+msgstr "Dependências de AppImages"
+
+msgid "Everything is up to date."
+msgstr "Tudo está atualizado."
+
+msgid "From a file"
+msgstr "De um arquivo"
+
+msgid "From the Snap Store"
+msgstr "Da Snap Store"
+
+msgid "Not updated: {0}"
+msgstr "Não atualizados: {0}"
+
+msgid "Nothing installed by MultiPak can be updated."
+msgstr "Nada instalado pelo MultiPak pode ser atualizado."
+
+msgid "These AppImages do not indicate their update address. Select each one and choose Update: {0}"
+msgstr "Estas AppImages não indicam o endereço de atualização. Selecione cada uma e escolha Atualizar: {0}"
+
+msgid "Update all"
+msgstr "Atualizar tudo"
+
+msgid "Update the containers and AppImages installed through MultiPak."
+msgstr "Atualize os contêineres e as AppImages instalados pelo MultiPak."
+
+msgid "Updated: {0}"
+msgstr "Atualizados: {0}"
+
+msgid "Updates not checked yet."
+msgstr "Atualizações ainda não verificadas."
+
+msgid "Install from a package file or from the Snap Store."
+msgstr "Instale a partir de um arquivo de pacote ou da Snap Store."
+
+msgid "Could not start the snap's services:\n{0}"
+msgstr "Não foi possível iniciar os serviços do snap:\n{0}"
+
+msgid "Could not prepare the snap's /tmp folder: {0}"
+msgstr "Não foi possível preparar a pasta /tmp do snap: {0}"
+
+msgid "Could not stop the snap's services:\n{0}"
+msgstr "Não foi possível parar os serviços do snap:\n{0}"
+
+msgid "Could not stop the snap's services: {0}"
+msgstr "Não foi possível parar os serviços do snap: {0}"
+
+msgid "MultiPak cannot run these services yet: {0}"
+msgstr "O MultiPak ainda não consegue executar estes serviços: {0}"
+
+msgid "MultiPak cannot run this service yet: {0}"
+msgstr "O MultiPak ainda não consegue executar este serviço: {0}"
+
+msgid "Starting the snap's background services…"
+msgstr "Iniciando os serviços em segundo plano do snap…"
+
+msgid "The snap's background services could not be started: {0}"
+msgstr "Não foi possível iniciar os serviços em segundo plano do snap: {0}"
+
+msgid "The snap's services depend on each other in a loop."
+msgstr "Os serviços do snap dependem uns dos outros em ciclo."
+
+msgid "These background services run with your user account, not as the administrator: {0}. They cannot use network ports below 1024."
+msgstr "Estes serviços em segundo plano rodam com a sua conta de usuário, não como administrador: {0}. Eles não podem usar portas de rede abaixo de 1024."
+
+msgid "This snap does not have a background service named {0}."
+msgstr "Este snap não tem um serviço em segundo plano chamado {0}."
+
+msgid "This snap only runs background services that MultiPak cannot run yet: {0}."
+msgstr "Este snap só executa serviços em segundo plano que o MultiPak ainda não consegue executar: {0}."
+
+msgid "Unknown action: {0}"
+msgstr "Ação desconhecida: {0}"
+
+msgid "the snap's services cannot be managed from here"
+msgstr "os serviços do snap não podem ser gerenciados daqui"
+
+msgid "unknown service: {0}"
+msgstr "serviço desconhecido: {0}"
+
+msgid "Invalid socket for a snap service: {0}"
+msgstr "Socket inválido para um serviço do snap: {0}"
+
+msgid "MultiPak cannot create this service's socket: {0}"
+msgstr "O MultiPak não consegue criar o socket deste serviço: {0}"
+
+msgid "The timer is empty."
+msgstr "O timer está vazio."
+
+msgid "The timer {0} is not understood."
+msgstr "O timer {0} não foi entendido."
+
+msgid "The timer {0} runs too often."
+msgstr "O timer {0} é executado com frequência demais."
+
+msgid "This snap needs system user accounts ({0}). They need subordinate IDs for your user (/etc/subuid and /etc/subgid) and newuidmap, as rootless Podman does."
+msgstr "Este snap precisa de contas de usuário do sistema ({0}). Elas exigem IDs subordinados para o seu usuário (/etc/subuid e /etc/subgid) e o newuidmap, como o Podman sem root."
+
+msgid "Background services"
+msgstr "Serviços em segundo plano"
+
+msgid "Failed"
+msgstr "Com falha"
+
+msgid "MultiPak cannot run this service: {0}"
+msgstr "O MultiPak não consegue executar este serviço: {0}"
+
+msgid "No installed snap has background services."
+msgstr "Nenhum snap instalado tem serviços em segundo plano."
+
+msgid "Running"
+msgstr "Em execução"
+
+msgid "Runs with your account and starts with your session."
+msgstr "Roda com a sua conta e inicia com a sua sessão."
+
+msgid "Scheduled"
+msgstr "Agendado"
+
+msgid "See, start and stop the services of your snaps."
+msgstr "Veja, inicie e pare os serviços dos seus snaps."
+
+msgid "Show log"
+msgstr "Ver registro"
+
+msgid "Start"
+msgstr "Iniciar"
+
+msgid "Started after installation and when you ask."
+msgstr "Iniciado após a instalação e quando você pedir."
+
+msgid "Started only when you ask."
+msgstr "Iniciado só quando você pedir."
+
+msgid "Starting"
+msgstr "Iniciando"
+
+msgid "Starting {0}…"
+msgstr "Iniciando {0}…"
+
+msgid "Stop"
+msgstr "Parar"
+
+msgid "Stopped"
+msgstr "Parado"
+
+msgid "Stopping"
+msgstr "Parando"
+
+msgid "Stopping {0}…"
+msgstr "Parando {0}…"
+
+msgid "The D-Bus name {0} belongs to another program; it does not start {1}."
+msgstr "O nome D-Bus {0} pertence a outro programa; ele não inicia {1}."
+
+msgid "The log is in the details below."
+msgstr "O registro está nos detalhes abaixo."
+
+msgid "The service has not written anything yet."
+msgstr "O serviço ainda não escreveu nada."
+
+msgid "The services of the snaps installed through MultiPak. They run with your user account, never as the administrator."
+msgstr "Os serviços dos snaps instalados pelo MultiPak. Eles rodam com a sua conta de usuário, nunca como administrador."
+
+msgid "These services of the snap are still running: {0}. Nothing was removed; stop them and try again."
+msgstr "Estes serviços do snap ainda estão em execução: {0}. Nada foi removido; pare-os e tente de novo."
+
+msgid "This is a preview. No service was changed."
+msgstr "Esta é uma prévia. Nenhum serviço foi alterado."
+
+msgid "Runs on its schedule ({0})."
+msgstr "Roda no seu horário ({0})."
+
+msgid "No installation is in progress."
+msgstr "Nenhuma instalação está em andamento."
+
+msgid "The command's output could not be read."
+msgstr "Não foi possível ler a saída do comando."
+
+msgid "From the {0} channel, not the stable one. Snaps there can break and change often."
+msgstr "Do canal {0}, não do estável. Snaps nesse canal podem quebrar e mudar com frequência."
+
+msgid "From the {0} channel."
+msgstr "Do canal {0}."
+
+msgid "The Snap Store has no release of {0} in the channel {1} for this computer."
+msgstr "A Snap Store não tem versão de {0} no canal {1} para este computador."
+
+msgid "Channel:"
+msgstr "Canal:"
+
+msgid "Bases and content"
+msgstr "Bases e conteúdo"
+
+msgid "Channel: {0}"
+msgstr "Canal: {0}"
+
+msgid "Installed from a local file. Updates are unavailable."
+msgstr "Instalado de um arquivo local. Não há atualizações disponíveis."
+
+msgid "Installed revisions: {0}"
+msgstr "Revisões instaladas: {0}"
+
+msgid "Snaps"
+msgstr "Snaps"
+
+msgid "Update available: {0} (revision {1})"
+msgstr "Atualização disponível: {0} (revisão {1})"
+
+msgid "Update available: revision {0}"
+msgstr "Atualização disponível: revisão {0}"
+
+msgid "A snap data directory is unavailable or is a symbolic link."
+msgstr "Uma pasta de dados do snap está indisponível ou é um link simbólico."
+
+msgid "An interrupted snap update needs recovery before retrying."
+msgstr "É preciso recuperar a atualização interrompida do snap antes de tentar novamente."
+
+msgid "Classic confinement"
+msgstr "Confinamento clássico"
+
+msgid "Close the snap application before updating it."
+msgstr "Feche o aplicativo snap antes de atualizá-lo."
+
+msgid "Could not restore the snap after the update failed. The backup was kept."
+msgstr "Não foi possível restaurar o snap após a falha na atualização. A cópia de segurança foi mantida."
+
+msgid "Downloading the new snap revision…"
+msgstr "Baixando a nova revisão do snap…"
+
+msgid "Personal files"
+msgstr "Arquivos pessoais"
+
+msgid "Preparing the new snap revision…"
+msgstr "Preparando a nova revisão do snap…"
+
+msgid "Read access"
+msgstr "Acesso de leitura"
+
+msgid "Snap update cancelled."
+msgstr "Atualização do snap cancelada."
+
+msgid "Snap update permissions"
+msgstr "Permissões da atualização do snap"
+
+msgid "Stopping the snap's services…"
+msgstr "Parando os serviços do snap…"
+
+msgid "System files"
+msgstr "Arquivos do sistema"
+
+msgid "The available snap revision changed. Check for updates again."
+msgstr "A revisão disponível do snap mudou. Verifique se há atualizações novamente."
+
+msgid "The new revision does not provide the installed component {0}."
+msgstr "A nova revisão não oferece o componente instalado {0}."
+
+msgid "The snap still has running services. Stop them before updating."
+msgstr "O snap ainda tem serviços em execução. Pare-os antes de atualizar."
+
+msgid "This snap installation changed. Reload the list before updating."
+msgstr "Esta instalação do snap mudou. Recarregue a lista antes de atualizar."
+
+msgid "Update complete."
+msgstr "Atualização concluída."
+
+msgid "Wait for the snap update to finish."
+msgstr "Aguarde a atualização do snap terminar."
+
+msgid "Write access"
+msgstr "Acesso de escrita"
+
+msgid "{0} requests new permissions:"
+msgstr "{0} solicita novas permissões:"
+
+msgid "{0} · {1}: {2}"
+msgstr "{0} · {1}: {2}"
+
+msgid "Revert to previous version"
+msgstr "Voltar à versão anterior"
+
+msgid "The previous snap revision is unavailable."
+msgstr "A revisão anterior do snap está indisponível."
+
+msgid "The previous snap revision was restored."
+msgstr "A revisão anterior do snap foi restaurada."
+
+msgid "{0} returned to version {1} (revision {2})."
+msgstr "{0} voltou à versão {1} (revisão {2})."
+
+msgid "Downloading {0} from the Snap Store…"
+msgstr "Baixando {0} da Snap Store…"
+
+msgid "The selected snap base or content is unavailable."
+msgstr "A base ou o conteúdo selecionado está indisponível."
+
+msgid "{0} is not a snap base."
+msgstr "{0} não é uma base de snap."
+
+msgid "{0} no longer provides the content {1} required by {2}."
+msgstr "{0} deixou de fornecer o conteúdo {1} necessário para {2}."
+
+msgid "Check for updates to include these snaps, bases or content: {0}"
+msgstr "Verifique se há atualizações para incluir estes snaps, bases ou conteúdos: {0}"
+
+msgid "A process of the snap is still running. Its services were left stopped. End that process or restart the session, then try again."
+msgstr "Um processo do snap ainda está em execução. Os serviços dele ficaram parados. Encerre esse processo ou reinicie a sessão e tente de novo."
+
+msgid "A process of the snap's services is still running. The services were left stopped. End that process or restart the session, then try again."
+msgstr "Um processo dos serviços do snap ainda está em execução. Os serviços ficaram parados. Encerre esse processo ou reinicie a sessão e tente de novo."
+
+msgid "Revision {0} is already downloaded. Still to switch: {1}"
+msgstr "A revisão {0} já foi baixada. Ainda falta trocar: {1}"
+
+msgid "Using the snap revision downloaded earlier."
+msgstr "Usando a revisão do snap baixada antes."
+
+msgid "Classic snaps run without MultiPak's sandbox, so MultiPak does not run them as administrator."
+msgstr "Snaps clássicos rodam sem o sandbox do MultiPak; por isso o MultiPak não os executa como administrador."
+
+msgid "No installed snap has commands that MultiPak can run as administrator."
+msgstr "Nenhum snap instalado tem comandos que o MultiPak possa executar como administrador."
+
+msgid "This is a preview. Nothing was run."
+msgstr "Esta é uma prévia. Nada foi executado."
+
+msgid "Running {0} as administrator…"
+msgstr "Executando {0} como administrador…"
+
+msgid "The command finished. Its output is in the details below."
+msgstr "O comando terminou. A saída dele está nos detalhes abaixo."
+
+msgid "The command ended with exit code {0}. Its output is in the details below."
+msgstr "O comando terminou com o código de saída {0}. A saída dele está nos detalhes abaixo."
+
+msgid "Running {0} as the snap's administrator. It is root inside the snap's sandbox, never on your computer, and can change all of the snap's data."
+msgstr "Executando {0} como administrador do snap. Ele é root dentro do sandbox do snap, nunca no seu computador, e pode alterar todos os dados do snap."
+
+msgid "Administrator commands"
+msgstr "Comandos de administrador"
+
+msgid "Run a snap's administration command, such as Nextcloud's occ, as the snap's administrator."
+msgstr "Execute um comando de administração de um snap, como o occ do Nextcloud, como administrador do snap."
+
+msgid "Some snaps have commands that need the administrator, such as Nextcloud's occ. MultiPak runs them as root inside the snap's sandbox, never as the administrator of your computer. Choose the command and type its arguments."
+msgstr "Alguns snaps têm comandos que exigem o administrador, como o occ do Nextcloud. O MultiPak os executa como root dentro do sandbox do snap, nunca como administrador do seu computador. Escolha o comando e digite os argumentos dele."
+
+msgid "Command"
+msgstr "Comando"
+
+msgid "Arguments, for example: status"
+msgstr "Argumentos, por exemplo: status"
+
+msgid "Run as administrator…"
+msgstr "Executar como administrador…"
+
+msgid "Run as administrator?"
+msgstr "Executar como administrador?"
+
+msgid "The command runs as root inside the snap's sandbox. It can read, change and delete all of this snap's data, and run any program of the snap. It does not get administrator rights on your computer. Run only commands you trust, such as those in the snap's documentation."
+msgstr "O comando roda como root dentro do sandbox do snap. Ele pode ler, alterar e apagar todos os dados deste snap e executar qualquer programa do snap. Ele não recebe direitos de administrador no seu computador. Execute apenas comandos em que você confia, como os da documentação do snap."
+
+msgid "Run as administrator"
+msgstr "Executar como administrador"
+
+msgid "Container %1 will be created for the application's dependencies."
+msgstr "O contêiner %1 será criado para as dependências do aplicativo."
+
+msgid "Container %1 will be reused for the application's dependencies."
+msgstr "O contêiner %1 será reutilizado para as dependências do aplicativo."
+
+msgid "The dependencies will be installed in a Distrobox container using %1, without changing the base system image. The application will open from this container.\n\nAny available shortcuts will appear in your application launcher."
+msgstr "As dependências serão instaladas dentro de um contêiner Distrobox via %1, sem alterar a imagem-base do sistema. O aplicativo será aberto a partir desse contêiner.\n\nAtalhos disponíveis aparecerão no lançador de aplicativos."
+
+msgid "Alerts"
+msgstr "Alertas"
+
+msgid "Collapse"
+msgstr "Recolher"
+
+msgid "Expand"
+msgstr "Expandir"
+
+msgid "Channel"
+msgstr "Canal"
+
+msgid "Unstable channel"
+msgstr "Canal não estável"
+
+msgid "{0} can have problems and change often."
+msgstr "{0} pode apresentar falhas e mudar com frequência."
+
+msgid "Optional components not installed"
+msgstr "Componentes opcionais não instalados"
+
+msgid "Features that depend on them may not work."
+msgstr "Recursos que dependem deles podem não funcionar."
+
+msgid "They run with your user account. Ports below 1024 are unavailable."
+msgstr "Rodam com sua conta de usuário. Portas abaixo de 1024 estão indisponíveis."
+
+msgid "Background services that will not run"
+msgstr "Serviços em segundo plano que não vão rodar"
+
+msgid "Services missing on this system"
+msgstr "Serviços ausentes neste sistema"
+
+msgid "These features may not work."
+msgstr "Estes recursos podem não funcionar."
+
+msgid "Read-only system files"
+msgstr "Arquivos do sistema somente leitura"
+
+msgid "The snap asks to change them. Features that write to them may not work."
+msgstr "O snap pede para alterá-los. Recursos que gravam neles podem não funcionar."
+
+msgid "Dependencies not found"
+msgstr "Dependências não encontradas"
+
+msgid "The application may not work completely."
+msgstr "O aplicativo pode não funcionar completamente."
+
+msgid "or"
+msgstr "ou"
+
+msgid "The file does not contain control.tar."
+msgstr "O arquivo não contém control.tar."
+
+msgid "Bundled tools"
+msgstr "Ferramentas incluídas"
+
+msgid "Opens snap and AppImage files."
+msgstr "Abre arquivos snap e AppImage."
+
+msgid "Reads RPM packages."
+msgstr "Lê pacotes RPM."
+
+msgid "Decompresses zstd data."
+msgstr "Descompacta dados zstd."
+
+msgid "Adding Slackware's full package sets…"
+msgstr "Adicionando os pacotes do Slackware completo…"
+
+msgid "Adding the libraries the application needs…"
+msgstr "Adicionando as bibliotecas que o aplicativo usa…"
+
+msgid "Choose an RPM, DEB, prebuilt Arch Linux or Slackware package, or an AppImage."
+msgstr "Escolha um pacote RPM, DEB, Arch Linux pré-compilado ou Slackware, ou um AppImage."
+
+msgid "Invalid Slackware package file name."
+msgstr "Nome de arquivo de pacote Slackware inválido."
+
+msgid "Invalid install/slack-desc file."
+msgstr "Arquivo install/slack-desc inválido."
+
+msgid "Invalid install/slack-required file."
+msgstr "Arquivo install/slack-required inválido."
+
+msgid "Packages added: {0}"
+msgstr "Pacotes adicionados: {0}"
+
+msgid "Slackware 15.0 — full (about 1.2 GB more to download)"
+msgstr "Slackware 15.0 — completo (cerca de 1,2 GB a mais para baixar)"
+
+msgid "Slackware 15.0 — light"
+msgstr "Slackware 15.0 — leve"
+
+msgid "Slackware package metadata exceeds the read limit."
+msgstr "Os metadados do pacote Slackware excedem o limite de leitura."
+
+msgid "Slackware packages (.txz and .tgz)"
+msgstr "Pacotes Slackware (.txz e .tgz)"
+
+msgid "Slackware packages do not say which release they were built for. MultiPak uses Slackware 15.0, the current stable release.\n\nThe light environment adds only what the application needs, but may miss something. The full environment downloads about 1.2 GB more and includes Slackware's common packages."
+msgstr "Pacotes Slackware não informam para qual versão foram feitos. O MultiPak usa o Slackware 15.0, a versão estável atual.\n\nO ambiente leve adiciona só o que o aplicativo usa, mas pode deixar algo de fora. O ambiente completo baixa cerca de 1,2 GB a mais e inclui os pacotes comuns do Slackware."
+
+msgid "Some libraries were not found in Slackware's packages: {0}. If the application does not open, install it in the full Slackware environment."
+msgstr "Algumas bibliotecas não foram encontradas nos pacotes do Slackware: {0}. Se o aplicativo não abrir, instale-o no ambiente Slackware completo."
+
+msgid "The Slackware package could not be read: {0}"
+msgstr "Não foi possível ler o pacote Slackware: {0}"
+
+msgid "The Slackware package has an invalid name, version, architecture or build."
+msgstr "O pacote Slackware tem nome, versão, arquitetura ou build inválidos."
+
+msgid "The file contents do not match a valid RPM, DEB, Arch, AppImage, snap or Slackware package. {0}"
+msgstr "O conteúdo do arquivo não corresponde a um pacote RPM, DEB, Arch, AppImage, snap ou Slackware válido. {0}"
+
+msgid "The file is not a compressed Slackware package."
+msgstr "O arquivo não é um pacote Slackware compactado."
+
+msgid "The file name does not identify a Slackware package (name-version-arch-build)."
+msgstr "O nome do arquivo não identifica um pacote Slackware (nome-versão-arquitetura-build)."
+
+msgid "The package contains an unsafe path."
+msgstr "O pacote contém um caminho inseguro."
+
+msgid "The package description exceeds the read limit."
+msgstr "A descrição do pacote excede o limite de leitura."
+
+msgid "The package does not contain install/slack-desc."
+msgstr "O pacote não contém install/slack-desc."
+
+msgid "Updating the Slackware package lists…"
+msgstr "Atualizando as listas de pacotes do Slackware…"
+
+msgid "install/slack-desc does not describe the named package."
+msgstr "O install/slack-desc não descreve o pacote indicado no nome do arquivo."
+
+msgid "This application is in the package format used by Slackware."
+msgstr "Este aplicativo está no formato de pacote usado pelo Slackware."
+
+msgid "Slackware packages do not list their dependencies. During installation, MultiPak adds the libraries the application needs."
+msgstr "Pacotes Slackware não listam suas dependências. Durante a instalação, o MultiPak adiciona as bibliotecas que o aplicativo usa."
+
+msgid "Component {0}"
+msgstr "Componente {0}"
+
+msgid "Invalid Pisi Linux binary package metadata."
+msgstr "Metadados de pacote Pisi Linux inválidos."
+
+msgid "Invalid Pisi Linux package dependency."
+msgstr "Dependência de pacote Pisi Linux inválida."
+
+msgid "Invalid Pisi Linux package name, version, release or architecture."
+msgstr "Nome, versão, revisão ou arquitetura do pacote Pisi Linux inválidos."
+
+msgid "Invalid or duplicate Pisi Linux package member: {0}."
+msgstr "Item inválido ou duplicado no pacote Pisi Linux: {0}."
+
+msgid "Missing or invalid Pisi Linux metadata: {0}."
+msgstr "Metadado Pisi Linux ausente ou inválido: {0}."
+
+msgid "Pisi Linux metadata XML must not contain a document type declaration."
+msgstr "O XML de metadados Pisi Linux não pode ter declaração de tipo de documento."
+
+msgid "Pisi Linux package directory exceeds the read limit."
+msgstr "O índice do pacote Pisi Linux passa do limite de leitura."
+
+msgid "Pisi Linux package metadata exceeds the read limit."
+msgstr "Os metadados do pacote Pisi Linux passam do limite de leitura."
+
+msgid "Pisi Linux packages (.pisi)"
+msgstr "Pacotes Pisi Linux (.pisi)"
+
+msgid "The Pisi Linux package could not be read: {0}"
+msgstr "Não foi possível ler o pacote Pisi Linux: {0}"
+
+msgid "The Pisi Linux package has no release history."
+msgstr "O pacote Pisi Linux não tem histórico de versões."
+
+msgid "The ZIP does not contain the required Pisi Linux binary package files."
+msgstr "O ZIP não contém os arquivos obrigatórios de um pacote Pisi Linux."
+
+msgid "The package metadata does not identify Pisi Linux."
+msgstr "Os metadados do pacote não indicam o Pisi Linux."
+
+msgid "The package's metadata identifies Pisi Linux. MultiPak uses the official Pisi Linux image, which is updated continuously."
+msgstr "Os metadados do pacote indicam o Pisi Linux. O MultiPak usa a imagem oficial do Pisi Linux, atualizada continuamente."
+
+msgid "This application is in the package format used by Pisi Linux."
+msgstr "Este aplicativo está no formato de pacote usado pelo Pisi Linux."
+
+msgid "Unsupported Pisi Linux binary package format."
+msgstr "Formato de pacote Pisi Linux não suportado."
+
+msgid "Unsupported Pisi Linux metadata compression."
+msgstr "Compressão dos metadados Pisi Linux não suportada."
+
+msgid "Updating the Pisi Linux package lists…"
+msgstr "Atualizando as listas de pacotes do Pisi Linux…"
+
+msgid "Downloading the SliTaz system…"
+msgstr "Baixando o sistema SliTaz…"
+
+msgid "Duplicate SliTaz receipt field: {0}."
+msgstr "Campo repetido no receipt SliTaz: {0}."
+
+msgid "Invalid SliTaz CPIO header."
+msgstr "Cabeçalho CPIO SliTaz inválido."
+
+msgid "Invalid SliTaz CPIO member name."
+msgstr "Nome de membro CPIO SliTaz inválido."
+
+msgid "Invalid SliTaz CPIO trailer."
+msgstr "Final do CPIO SliTaz inválido."
+
+msgid "Invalid SliTaz package name or version."
+msgstr "Nome ou versão de pacote SliTaz inválido."
+
+msgid "Invalid SliTaz receipt checksum."
+msgstr "Soma de verificação do receipt SliTaz inválida."
+
+msgid "Invalid or duplicate SliTaz package member."
+msgstr "Membro do pacote SliTaz inválido ou repetido."
+
+msgid "Preparing the SliTaz image…"
+msgstr "Preparando a imagem do SliTaz…"
+
+msgid "SliTaz cooking — 32-bit (i486)"
+msgstr "SliTaz cooking — 32 bits (i486)"
+
+msgid "SliTaz cooking — 64-bit"
+msgstr "SliTaz cooking — 64 bits"
+
+msgid "SliTaz packages (.tazpkg)"
+msgstr "Pacotes SliTaz (.tazpkg)"
+
+msgid "The CPIO archive does not contain the required SliTaz package files."
+msgstr "O arquivo CPIO não contém os arquivos obrigatórios de um pacote SliTaz."
+
+msgid "The SliTaz CPIO archive contains too many members."
+msgstr "O arquivo CPIO SliTaz tem membros demais."
+
+msgid "The SliTaz CPIO archive is truncated."
+msgstr "O arquivo CPIO SliTaz está incompleto."
+
+msgid "The SliTaz ISO image does not contain {0}."
+msgstr "A imagem ISO do SliTaz não contém {0}."
+
+msgid "The SliTaz ISO image is not valid."
+msgstr "A imagem ISO do SliTaz não é válida."
+
+msgid "The SliTaz download is larger than expected."
+msgstr "O download do SliTaz é maior que o esperado."
+
+msgid "The SliTaz download server returned an invalid checksum."
+msgstr "O servidor de downloads do SliTaz devolveu uma soma de verificação inválida."
+
+msgid "The SliTaz download {0} failed verification. Try again later."
+msgstr "O download {0} do SliTaz falhou na verificação. Tente de novo mais tarde."
+
+msgid "The SliTaz package could not be read: {0}"
+msgstr "Não foi possível ler o pacote SliTaz: {0}"
+
+msgid "The SliTaz package {0} is not in the repository."
+msgstr "O pacote SliTaz {0} não está no repositório."
+
+msgid "The SliTaz receipt exceeds the read limit."
+msgstr "O receipt SliTaz passa do limite de leitura."
+
+msgid "The SliTaz receipt field {0} is not a literal."
+msgstr "O campo {0} do receipt SliTaz não é um valor literal."
+
+msgid "The SliTaz system archive is not valid."
+msgstr "O arquivo do sistema SliTaz não é válido."
+
+msgid "The SliTaz system archive is too large."
+msgstr "O arquivo do sistema SliTaz é grande demais."
+
+msgid "The SliTaz system could not be downloaded: {0}"
+msgstr "Não foi possível baixar o sistema SliTaz: {0}"
+
+msgid "The package's programs show whether it is for SliTaz's 64-bit or 32-bit (i486) repository. MultiPak builds its SliTaz environment from the official system image the first time, a download of about 30 MB."
+msgstr "Os programas do pacote mostram se ele é do repositório de 64 bits ou de 32 bits (i486) do SliTaz. Na primeira vez, o MultiPak monta o ambiente SliTaz a partir da imagem oficial do sistema, um download de cerca de 30 MB."
+
+msgid "The server redirected to an insecure address."
+msgstr "O servidor redirecionou para um endereço inseguro."
+
+msgid "This application is in the package format used by SliTaz."
+msgstr "Este aplicativo está no formato de pacote usado pelo SliTaz."
+
+msgid "Unsupported SliTaz package architecture."
+msgstr "Arquitetura de pacote SliTaz não suportada."
+
+msgid "Updating the SliTaz package lists…"
+msgstr "Atualizando as listas de pacotes do SliTaz…"
+
+msgid "Gentoo binary packages (.gpkg.tar)"
+msgstr "Pacotes binários do Gentoo (.gpkg.tar)"
+
+msgid "Gentoo package metadata exceeds the read limit."
+msgstr "Os metadados do pacote Gentoo excedem o limite de leitura."
+
+msgid "Invalid Gentoo metadata file."
+msgstr "Arquivo de metadados Gentoo inválido."
+
+msgid "Invalid Gentoo package identity."
+msgstr "Identificação de pacote Gentoo inválida."
+
+msgid "Invalid member in Gentoo GPKG archive."
+msgstr "Membro inválido no arquivo GPKG do Gentoo."
+
+msgid "Invalid or duplicate Gentoo metadata file."
+msgstr "Arquivo de metadados Gentoo inválido ou repetido."
+
+msgid "Missing or invalid Gentoo metadata: {0}."
+msgstr "Metadado Gentoo ausente ou inválido: {0}."
+
+msgid "The Gentoo package could not be read: {0}"
+msgstr "Não foi possível ler o pacote Gentoo: {0}"
+
+msgid "The file does not contain the required Gentoo GPKG members."
+msgstr "O arquivo não contém os membros obrigatórios de um GPKG do Gentoo."
+
+msgid "The package's metadata identifies Gentoo. MultiPak uses Gentoo's official base system, about 400 MB the first time, and its prebuilt packages for dependencies."
+msgstr "Os metadados do pacote identificam o Gentoo. O MultiPak usa o sistema base oficial do Gentoo, cerca de 400 MB na primeira vez, e os pacotes pré-compilados dele para as dependências."
+
+msgid "This application is in the binary package format used by Gentoo."
+msgstr "Este aplicativo está no formato de pacote binário usado pelo Gentoo."
+
+msgid "Unsupported Gentoo metadata compression: {0}."
+msgstr "Compressão de metadados Gentoo não suportada: {0}."
+
+msgid "Updating the Gentoo package tree…"
+msgstr "Atualizando a árvore de pacotes do Gentoo…"
+
+msgid "Converting the Puppy Linux package…"
+msgstr "Convertendo o pacote do Puppy Linux…"
+
+msgid "Finding the libraries the application needs…"
+msgstr "Procurando as bibliotecas de que o aplicativo precisa…"
+
+msgid "Invalid Puppy Linux package directory."
+msgstr "Pasta de pacote do Puppy Linux inválida."
+
+msgid "Invalid Puppy Linux package name or version."
+msgstr "Nome ou versão de pacote do Puppy Linux inválido."
+
+msgid "Invalid Puppy Linux pet.specs metadata."
+msgstr "Metadados pet.specs do Puppy Linux inválidos."
+
+msgid "Invalid or duplicate Puppy Linux pet.specs metadata."
+msgstr "Metadados pet.specs do Puppy Linux inválidos ou repetidos."
+
+msgid "Puppy Linux is built from another distribution's packages, and pet.specs says this package was built for {0}. MultiPak converts it into a package of that distribution and adds the libraries its programs need."
+msgstr "O Puppy Linux é feito com os pacotes de outra distribuição, e o pet.specs diz que este pacote foi feito para {0}. O MultiPak o converte num pacote dessa distribuição e acrescenta as bibliotecas de que os programas dele precisam."
+
+msgid "Puppy Linux is built from another distribution's packages, but this package does not say which one, or names a release MultiPak does not offer. MultiPak suggests {0}. Compatibility is uncertain: if the application does not open, try another environment."
+msgstr "O Puppy Linux é feito com os pacotes de outra distribuição, mas este pacote não diz qual, ou cita uma versão que o MultiPak não oferece. O MultiPak sugere {0}. A compatibilidade é incerta: se o aplicativo não abrir, tente outro ambiente."
+
+msgid "Puppy Linux package metadata exceeds the read limit."
+msgstr "Os metadados do pacote do Puppy Linux excedem o limite de leitura."
+
+msgid "Puppy Linux packages (.pet)"
+msgstr "Pacotes do Puppy Linux (.pet)"
+
+msgid "Some libraries were not found in the distribution's packages: {0}. Puppy Linux may provide them in other .pet packages; install those in the same environment first. Otherwise the application may not open."
+msgstr "Algumas bibliotecas não foram encontradas nos pacotes da distribuição: {0}. O Puppy Linux pode oferecê-las em outros pacotes .pet; instale-os antes no mesmo ambiente. Sem isso, o aplicativo pode não abrir."
+
+msgid "The Puppy Linux PET checksum does not match."
+msgstr "A soma de verificação do PET do Puppy Linux não confere."
+
+msgid "The Puppy Linux package contains a reserved folder: {0}."
+msgstr "O pacote do Puppy Linux contém uma pasta reservada: {0}."
+
+msgid "The Puppy Linux package contains an unsupported special file."
+msgstr "O pacote do Puppy Linux contém um arquivo especial não suportado."
+
+msgid "The Puppy Linux package contains no files or metadata."
+msgstr "O pacote do Puppy Linux não contém arquivos nem metadados."
+
+msgid "The Puppy Linux package could not be read: {0}"
+msgstr "Não foi possível ler o pacote do Puppy Linux: {0}"
+
+msgid "The Puppy Linux package exceeds the read limit."
+msgstr "O pacote do Puppy Linux excede o limite de leitura."
+
+msgid "The Puppy Linux package lists too many files."
+msgstr "O pacote do Puppy Linux lista arquivos demais."
+
+msgid "The Puppy Linux package must use gzip or XZ compression."
+msgstr "O pacote do Puppy Linux precisa usar compressão gzip ou XZ."
+
+msgid "The file is missing a valid Puppy Linux PET checksum trailer."
+msgstr "Falta ao arquivo a soma de verificação válida no fim, própria do PET do Puppy Linux."
+
+msgid "This application is in the PET package format used by Puppy Linux. MultiPak converts it into a package of the distribution Puppy was built from."
+msgstr "Este aplicativo está no formato de pacote PET usado pelo Puppy Linux. O MultiPak o converte num pacote da distribuição a partir da qual o Puppy foi feito."
+
+msgid "Alpine Linux packages (.apk)"
+msgstr "Pacotes do Alpine Linux (.apk)"
+
+msgid "Alpine package metadata exceeds the read limit."
+msgstr "Os metadados do pacote do Alpine passam do limite de leitura."
+
+msgid "The package's .PKGINFO names the version of abuild that built it, the one Alpine {0} uses. MultiPak uses {1}, from Alpine's official image."
+msgstr "O .PKGINFO do pacote informa a versão do abuild que o gerou, a mesma usada pelo Alpine {0}. O MultiPak usa o {1}, da imagem oficial do Alpine."
+
+msgid "Alpine no longer updates this release. Prefer a newer package if one is available."
+msgstr "O Alpine não atualiza mais essa versão. Se houver um pacote mais novo, prefira-o."
+
+msgid "The package was built with a newer version of abuild than Alpine's stable releases use, probably for Alpine's development branch. MultiPak uses {0}."
+msgstr "O pacote foi gerado com um abuild mais novo que o das versões estáveis do Alpine, provavelmente para o ramo de desenvolvimento. O MultiPak usa o {0}."
+
+msgid "The package's .PKGINFO does not show which Alpine release built it. MultiPak uses {0}, the newest stable release. If the package was built for an older release, a library may be missing."
+msgstr "O .PKGINFO do pacote não mostra para qual versão do Alpine ele foi feito. O MultiPak usa o {0}, a versão estável mais nova. Se o pacote foi feito para uma versão mais antiga, pode faltar alguma biblioteca."
+
+msgid "Alpine uses the musl C library instead of glibc, so its packages work only in an Alpine environment."
+msgstr "O Alpine usa a biblioteca C musl em vez da glibc, então seus pacotes só funcionam num ambiente Alpine."
+
+msgid "Alpine Linux edge (development branch)"
+msgstr "Alpine Linux edge (ramo de desenvolvimento)"
+
+msgid "Invalid Alpine .PKGINFO metadata."
+msgstr "Metadados .PKGINFO do Alpine inválidos."
+
+msgid "Invalid Alpine package architecture."
+msgstr "Arquitetura do pacote do Alpine inválida."
+
+msgid "Invalid Alpine package name."
+msgstr "Nome do pacote do Alpine inválido."
+
+msgid "Invalid Alpine package version."
+msgstr "Versão do pacote do Alpine inválida."
+
+msgid "Missing or duplicate Alpine metadata: {0}."
+msgstr "Metadado do Alpine ausente ou duplicado: {0}."
+
+msgid "The Alpine package could not be read: {0}"
+msgstr "Não foi possível ler o pacote do Alpine: {0}"
+
+msgid "The Alpine package is not signed with a key Alpine trusts. MultiPak installed it without the signature check; install only packages from sources you trust."
+msgstr "O pacote do Alpine não está assinado com uma chave em que o Alpine confia. O MultiPak o instalou sem verificar a assinatura; instale só pacotes de fontes em que você confia."
+
+msgid "The file does not contain Alpine .PKGINFO metadata."
+msgstr "O arquivo não contém metadados .PKGINFO do Alpine."
+
+msgid "This Alpine package uses the new apk v3 format, which MultiPak cannot read yet. Use a package in the classic format, like those in Alpine's repositories."
+msgstr "Este pacote do Alpine usa o novo formato apk v3, que o MultiPak ainda não lê. Use um pacote no formato clássico, como os dos repositórios do Alpine."
+
+msgid "This application is in the package format used by Alpine Linux."
+msgstr "Este aplicativo está no formato de pacote usado pelo Alpine Linux."
+
+msgid "This is an Android app. MultiPak installs Linux packages; its .apk support is for Alpine Linux packages."
+msgstr "Este é um aplicativo de Android. O MultiPak instala pacotes de Linux; o suporte a .apk é para pacotes do Alpine Linux."
+
+msgid "Updating the Alpine package lists…"
+msgstr "Atualizando as listas de pacotes do Alpine…"
+
+msgid "Choose an RPM, DEB, prebuilt Arch Linux, Slackware, Pisi Linux, SliTaz, Gentoo, Puppy Linux, Alpine or Void Linux package, or an AppImage."
+msgstr "Escolha um pacote RPM, DEB, Arch Linux pré-compilado, Slackware, Pisi Linux, SliTaz, Gentoo, Puppy Linux, Alpine ou Void Linux, ou um AppImage."
+
+msgid "Invalid XBPS dependency list: {0}."
+msgstr "Lista de dependências XBPS inválida: {0}."
+
+msgid "Invalid XBPS metadata file: {0}."
+msgstr "Arquivo de metadados XBPS inválido: {0}."
+
+msgid "Invalid XBPS package properties."
+msgstr "Propriedades do pacote XBPS inválidas."
+
+msgid "Invalid XBPS package version."
+msgstr "Versão do pacote XBPS inválida."
+
+msgid "MultiPak does not support XBPS packages compressed with LZ4."
+msgstr "O MultiPak não oferece suporte a pacotes XBPS comprimidos com LZ4."
+
+msgid "MultiPak uses a local repository for this XBPS file. Its signature was not verified. Install only packages from sources you trust."
+msgstr "O MultiPak usa um repositório local para este arquivo XBPS. A assinatura não foi verificada. Instale apenas pacotes de fontes em que você confia."
+
+msgid "The XBPS package could not be read: {0}"
+msgstr "Não foi possível ler o pacote XBPS: {0}"
+
+msgid "The file contents do not match a valid RPM, DEB, Arch, AppImage, snap, Slackware, Pisi Linux, SliTaz, Gentoo, Puppy Linux, Alpine or Void Linux package. {0}"
+msgstr "O conteúdo do arquivo não corresponde a um pacote RPM, DEB, Arch, AppImage, snap, Slackware, Pisi Linux, SliTaz, Gentoo, Puppy Linux, Alpine ou Void Linux válido. {0}"
+
+msgid "The file does not contain XBPS props.plist and files.plist metadata."
+msgstr "O arquivo não contém os metadados XBPS props.plist e files.plist."
+
+msgid "This application is in the package format used by Void Linux."
+msgstr "Este aplicativo está no formato de pacote usado pelo Void Linux."
+
+msgid "Void Linux (rolling release)"
+msgstr "Void Linux (atualização contínua)"
+
+msgid "Void Linux packages (.xbps)"
+msgstr "Pacotes do Void Linux (.xbps)"
+
+msgid "XBPS package metadata exceeds the read limit."
+msgstr "Os metadados do pacote XBPS passam do limite de leitura."
+
+msgid " The filename indicates {0}, unlike the internal metadata; the internal metadata took priority."
+msgstr " O nome do arquivo indica {0}, diferente dos metadados internos; os metadados internos tiveram prioridade."
+
+
+
+msgid "The package's metadata identifies {0} but not the release it was built for. MultiPak uses {1}, the newest stable release. If a library is missing, try another release of {0}."
+msgstr "Os metadados do pacote identificam {0}, mas não a versão para a qual ele foi feito. O MultiPak usa {1}, a versão estável mais recente. Se faltar alguma biblioteca, experimente outra versão do {0}."
+
+msgid "The package's metadata indicates that it was built for {0}, but MultiPak could not offer an environment of that distribution. It suggests {1}; the application may not work there."
+msgstr "Os metadados do pacote indicam que ele foi feito para {0}, mas o MultiPak não conseguiu oferecer um ambiente dessa distribuição. Ele sugere {1}; o aplicativo pode não funcionar nele."
+
+msgid "The package's metadata indicates that it was built for {0}, newer than the releases MultiPak offers. MultiPak uses {1}; if a library is missing, look for a package built for it."
+msgstr "Os metadados do pacote indicam que ele foi feito para {0}, mais nova que as versões oferecidas pelo MultiPak. O MultiPak usa {1}; se faltar alguma biblioteca, procure um pacote feito para ela."
+
+msgid "The package's metadata indicates that it was built for {0}. MultiPak installs it in {0} with that distribution's package manager, {1}."
+msgstr "Os metadados do pacote indicam que ele foi feito para {0}. O MultiPak o instala no {0} com o gerenciador de pacotes dessa distribuição, o {1}."
+
+msgid "The package's signature could not be verified with the distribution's keys. MultiPak installed it without the signature check; install only packages from sources you trust."
+msgstr "Não foi possível verificar a assinatura do pacote com as chaves da distribuição. O MultiPak o instalou sem verificar a assinatura; instale apenas pacotes de fontes em que você confia."
+
+msgid "Updating the ALT Linux package lists…"
+msgstr "Atualizando as listas de pacotes do ALT Linux…"
+
+msgid "Updating the openSUSE package lists…"
+msgstr "Atualizando as listas de pacotes do openSUSE…"
+
+msgid "Preparing the desktop theme…"
+msgstr "Preparando o tema da área de trabalho…"
+
+msgid "Choose an RPM, DEB, prebuilt Arch Linux, Slackware, Pisi Linux, SliTaz, Gentoo, Puppy Linux, Alpine, Void Linux or Solus package, or an AppImage."
+msgstr "Escolha um pacote RPM, DEB, Arch Linux pré-compilado, Slackware, Pisi Linux, SliTaz, Gentoo, Puppy Linux, Alpine, Void Linux ou Solus, ou um AppImage."
+
+msgid "Invalid or duplicate {0} package member: {1}."
+msgstr "Membro do pacote {0} inválido ou duplicado: {1}."
+
+msgid "Invalid {0} binary package metadata."
+msgstr "Metadados de pacote binário {0} inválidos."
+
+msgid "Invalid {0} package dependency."
+msgstr "Dependência de pacote {0} inválida."
+
+msgid "Invalid {0} package name, version, release or architecture."
+msgstr "Nome, versão, revisão ou arquitetura do pacote {0} inválidos."
+
+msgid "Missing or invalid {0} metadata: {1}."
+msgstr "Metadado {0} ausente ou inválido: {1}."
+
+msgid "Solus (rolling release)"
+msgstr "Solus (atualização contínua)"
+
+msgid "Solus packages (.eopkg)"
+msgstr "Pacotes do Solus (.eopkg)"
+
+msgid "The ZIP does not contain the required {0} binary package files."
+msgstr "O ZIP não contém os arquivos obrigatórios de um pacote binário {0}."
+
+msgid "The file contents do not match a valid RPM, DEB, Arch, AppImage, snap, Slackware, Pisi Linux, SliTaz, Gentoo, Puppy Linux, Alpine, Void Linux or Solus package. {0}"
+msgstr "O conteúdo do arquivo não corresponde a um pacote RPM, DEB, Arch, AppImage, snap, Slackware, Pisi Linux, SliTaz, Gentoo, Puppy Linux, Alpine, Void Linux ou Solus válido. {0}"
+
+msgid "The package metadata does not identify Pisi Linux or Solus."
+msgstr "Os metadados do pacote não identificam o Pisi Linux nem o Solus."
+
+msgid "The package's metadata identifies Solus. Solus publishes no container image: MultiPak uses an unofficial image built from Solus's official repository, about 300 MB to download the first time, and installs dependencies from it."
+msgstr "Os metadados do pacote identificam o Solus. O Solus não publica imagem de contêiner: o MultiPak usa uma imagem não oficial montada a partir do repositório oficial do Solus, cerca de 300 MB para baixar na primeira vez, e instala as dependências dele."
+
+msgid "The {0} package could not be read: {1}"
+msgstr "Não foi possível ler o pacote {0}: {1}"
+
+msgid "The {0} package has no release history."
+msgstr "O pacote {0} não tem histórico de revisões."
+
+msgid "This application is in the package format used by Solus."
+msgstr "Este aplicativo está no formato de pacote usado pelo Solus."
+
+msgid "This is a {0} delta package, which only updates an installed earlier version. Download the full package instead."
+msgstr "Este é um pacote delta do {0}, que só atualiza uma versão anterior já instalada. Baixe o pacote completo."
+
+msgid "Unsupported {0} binary package format."
+msgstr "Formato de pacote binário {0} sem suporte."
+
+msgid "Unsupported {0} metadata compression."
+msgstr "Compressão de metadados {0} sem suporte."
+
+msgid "Updating the Solus package lists…"
+msgstr "Atualizando as listas de pacotes do Solus…"
+
+msgid "{0} metadata XML must not contain a document type declaration."
+msgstr "O XML de metadados {0} não deve conter declaração de tipo de documento."
+
+msgid "{0} package directory exceeds the read limit."
+msgstr "O diretório do pacote {0} excede o limite de leitura."
+
+msgid "{0} package metadata exceeds the read limit."
+msgstr "Os metadados do pacote {0} excedem o limite de leitura."
+
+msgid "Preparing the Solus image…"
+msgstr "Preparando a imagem do Solus…"
+
+msgid "%1 is installed in a container, so MultiPak updates the whole container, including these applications:\n\n%2\n\nThe container's dependencies and system components are also updated. Your system outside the container is not changed."
+msgstr "Como %1 está instalado em um contêiner, o MultiPak atualiza o contêiner inteiro, incluindo os seguintes aplicativos:\n\n%2\n\nTambém serão atualizados as dependências e os componentes de sistema do contêiner. O seu sistema, fora do contêiner, não é alterado."
+
+msgid "%1, %2 updates"
+msgstr "%1, %2 atualizações"
+
+msgid "Already up to date"
+msgstr "Em dia"
+
+msgid "Checking for updates in {0}…"
+msgstr "Verificando atualizações em {0}…"
+
+msgid "Components"
+msgstr "Componentes"
+
+msgid "File associations"
+msgstr "Associação de arquivos"
+
+msgid "Find snaps on the <a href='https://snapcraft.io/store'>snapcraft.io</a> site, then copy the link here. A .snap file downloaded from the site can be installed with Choose file."
+msgstr "Procure snaps no site <a href='https://snapcraft.io/store'>snapcraft.io</a> e cole o link aqui. Um arquivo .snap baixado do site pode ser instalado em Escolher arquivo."
+
+msgid "Installed from a file, without a source of updates. To update it, install the new version from a file."
+msgstr "Instalado de um arquivo, sem fonte de atualização. Para atualizar, instale a nova versão a partir de um arquivo."
+
+msgid "MultiPak cannot check this container for updates yet."
+msgstr "O MultiPak ainda não consegue verificar atualizações neste contêiner."
+
+msgid "No snaps were installed through MultiPak. Install one from the Snap Store to use these tools."
+msgstr "Nenhum snap foi instalado pelo MultiPak. Instale um da Snap Store para usar estas ferramentas."
+
+msgid "No update source"
+msgstr "Sem fonte de atualização"
+
+msgid "Not checked for updates"
+msgstr "Não verificados"
+
+msgid "Snap services"
+msgstr "Serviços Snap"
+
+msgid "To get started, click a package to install it, or use the two tools below:"
+msgstr "Para começar, clique em um pacote para instalá-lo ou use as duas ferramentas abaixo:"
+
+msgid "Update %1"
+msgstr "Atualizar %1"
+
+msgid "Update %1?"
+msgstr "Atualizar %1?"
+
+msgid "Update all of them"
+msgstr "Atualizar todos"
+
+msgid "Version: {0}"
+msgstr "Versão: {0}"
+
+msgid "Welcome"
+msgstr "Bem-vindo(a)"
+
+msgid "With updates"
+msgstr "Com atualização"
+
+msgid "Applications"
+msgstr "Aplicativos"
+
+msgid "Choose an application to update, or update everything. Applications that share a container are updated together, so that they keep working."
+msgstr "Escolha um aplicativo para atualizar ou atualize tudo. Aplicativos que dividem um contêiner são atualizados juntos, para continuarem funcionando."
+
+msgid "To keep everything working, these applications will also be updated:\n\n%1\n\nOther packages installed with them will also be updated."
+msgstr "Para manter tudo funcionando, estes aplicativos também serão atualizados:\n\n%1\n\nOutros pacotes instalados junto com eles também serão atualizados."
+
+msgid "Used by RPM for package scripts."
+msgstr "Usado pelo RPM nos scripts dos pacotes."
+
+msgid "Used by RPM to read its options."
+msgstr "Usado pelo RPM para ler suas opções."
+
+msgid "To get started, click a package to install it. Snaps found on the <a href='https://snapcraft.io/store'>snapcraft.io</a> site also open directly in MultiPak. Or use the two tools below:"
+msgstr "Para começar, clique em um pacote para instalá-lo. Snaps encontrados no site <a href='https://snapcraft.io/store'>snapcraft.io</a> também abrem direto no MultiPak. Ou use as duas ferramentas abaixo:"
+
+msgid "File on this computer"
+msgstr "Arquivo no computador"
+
+msgid "Snap Store"
+msgstr "Snap Store"
+
+msgid "Enter the identifier or the snapcraft.io link of a snap."
+msgstr "Digite o identificador ou o link snapcraft.io de um snap."
+
+msgid "About"
+msgstr "Sobre"
+
+msgid "Stop %1"
+msgstr "Parar %1"
+
+msgid "Start %1"
+msgstr "Iniciar %1"
+
+msgid "Show the log of %1"
+msgstr "Ver o registro de %1"
+
+msgid "Uninstall %1"
+msgstr "Desinstalar %1"
+
+msgid "They run with your user account, never as the administrator."
+msgstr "Rodam com a sua conta de usuário, nunca como administrador."
+
+msgid "No snaps were installed through MultiPak."
+msgstr "Nenhum snap foi instalado pelo MultiPak."
+
+msgid "They run as root inside the snap's sandbox, never as the administrator of your computer."
+msgstr "Rodam como root dentro do sandbox do snap, nunca como administrador do seu computador."
+
+msgid "Run…"
+msgstr "Executar…"
+
+msgid "Applications with a window do not run as administrator: as root they could leave files in the snap's data that only root can change."
+msgstr "Aplicativos com janela não rodam como administrador: como root, eles poderiam deixar nos dados do snap arquivos que só o root consegue alterar."
+
+msgid "Container %1 will be reused for the dependencies."
+msgstr "O contêiner %1 será reutilizado para as dependências."
+
+msgid "Container %1 will be created for the dependencies."
+msgstr "O contêiner %1 será criado para as dependências."
+
+msgid "To install applications, open a package from your file manager or use one of the options below. Snaps from the <a href='https://snapcraft.io/store'>snapcraft.io</a> site also open directly in MultiPak."
+msgstr "Para instalar aplicativos, abra um pacote pelo gerenciador de arquivos ou use uma das opções abaixo. Snaps do site <a href='https://snapcraft.io/store'>snapcraft.io</a> também abrem direto no MultiPak."
+
+msgid "Void Linux musl (rolling release)"
+msgstr "Void Linux musl (atualização contínua)"
+
+msgid "Void Linux 32-bit (rolling release)"
+msgstr "Void Linux 32 bits (atualização contínua)"
+
+msgid "Void Linux publishes no 32-bit image."
+msgstr "O Void Linux não publica imagem de 32 bits."
+
+msgid "This package is for {0}, but the Void Linux environment installs {1} packages. Choose a matching Void Linux environment."
+msgstr "Este pacote é para {0}, mas o ambiente Void Linux instala pacotes {1}. Escolha um ambiente Void Linux compatível."
+
+msgid "The package's metadata identifies {0}."
+msgstr "Os metadados do pacote identificam o {0}."

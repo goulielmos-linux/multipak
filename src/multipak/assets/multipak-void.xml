@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-xbps-package">
+    <comment>Void Linux package</comment>
+    <comment xml:lang="pt_BR">Pacote do Void Linux</comment>
+    <glob pattern="*.xbps"/>
+    <icon name="package-x-generic"/>
+  </mime-type>
+</mime-info>

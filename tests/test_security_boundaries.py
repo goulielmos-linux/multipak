@@ -38,12 +38,14 @@ def test_desktop_duplicate_exec_and_defaults_are_rejected():
 @pytest.mark.parametrize(
     "record",
     [
-        b"foo\nbash\x1f1-1\x1fnoarch",
-        b"foo\x1f1-1\x1fnoarch\n",
-        b"foo\x1f1-1\x1fnoarch\x1fextra",
-        b"foo\x1f\x1fnoarch",
-        b"foo\x00bar\x1f1-1\x1fnoarch",
-        b"foo\x1f1-1\x1fnoarch\r",
+        b"foo\nbash\x1f1-1\x1fnoarch\x1f(none)",
+        b"foo\x1f1-1\x1fnoarch\x1f(none)\n",
+        b"foo\x1f1-1\x1fnoarch\x1f(none)\x1fextra",
+        b"foo\x1f1-1\x1fnoarch",
+        b"foo\x1f\x1fnoarch\x1f(none)",
+        b"foo\x1f1-1\x1fnoarch\x1f",
+        b"foo\x00bar\x1f1-1\x1fnoarch\x1f(none)",
+        b"foo\x1f1-1\x1fnoarch\x1f(none)\r",
     ],
 )
 def test_rpm_identity_requires_exactly_one_complete_record(tmp_path, record):

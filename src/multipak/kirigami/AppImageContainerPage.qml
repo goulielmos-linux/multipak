@@ -4,8 +4,9 @@ import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
 import "BreezeIcons.js" as BreezeIcons
 
-// Review page for an AppImage installed with its dependencies in MultiPak's container.
-// It follows the layout of the container review for RPM, DEB and Arch packages.
+// Review page for an AppImage that runs with its dependencies from MultiPak's container.
+// The AppImage itself stays in MultiPak's folder: only its dependencies go into the
+// container, so the two cards are linked side by side instead of nested.
 Kirigami.ScrollablePage {
     id: page
     objectName: "appimageContainerPage"
@@ -43,132 +44,128 @@ Kirigami.ScrollablePage {
             Layout.fillWidth: true
         }
 
-        Kirigami.AbstractCard {
-            objectName: "appimageContainerCard"
+        ColumnLayout {
+            spacing: 0
             Layout.fillWidth: true
 
-            contentItem: RowLayout {
-                spacing: Kirigami.Units.largeSpacing
+            Kirigami.AbstractCard {
+                id: containerCard
+                objectName: "appimageContainerCard"
+                Layout.fillWidth: true
 
-                Kirigami.Icon {
-                    source: Qt.resolvedUrl("assets/container.svg")
-                    Layout.preferredWidth: Kirigami.Units.iconSizes.large
-                    Layout.preferredHeight: Kirigami.Units.iconSizes.large
-                    Layout.alignment: Qt.AlignTop
-                    Accessible.ignored: true
-                }
+                contentItem: RowLayout {
+                    spacing: Kirigami.Units.largeSpacing
 
-                ColumnLayout {
-                    spacing: Kirigami.Units.smallSpacing
-                    Layout.fillWidth: true
+                    Kirigami.Icon {
+                        source: Qt.resolvedUrl("assets/container.svg")
+                        Layout.preferredWidth: Kirigami.Units.iconSizes.large
+                        Layout.preferredHeight: Kirigami.Units.iconSizes.large
+                        Layout.alignment: Qt.AlignTop
+                        Accessible.ignored: true
+                    }
 
-                    RowLayout {
+                    ColumnLayout {
                         spacing: Kirigami.Units.smallSpacing
                         Layout.fillWidth: true
 
-                        Controls.Label {
-                            objectName: "appimageEnvironmentTitle"
-                            text: qsTr("Container based on %1").arg(welcome.appImageEnvironmentTitle)
-                            font.bold: true
-                            textFormat: Text.PlainText
-                            wrapMode: Text.WordWrap
-                            Layout.fillWidth: false
-                        }
-
-                        Controls.ToolButton {
-                            objectName: "appimageEnvironmentInfoButton"
-                            icon.source: BreezeIcons.source("help-about", Kirigami.Theme.backgroundColor)
-                            icon.width: Kirigami.Units.iconSizes.small
-                            icon.height: Kirigami.Units.iconSizes.small
-                            padding: Kirigami.Units.smallSpacing / 2
-                            implicitWidth: icon.width + leftPadding + rightPadding
-                            implicitHeight: icon.height + topPadding + bottomPadding
-                            text: qsTr("About the recommended environment")
-                            display: Controls.AbstractButton.IconOnly
-                            onClicked: environmentDialog.open()
-                            Controls.ToolTip.visible: hovered
-                            Controls.ToolTip.text: text
-                            Accessible.name: text
-                        }
-
-                        Item {
+                        RowLayout {
+                            spacing: Kirigami.Units.smallSpacing
                             Layout.fillWidth: true
-                        }
-                    }
 
-                    Controls.Label {
-                        objectName: "appimageContainerName"
-                        text: (welcome.appImageContainerExists
-                            ? qsTr("Container %1 will be reused for this installation.")
-                            : qsTr("Container %1 will be created for this installation."))
-                            .arg(welcome.appImageContainerName)
-                        textFormat: Text.PlainText
-                        wrapMode: Text.Wrap
-                        Layout.fillWidth: true
-                    }
+                            Controls.Label {
+                                objectName: "appimageEnvironmentTitle"
+                                text: qsTr("Container based on %1").arg(welcome.appImageEnvironmentTitle)
+                                font.bold: true
+                                textFormat: Text.PlainText
+                                wrapMode: Text.WordWrap
+                                Layout.fillWidth: false
+                            }
 
-                    RowLayout {
-                        spacing: Kirigami.Units.smallSpacing
-                        Layout.fillWidth: true
+                            Controls.ToolButton {
+                                objectName: "appimageEnvironmentInfoButton"
+                                icon.source: BreezeIcons.source("help-about", Kirigami.Theme.backgroundColor)
+                                icon.width: Kirigami.Units.iconSizes.small
+                                icon.height: Kirigami.Units.iconSizes.small
+                                padding: Kirigami.Units.smallSpacing / 2
+                                implicitWidth: icon.width + leftPadding + rightPadding
+                                implicitHeight: icon.height + topPadding + bottomPadding
+                                text: qsTr("About the recommended environment")
+                                display: Controls.AbstractButton.IconOnly
+                                onClicked: environmentDialog.open()
+                                Controls.ToolTip.visible: hovered
+                                Controls.ToolTip.text: text
+                                Accessible.name: text
+                            }
 
-                        Kirigami.Icon {
-                            source: Qt.resolvedUrl("assets/dependencies.svg")
-                            Layout.preferredWidth: Kirigami.Units.iconSizes.smallMedium
-                            Layout.preferredHeight: Kirigami.Units.iconSizes.smallMedium
-                            Accessible.ignored: true
-                        }
-
-                        Controls.Label {
-                            text: qsTr("Required dependencies:")
-                        }
-
-                        Controls.Label {
-                            objectName: "appimageRequirementsLink"
-                            text: qsTr("<a href='dependencies'>View full list</a>")
-                            textFormat: Text.RichText
-                            linkColor: Kirigami.Theme.linkColor
-                            Accessible.role: Accessible.Link
-                            Accessible.name: qsTr("View the full list of required dependencies")
-                            activeFocusOnTab: true
-                            onLinkActivated: requirementsDialog.open()
-                            Keys.onReturnPressed: requirementsDialog.open()
-                            Keys.onSpacePressed: requirementsDialog.open()
-                            HoverHandler {
-                                cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
+                            Item {
+                                Layout.fillWidth: true
                             }
                         }
 
-                        Item {
+                        Controls.Label {
+                            objectName: "appimageContainerName"
+                            text: (welcome.appImageContainerExists
+                                ? qsTr("Container %1 will be reused for the dependencies.")
+                                : qsTr("Container %1 will be created for the dependencies."))
+                                .arg(welcome.appImageContainerName)
+                            textFormat: Text.PlainText
+                            wrapMode: Text.Wrap
                             Layout.fillWidth: true
+                        }
+
+                        RowLayout {
+                            spacing: Kirigami.Units.smallSpacing
+                            Layout.fillWidth: true
+
+                            Kirigami.Icon {
+                                source: Qt.resolvedUrl("assets/dependencies.svg")
+                                Layout.preferredWidth: Kirigami.Units.iconSizes.smallMedium
+                                Layout.preferredHeight: Kirigami.Units.iconSizes.smallMedium
+                                Accessible.ignored: true
+                            }
+
+                            Controls.Label {
+                                // Found without running the app: the isolated check
+                                // looks for the rest before the installation finishes.
+                                text: qsTr("Preliminary dependencies:")
+                            }
+
+                            Controls.Label {
+                                objectName: "appimageRequirementsLink"
+                                text: qsTr("<a href='dependencies'>View full list</a>")
+                                textFormat: Text.RichText
+                                linkColor: Kirigami.Theme.linkColor
+                                Accessible.role: Accessible.Link
+                                Accessible.name: qsTr("View the full list of required dependencies")
+                                activeFocusOnTab: true
+                                onLinkActivated: requirementsDialog.open()
+                                Keys.onReturnPressed: requirementsDialog.open()
+                                Keys.onSpacePressed: requirementsDialog.open()
+                                HoverHandler {
+                                    cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                }
+                            }
+
+                            Item {
+                                Layout.fillWidth: true
+                            }
                         }
                     }
                 }
             }
-        }
 
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: 0
-
+            // A straight link between the two icons: the application uses the container,
+            // it is not inside it.
             Item {
-                id: applicationBranch
-                Layout.preferredWidth: Kirigami.Units.iconSizes.large
-                Layout.fillHeight: true
+                objectName: "appimageContainerLink"
+                Layout.fillWidth: true
+                Layout.preferredHeight: Kirigami.Units.largeSpacing * 2
                 Accessible.ignored: true
 
                 Rectangle {
-                    x: applicationBranch.width / 2
-                    y: -body.spacing
+                    x: containerCard.leftPadding + Kirigami.Units.iconSizes.large / 2
                     width: 1
-                    height: applicationBranch.height / 2 + body.spacing
-                    color: Kirigami.Theme.disabledTextColor
-                }
-
-                Rectangle {
-                    x: applicationBranch.width / 2
-                    y: applicationBranch.height / 2
-                    width: applicationBranch.width / 2
-                    height: 1
+                    height: parent.height
                     color: Kirigami.Theme.disabledTextColor
                 }
             }
@@ -214,38 +211,10 @@ Kirigami.ScrollablePage {
 
         Controls.Label {
             objectName: "appimageContainerExplanation"
-            text: qsTr("The package and its dependencies will be installed in a Distrobox container using %1, without changing the base system image.\n\nAny available shortcuts will appear in your application launcher.").arg("DNF")
+            text: qsTr("The dependencies will be installed in a Distrobox container using %1, without changing the base system image. The application will open from this container.\n\nAny available shortcuts will appear in your application launcher.").arg("DNF")
             textFormat: Text.PlainText
             wrapMode: Text.WordWrap
             Layout.fillWidth: true
-        }
-
-        ColumnLayout {
-            spacing: Kirigami.Units.smallSpacing
-            Layout.fillWidth: true
-
-            Controls.CheckBox {
-                objectName: "appimageVerifyCheck"
-                text: qsTr("When finished, open the application for a few seconds in an isolated environment to find other missing dependencies and install them.")
-                checked: welcome.appImageVerify
-                onToggled: welcome.setAppImageVerify(checked)
-                Layout.fillWidth: true
-                contentItem: Controls.Label {
-                    text: parent.text
-                    wrapMode: Text.WordWrap
-                    leftPadding: parent.indicator.width + parent.spacing
-                    verticalAlignment: Text.AlignVCenter
-                }
-            }
-
-            Controls.Label {
-                objectName: "appimageVerifyNote"
-                text: qsTr("The check runs without access to your files or to the network.")
-                wrapMode: Text.WordWrap
-                opacity: 0.7
-                Layout.fillWidth: true
-                Layout.leftMargin: Kirigami.Units.gridUnit * 2
-            }
         }
     }
 
@@ -269,9 +238,11 @@ Kirigami.ScrollablePage {
         id: requirementsDialog
         objectName: "appimageRequirementsDialog"
         transientParent: page.Window.window
-        title: qsTr("Required dependencies")
+        title: qsTr("Preliminary dependencies")
+        introduction: qsTr("To run the AppImage in the container:")
         dependencies: welcome.appImageRequirementsText
-        note: qsTr("MultiPak will install in the container the dependencies it does not already have.")
+        note: qsTr("Before the installation finishes, the application will run for %1 seconds in an isolated environment to look for other dependencies.").arg(welcome.appImageCheckSeconds)
+            + " " + qsTr("The check runs without access to your files or to the network.")
     }
 
     footer: Controls.ToolBar {

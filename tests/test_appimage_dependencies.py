@@ -18,7 +18,7 @@ from multipak.appimage_dependencies import (
     python_imports,
     startup_failures,
 )
-from multipak.containers import ManagedContainer, _save_record
+from multipak.containers import ManagedContainer, save_record
 from multipak.engine import Engine
 from multipak.models import Package, Transaction
 from multipak.process import Cancelled, CommandError, Runner
@@ -528,7 +528,7 @@ def test_launch_refuses_another_container_that_took_the_name(store, monkeypatch)
 
 def test_last_container_appimage_offers_container_removal(store):
     record = ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32)
-    _save_record(store, record)
+    save_record(store, record)
     first = installed_container_appimage(store, "5")
     second = installed_container_appimage(store, "6")
     assert containers._candidate(store, first) == record
@@ -736,7 +736,7 @@ def test_update_refuses_a_container_that_took_a_recorded_name(store):
     from multipak import updates
 
     record = ManagedContainer("MultiPak-Fedora-45", "c" * 64, "a" * 32)
-    _save_record(store, record)
+    save_record(store, record)
 
     def responses(argv):
         if argv[:3] == ["podman", "container", "inspect"]:
@@ -803,7 +803,7 @@ def renamed_responses(state, current="Meus AppImages", others=()):
 
 
 def test_a_renamed_appimage_container_is_taken_back(store):
-    _save_record(store, ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32))
+    save_record(store, ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32))
     tx = installed_container_appimage(store, "8")
     state = {}
     engine = engine_for(store, Recorder(renamed_responses(state)))
@@ -817,7 +817,7 @@ def test_a_renamed_appimage_container_is_taken_back(store):
 
 
 def test_a_taken_back_container_avoids_a_name_another_container_took(store):
-    _save_record(store, ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32))
+    save_record(store, ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32))
     tx = installed_container_appimage(store, "9")
     state = {}
     engine = engine_for(
@@ -867,7 +867,7 @@ def no_system_dependencies(monkeypatch, everything=False):
 
 def test_repair_plan_for_a_renamed_container(store, monkeypatch):
     no_system_dependencies(monkeypatch)
-    _save_record(store, ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32))
+    save_record(store, ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32))
     tx = installed_container_appimage(store, "a")
     engine = engine_for(store, Recorder(renamed_responses({})))
     plan = appimage_container.repair_plan(engine, tx.id)
@@ -883,7 +883,7 @@ def test_repair_plan_for_a_renamed_container(store, monkeypatch):
 
 def test_repair_plan_for_a_deleted_container(store, monkeypatch):
     no_system_dependencies(monkeypatch)
-    _save_record(store, ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32))
+    save_record(store, ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32))
     tx = installed_container_appimage(store, "a")
     engine = engine_for(store, Recorder(renamed_responses({"existing": set()})))
     plan = appimage_container.repair_plan(engine, tx.id)
@@ -907,7 +907,7 @@ def test_repair_on_the_system_leaves_containers_alone(store):
 
 
 def test_repair_takes_a_renamed_container_back_without_reinstalling(store):
-    _save_record(store, ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32))
+    save_record(store, ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32))
     tx = installed_container_appimage(store, "a")
     tx.container = "Meus AppImages-antigo"
     tx.appimage_packages = ["python3-tkinter"]
@@ -1042,10 +1042,52 @@ def test_nothing_is_forgotten_when_podman_cannot_be_queried(store):
 
 def test_repair_plan_only_relinks_when_the_container_already_has_its_name(store, monkeypatch):
     no_system_dependencies(monkeypatch, everything=True)
-    _save_record(store, ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32))
+    save_record(store, ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32))
     tx = installed_container_appimage(store, "a")
     tx.container = "Meus AppImages"
     store.save(tx)
     state = {"name": appimage_container.CONTAINER_NAME}
     engine = engine_for(store, Recorder(renamed_responses(state)))
     assert appimage_container.repair_plan(engine, tx.id)["kind"] == "relink"
+
+
+def test_the_check_gives_graphical_applications_a_virtual_display(store, tmp_path):
+    def responses(argv):
+        if argv[:3] == ["podman", "container", "inspect"]:
+            return "c" * 64
+        if "rpm" in argv and appimage_container.XVFB in argv:
+            return f"{appimage_container.XVFB}-21.1.18-1.fc45.x86_64\n"
+        return ""
+
+    runner = Recorder(responses)
+    engine = engine_for(store, runner)
+    container = ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32)
+    appimage_container.isolated_check(engine, container, tmp_path / "AppDir", "e" * 32)
+    run = next(argv for argv in runner.calls if argv[:2] == ["podman", "run"])
+    # Still no network, files or privileges; only Xvfb's keymaps get a writable place.
+    for option in ("--network=none", "--cap-drop=all", "--read-only", "--rm"):
+        assert option in run
+    tmpfs = [run[i + 1] for i, value in enumerate(run) if value == "--tmpfs"]
+    assert tmpfs == ["/tmp", "/run", "/var/lib/xkb"]
+    volumes = [run[i + 1] for i, value in enumerate(run) if value == "--volume"]
+    assert volumes == [f"{tmp_path / 'AppDir'}:/opt/multipak-appimage:ro"]
+    entry = run.index("--entrypoint")
+    assert run[entry + 1] == "/bin/sh" and run[entry + 3] == "-c"
+    assert "Xvfb :99" in run[entry + 4] and "timeout" in run[entry + 4]
+    assert run[-2:] == [str(appimage_container.CHECK_SECONDS), "/opt/multipak-appimage/AppRun"]
+    # Already installed: nothing to install.
+    assert not any("dnf" in argv for argv in runner.calls)
+
+
+def test_without_xvfb_the_check_runs_as_before(store, tmp_path):
+    runner = Recorder(
+        lambda argv: "c" * 64 if argv[:3] == ["podman", "container", "inspect"] else ""
+    )
+    engine = engine_for(store, runner)
+    container = ManagedContainer(appimage_container.CONTAINER_NAME, "c" * 64, "a" * 32)
+    appimage_container.isolated_check(engine, container, tmp_path / "AppDir", "e" * 32)
+    # It tried to install Xvfb once, and went on without it.
+    assert any("dnf" in argv and appimage_container.XVFB in argv for argv in runner.calls)
+    run = next(argv for argv in runner.calls if argv[:2] == ["podman", "run"])
+    assert run[run.index("--entrypoint") + 1] == "/usr/bin/timeout"
+    assert "/var/lib/xkb" not in run

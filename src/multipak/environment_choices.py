@@ -2,15 +2,13 @@
 
 import re
 
-from .models import Environment, ExistingEnvironment
+from .models import Environment, ExistingEnvironment, container_title
 
 
 def container_base(environment: Environment, *, resolved_version: str | None = None) -> str:
     family, _, version = environment.id.partition("-")
-    if family == "arch":
-        return "MultiPak-Arch-Linux"
     target_version = resolved_version or environment.resolved_version or version
-    return f"MultiPak-{family.title()}-{target_version}"
+    return container_title(family, target_version)
 
 
 def next_container_name(base: str, names, *, new: bool = False) -> str:

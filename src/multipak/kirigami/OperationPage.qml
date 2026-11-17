@@ -73,7 +73,9 @@ Kirigami.ScrollablePage {
 
         Controls.ToolButton {
             objectName: "operationDetailsButton"
-            visible: welcome.logs.length > 0
+            // Details that only repeat the message above are not offered.
+            visible: welcome.logs.trim().length > 0
+                && welcome.logs.trim() !== welcome.status.trim()
             text: page.detailsExpanded ? qsTr("Hide details") : qsTr("Show details")
             onClicked: page.detailsExpanded = !page.detailsExpanded
         }
@@ -82,7 +84,8 @@ Kirigami.ScrollablePage {
             objectName: "operationLogView"
             logObjectName: "operationLog"
             text: page.detailsExpanded ? welcome.logs : ""
-            visible: page.detailsExpanded && welcome.logs.length > 0
+            visible: page.detailsExpanded && welcome.logs.trim().length > 0
+                && welcome.logs.trim() !== welcome.status.trim()
             Layout.fillWidth: true
             Layout.preferredHeight: Kirigami.Units.gridUnit * 9
         }

@@ -50,7 +50,11 @@ def test_rpm_metadata_uses_query_and_never_executes_scripts(tmp_path):
     class Query:
         def run(self, argv, **options):
             calls.append(argv)
-            return "demo\x1f1.0-1.fc44\x1fnoarch" if "--queryformat" in argv else "libc.so.6"
+            return (
+                "demo\x1f1.0-1.fc44\x1fnoarch\x1fFedora Project"
+                if "--queryformat" in argv
+                else "libc.so.6"
+            )
 
     package = inspect_package(path, Query())
     assert package.distro_hint == "fedora-44"
@@ -78,7 +82,7 @@ def test_rpm_destination_prefers_internal_metadata_then_unambiguous_filename(
 
     class Query:
         def run(self, argv, **options):
-            return f"app\x1f1.0-{release}\x1fnoarch" if "--queryformat" in argv else ""
+            return f"app\x1f1.0-{release}\x1fnoarch\x1f(none)" if "--queryformat" in argv else ""
 
     package = inspect_package(path, Query())
     assert package.distro_hint == hint
@@ -100,7 +104,9 @@ def test_renamed_rpm_uses_rpm_parser(tmp_path):
     class Query:
         def run(self, argv, **options):
             assert argv[0] == "rpm"
-            return "demo\x1f1.0-1.fc45\x1fnoarch" if "--queryformat" in argv else ""
+            return (
+                "demo\x1f1.0-1.fc45\x1fnoarch\x1fFedora Project" if "--queryformat" in argv else ""
+            )
 
     assert inspect_package(path, Query()).kind == "rpm"
 
@@ -128,7 +134,11 @@ def test_flatpak_rpm_inspection_uses_bundled_tool_and_sandbox_path(tmp_path, mon
     class Query:
         def run(self, argv, **options):
             calls.append(argv)
-            return b"demo\x1f1.0-1.fc44\x1fnoarch" if options.get("binary") else "libc.so.6"
+            return (
+                b"demo\x1f1.0-1.fc44\x1fnoarch\x1fFedora Project"
+                if options.get("binary")
+                else "libc.so.6"
+            )
 
     package = inspect_package(path, Query())
     assert package.name == "demo"
