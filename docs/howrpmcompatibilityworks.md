@@ -1,6 +1,6 @@
 # How MultiPak installs RPM packages (Fedora, Mageia, openSUSE and ALT Linux)
 
-*MultiPak 1.1.0. Translated from the [Portuguese version](howrpmcompatibilityworks.pt-BR.md), which is the reference text.*
+*MultiPak 1.2.0. Translated from the [Portuguese version](howrpmcompatibilityworks.pt-BR.md), which is the reference text.*
 
 ---
 

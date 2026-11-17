@@ -84,6 +84,10 @@ def main():
         PREFIX / "share/mime/packages" / f"{APP_ID}.packages.xml",
     )
     install(
+        ROOT / "src/multipak/assets/multipak-android.xml",
+        PREFIX / "share/mime/packages" / f"{APP_ID}.android.xml",
+    )
+    install(
         ROOT / "src/multipak/assets/multipak-snap.xml",
         PREFIX / "share/mime/packages" / f"{APP_ID}.snap.xml",
     )

@@ -1,6 +1,6 @@
 # How MultiPak installs and runs snaps
 
-*MultiPak 1.1.0. Translated from the [Portuguese version](howsnapcompatibilityworks.pt-BR.md), which is the reference text.*
+*MultiPak 1.2.0. Translated from the [Portuguese version](howsnapcompatibilityworks.pt-BR.md), which is the reference text.*
 
 ---
 

@@ -19,6 +19,15 @@ from .integration import DESKTOP_ID
 LEGACY_INSTALLER = host.LEGACY_APP_ID + ".installer.desktop"
 APPIMAGE_MIME = "application/x-multipak-appimage"
 FORMATS = {
+    "android": (
+        mark("Android (.apk, .apkm, .apks, .xapk)"),
+        (
+            "application/vnd.android.package-archive",
+            "application/vnd.apkm",
+            "application/x-apks",
+            "application/xapk-package-archive",
+        ),
+    ),
     "rpm": ("RPM (.rpm)", ("application/x-rpm",)),
     "deb": ("DEB (.deb)", ("application/vnd.debian.binary-package", "application/x-deb")),
     "arch": (
@@ -180,6 +189,7 @@ class FileAssociations:
         self.state_path = self.config / "multipak/file-associations.json"
         self.xml_path = self.data / "mime/packages/io.github.multipak.appimage.xml"
         self.arch_xml_path = self.data / "mime/packages/io.github.multipak.packages.xml"
+        self.android_xml_path = self.data / "mime/packages/io.github.multipak.android.xml"
         self.snap_xml_path = self.data / "mime/packages/io.github.multipak.snap.xml"
         self.slackware_xml_path = self.data / "mime/packages/io.github.multipak.slackware.xml"
         self.pisi_xml_path = self.data / "mime/packages/io.github.multipak.pisi.xml"
@@ -385,9 +395,17 @@ class FileAssociations:
                 self.alpine_xml_path,
                 self.void_xml_path,
                 self.solus_xml_path,
+                self.android_xml_path,
             )
         }
         try:
+            if selected["android"]:
+                _atomic_write(
+                    self.android_xml_path,
+                    (Path(__file__).with_name("assets") / "multipak-android.xml").read_text(),
+                )
+            else:
+                self.android_xml_path.unlink(missing_ok=True)
             _atomic_write(
                 self.state_path,
                 json.dumps(

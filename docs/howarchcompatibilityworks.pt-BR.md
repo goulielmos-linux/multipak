@@ -1,6 +1,6 @@
 # Como o MultiPak instala pacotes do Arch Linux
 
-*MultiPak 1.1.0.*
+*MultiPak 1.2.0.*
 
 ---
 

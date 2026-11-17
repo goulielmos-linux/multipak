@@ -1,6 +1,6 @@
 # Como o MultiPak instala pacotes DEB (Debian e Ubuntu)
 
-*MultiPak 1.1.0.*
+*MultiPak 1.2.0.*
 
 ---
 

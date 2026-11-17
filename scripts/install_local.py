@@ -73,7 +73,10 @@ def main() -> None:
         [str(runtime / "bin/python"), "-m", "multipak.integration"],
         check=True,
     )
-    print("Installation completed. Open an RPM, DEB, Arch or AppImage package to begin.")
+    subprocess.run([str(runtime / "bin/python"), "-m", "multipak.android_menu"], check=True)
+    if kde_cache := shutil.which("kbuildsycoca6"):
+        subprocess.run([kde_cache, "--noincremental"], check=True)
+    print("Installation completed. Open an RPM, DEB, Arch, AppImage or Android APK to begin.")
 
 
 if __name__ == "__main__":
