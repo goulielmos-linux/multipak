@@ -48,8 +48,8 @@ verificação, **com um aviso**.
 
 ### 1.4 Atualizar e remover
 
-- **Atualizar**: `distrobox upgrade` (o Distrobox conhece o apk), em **Gerenciador →
-  Atualizar**.
+- **Atualizar**: em **Gerenciador → Atualizar**, o MultiPak atualiza o contêiner inteiro
+  com o comando do próprio Distrobox (`distrobox upgrade`), que usa o apk.
 - **Versões novas**: o Gerenciador consulta `apk version` para saber quais aplicativos
   têm versão nova e mostra cada um em **Com atualização**, **Em dia** ou **Sem fonte de
   atualização** (instalado de um arquivo que nenhum repositório oferece). Ao abrir, usa

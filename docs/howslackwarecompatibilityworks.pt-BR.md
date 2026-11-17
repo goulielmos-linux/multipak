@@ -23,13 +23,7 @@ pacotes; no MultiPak, ele mesmo faz isso (veja o passo 4 abaixo).
    `nome-versão-arch-build` e se `install/slack-desc` descrever esse mesmo pacote.
    Dois cliques abrem com o MultiPak só `.txz` e `.tgz` com nome de pacote; outros
    arquivos compactados continuam com o programa de costume.
-2. **Escolhe o ambiente** entre dois, feitos da mesma imagem pequena
-   (`docker.io/aclemons/slackware:15.0`):
-   - **leve** (padrão, contêiner `MultiPak-Slackware-15.0`): só o que o aplicativo
-     precisa;
-   - **completo** (contêiner `MultiPak-Slackware-15.0-full`): também as séries de base,
-     bibliotecas, rede e X11 do Slackware (cerca de 1,2 GB a mais para baixar, uns 6 GB
-     no disco).
+2. **Escolhe o ambiente:** leve, o padrão, ou completo (veja 1.3).
 3. **Confia na chave do Slackware:** a imagem não traz a chave de assinatura, e sem
    ela o slackpkg recusa tudo. O MultiPak importa uma cópia da chave oficial antes do
    primeiro pacote.
@@ -41,10 +35,19 @@ pacotes; no MultiPak, ele mesmo faz isso (veja o passo 4 abaixo).
 5. **Atalho no menu.** Se alguma biblioteca não foi achada, o MultiPak avisa e sugere
    o ambiente completo.
 
-### 1.3 Atualizar e remover
+### 1.3 O contêiner
 
-- **Atualizar**: `distrobox upgrade` (o Distrobox conhece o slackpkg), em **Gerenciador
-  → Atualizar**.
+Dois ambientes, feitos da mesma imagem pequena (`docker.io/aclemons/slackware:15.0`):
+
+| Ambiente | Contêiner | O que traz |
+| --- | --- | --- |
+| leve (padrão) | `MultiPak-Slackware-15.0` | só o que o aplicativo precisa |
+| completo | `MultiPak-Slackware-15.0-full` | também as séries de base, bibliotecas, rede e X11 do Slackware (cerca de 1,2 GB a mais para baixar, uns 6 GB no disco) |
+
+### 1.4 Atualizar e remover
+
+- **Atualizar**: em **Gerenciador → Atualizar**, o MultiPak atualiza o contêiner inteiro
+  com o comando do próprio Distrobox (`distrobox upgrade`), que usa o slackpkg.
 - **Versões novas**: para cada aplicativo, o Gerenciador compara a versão instalada com
   a mais nova da lista de pacotes do Slackware; uma correção publicada depois do
   lançamento (série `patches`) conta como a mais nova. Assim mostra cada um em **Com
@@ -54,7 +57,7 @@ pacotes; no MultiPak, ele mesmo faz isso (veja o passo 4 abaixo).
 - **Remover**: `removepkg`. Como o Slackware não registra dependências, só o pacote do
   aplicativo é removido; as bibliotecas que o MultiPak acrescentou ficam.
 
-### 1.4 O que (ainda) não funciona
+### 1.5 O que (ainda) não funciona
 
 - Pacotes feitos para outras versões do Slackware (como a 14.2 ou a *-current*): o
   MultiPak só oferece o 15.0, a estável atual. Como o pacote não diz para qual versão

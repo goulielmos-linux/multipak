@@ -1,4 +1,4 @@
-# Como o MultiPak roda snaps
+# Como o MultiPak instala e roda snaps
 
 *MultiPak 1.2.0.*
 

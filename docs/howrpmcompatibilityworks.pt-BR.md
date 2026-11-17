@@ -61,8 +61,9 @@ ou escuro do computador, inclusive em programas GTK 2. Sem isso, o openSUSE most
 
 ### 1.6 Atualizar e remover
 
-- **Atualizar**: `distrobox upgrade`, que já roda `dnf upgrade`, `zypper dup` ou
-  `apt-get dist-upgrade`, em **Gerenciador → Atualizar**.
+- **Atualizar**: em **Gerenciador → Atualizar**, o MultiPak atualiza o contêiner inteiro
+  com o comando do próprio Distrobox (`distrobox upgrade`), que roda `dnf upgrade`,
+  `zypper dup` ou `apt-get dist-upgrade`, conforme a distribuição.
 - **Versões novas**: o Gerenciador pergunta ao gerenciador da distribuição (`dnf
   check-update` e `repoquery`, `zypper list-updates` e `search`, ou `apt-cache policy`
   no APT-RPM) quais aplicativos têm versão nova e mostra cada um em **Com atualização**,

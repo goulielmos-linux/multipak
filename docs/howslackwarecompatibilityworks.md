@@ -26,13 +26,7 @@ in MultiPak, it does this itself (see step 4 below).
    has the form `name-version-arch-build` and `install/slack-desc` describes that same
    package. Double-clicking opens only `.txz` and `.tgz` files with a package name in
    MultiPak; other compressed archives keep opening with their usual program.
-2. **Chooses the environment** between two, built from the same small image
-   (`docker.io/aclemons/slackware:15.0`):
-   - **light** (default, container `MultiPak-Slackware-15.0`): only what the application
-     needs;
-   - **full** (container `MultiPak-Slackware-15.0-full`): also Slackware's base,
-     libraries, network and X11 series (about 1.2 GB more to download, around 6 GB on
-     disk).
+2. **Chooses the environment:** light, the default, or full (see 1.3).
 3. **Trusts Slackware's key:** the image does not include the signing key, and without
    it slackpkg refuses everything. MultiPak imports a copy of the official key before
    the first package.
@@ -44,10 +38,19 @@ in MultiPak, it does this itself (see step 4 below).
 5. **Adds menu shortcuts.** If any library was not found, MultiPak warns you and
    suggests the full environment.
 
-### 1.3 Updating and uninstalling
+### 1.3 The container
 
-- **Update**: `distrobox upgrade` (Distrobox knows slackpkg), under **Manager →
-  Update**.
+Two environments, built from the same small image (`docker.io/aclemons/slackware:15.0`):
+
+| Environment | Container | What it includes |
+| --- | --- | --- |
+| light (default) | `MultiPak-Slackware-15.0` | only what the application needs |
+| full | `MultiPak-Slackware-15.0-full` | also Slackware's base, libraries, network and X11 series (about 1.2 GB more to download, around 6 GB on disk) |
+
+### 1.4 Updating and uninstalling
+
+- **Update**: under **Manager → Update**, MultiPak updates the whole container with
+  Distrobox's own command (`distrobox upgrade`), which uses slackpkg.
 - **New versions**: for each application, the Manager compares the installed version
   with the newest one in Slackware's package list; a fix published after the release
   (the `patches` series) counts as the newest. It then lists each application under
@@ -57,7 +60,7 @@ in MultiPak, it does this itself (see step 4 below).
 - **Uninstall**: `removepkg`. Since Slackware does not record dependencies, only the
   application's package is removed; the libraries MultiPak added stay.
 
-### 1.4 Known limitations
+### 1.5 Known limitations
 
 - Packages built for other Slackware versions (such as 14.2 or *-current*): MultiPak
   offers only 15.0, the current stable release. Since a package does not say which

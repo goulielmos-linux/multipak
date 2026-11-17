@@ -1,6 +1,6 @@
 # How MultiPak installs RPM packages (Fedora, Mageia, openSUSE and ALT Linux)
 
-*Translated from the [Portuguese version](howrpmenvironmentsworks.pt-BR.md), which is
+*Translated from the [Portuguese version](howrpmcompatibilityworks.pt-BR.md), which is
 the reference text.*
 
 *MultiPak 1.2.0.*
@@ -67,8 +67,9 @@ icons.
 
 ### 1.6 Updating and uninstalling
 
-- **Update**: `distrobox upgrade`, which already runs `dnf upgrade`, `zypper dup` or
-  `apt-get dist-upgrade`, under **Manager → Update**.
+- **Update**: under **Manager → Update**, MultiPak updates the whole container with
+  Distrobox's own command (`distrobox upgrade`), which runs `dnf upgrade`, `zypper dup`
+  or `apt-get dist-upgrade`, depending on the distribution.
 - **New versions**: the Manager asks the distribution's package manager (`dnf
   check-update` and `repoquery`, `zypper list-updates` and `search`, or `apt-cache
   policy` on APT-RPM) which applications have a new version and lists each one under

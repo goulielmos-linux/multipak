@@ -13,43 +13,41 @@ gerencia a Integração Waydroid e ajusta as configurações do MultiPak.
 
 ## Recursos
 
-- **Pacotes Linux**, instalados com suas dependências em contêineres Distrobox:
-  - RPM do Fedora, Mageia, openSUSE e ALT Linux.
-    [Veja como funciona.](docs/howrpmenvironmentsworks.pt-BR.md)
-  - DEB e Arch Linux.
-  - Alpine Linux. [Veja como funciona.](docs/howalpinecompatibilityworks.pt-BR.md)
-  - Void Linux. [Veja como funciona.](docs/howvoidcompatibilityworks.pt-BR.md)
-  - Solus. [Veja como funciona.](docs/howsoluscompatibilityworks.pt-BR.md)
-  - Slackware. [Veja como funciona.](docs/howslackwarecompatibilityworks.pt-BR.md)
-  - Gentoo. [Veja como funciona.](docs/howgentoocompatibilityworks.pt-BR.md)
-  - Pisi Linux. [Veja como funciona.](docs/howpisicompatibilityworks.pt-BR.md)
-  - SliTaz. [Veja como funciona.](docs/howslitazcompatibilityworks.pt-BR.md)
-  - Puppy Linux. [Veja como funciona.](docs/howpuppycompatibilityworks.pt-BR.md)
-- **Sempre atualizado:** as novas versões de cada distribuição aparecem no MultiPak sozinhas,
-  sem precisar atualizá-lo. As exceções são o Slackware e o Pisi Linux, cuja versão suportada
-  é definida no MultiPak.
-- **AppImages** que precisam de bibliotecas que faltam no seu sistema funcionam mesmo assim: o
-  MultiPak descobre o que falta antes da primeira execução e providencia num contêiner
-  compartilhado. [Veja como funciona.](docs/howappimagecompatibilityworks.pt-BR.md)
-- **Snaps** são instalados sem o snapd, a partir de um arquivo, de um link ou da Snap Store,
-  com serviços em segundo plano incluídos. [Veja como esse milagre funciona.](docs/howsnapcompatibilityworks.pt-BR.md)
-- **Aplicativos Android** (APK, APKM, APKS, XAPK) rodam em contêineres Android baseados no
-  Waydroid, gerenciados pela Integração Waydroid.
-- **Revisão antes de instalar**, com uma busca na sua loja de aplicativos (Bazaar, GNOME Software
-  ou KDE Discover) por uma alternativa em Flatpak.
-- **Atualizações por aplicativo:** veja quais têm versão nova e atualize um por um ou todos de
-  uma vez. Um aplicativo em contêiner é atualizado junto com o contêiner.
-- **Contêineres do seu jeito:** padrão, personalizado ou um já existente que você reaproveita.
-- **Configurações** de associação de arquivos e do idioma da interface (inglês ou português do
-  Brasil).
+- **Instala automaticamente pacotes de distribuições** e suas dependências em
+  contêineres Distrobox. As distribuições suportadas estão na tabela abaixo.
+- **Instala snaps sem o snapd**, a partir de um arquivo, de um link ou da Snap Store,
+  com serviços em segundo plano incluídos.
+- **Roda AppImages**, mesmo os que precisam de bibliotecas que faltam no seu sistema.
+- **Instala aplicativos Android** em contêineres Android baseados no Waydroid,
+  gerenciados pela Integração Waydroid.
+- **Sempre atualizado:** novas versões das distribuições aparecem sozinhas, sem precisar
+  atualizar o MultiPak (exceto Slackware e Pisi Linux).
+- **Mostra tudo antes de instalar**: o aplicativo, o contêiner e quão seguro o MultiPak
+  está da escolha.
+- **Procura uma alternativa em Flatpak** na sua loja de aplicativos (Bazaar, GNOME
+  Software ou KDE Discover) antes de instalar.
 
-Arquivos suportados: `.rpm`, `.deb`, `.pkg.tar`, `.pkg.tar.zst`, `.pkg.tar.xz`,
-`.pkg.tar.gz`, `.pkg.tar.bz2`, pacotes do Slackware `.txz`, `.tgz`, `.tar.xz` e `.tar.gz`,
-pacotes do Pisi Linux `.pisi`, do SliTaz `.tazpkg`, do Gentoo `.gpkg.tar`, do Puppy Linux
-`.pet`, do Alpine Linux `.apk`, do Void Linux `.xbps` e do Solus `.eopkg`,
-arquivos `.AppImage` dos tipos 1 e 2, arquivos `.snap` e aplicativos Android `.apk`,
-`.apkm`, `.apks` e `.xapk`. Pacotes do Alpine e aplicativos Android usam a mesma extensão
-`.apk`; o MultiPak os diferencia pelo conteúdo.
+### Pacotes suportados
+
+| Pacote | Extensões | Como funciona |
+| --- | --- | --- |
+| RPM (Fedora, Mageia, openSUSE, ALT Linux) | `.rpm` | [Veja como funciona](docs/howrpmcompatibilityworks.pt-BR.md) |
+| DEB (Debian, Ubuntu) | `.deb` | [Veja como funciona](docs/howdebcompatibilityworks.pt-BR.md) |
+| Arch Linux | `.pkg.tar`, `.pkg.tar.zst`, `.pkg.tar.xz`, `.pkg.tar.gz`, `.pkg.tar.bz2` | [Veja como funciona](docs/howarchcompatibilityworks.pt-BR.md) |
+| Alpine Linux | `.apk`\* | [Veja como funciona](docs/howalpinecompatibilityworks.pt-BR.md) |
+| Void Linux | `.xbps` | [Veja como funciona](docs/howvoidcompatibilityworks.pt-BR.md) |
+| Solus | `.eopkg` | [Veja como funciona](docs/howsoluscompatibilityworks.pt-BR.md) |
+| Slackware | `.txz`, `.tgz`, `.tar.xz`, `.tar.gz` | [Veja como funciona](docs/howslackwarecompatibilityworks.pt-BR.md) |
+| Gentoo | `.gpkg.tar` | [Veja como funciona](docs/howgentoocompatibilityworks.pt-BR.md) |
+| Pisi Linux | `.pisi` | [Veja como funciona](docs/howpisicompatibilityworks.pt-BR.md) |
+| SliTaz | `.tazpkg` | [Veja como funciona](docs/howslitazcompatibilityworks.pt-BR.md) |
+| Puppy Linux | `.pet` | [Veja como funciona](docs/howpuppycompatibilityworks.pt-BR.md) |
+| Snap | `.snap` | [Veja como esse *milagre* funciona](docs/howsnapcompatibilityworks.pt-BR.md) |
+| AppImage (tipos 1 e 2) | `.AppImage` | [Veja como funciona](docs/howappimagecompatibilityworks.pt-BR.md) |
+| Android | `.apk`\*, `.apkm`, `.apks`, `.xapk` | — |
+
+\* Pacotes do Alpine e aplicativos Android usam a mesma extensão `.apk`; o MultiPak os
+diferencia pelo conteúdo.
 
 ## Capturas de tela
 
