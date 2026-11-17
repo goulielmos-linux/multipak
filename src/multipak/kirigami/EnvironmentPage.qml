@@ -120,10 +120,7 @@ Kirigami.ScrollablePage {
 
                     Controls.Label {
                         objectName: "selectedContainerName"
-                        text: (welcome.containerExists
-                            ? qsTr("Container %1 will be reused for this installation.")
-                            : qsTr("Container %1 will be created for this installation."))
-                            .arg(welcome.containerName)
+                        text: welcome.containerDescription
                         textFormat: Text.PlainText
                         wrapMode: Text.Wrap
                         Layout.fillWidth: true

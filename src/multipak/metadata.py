@@ -8,6 +8,7 @@ import platform
 import re
 import sys
 import tarfile
+import zipfile
 from contextlib import ExitStack
 from pathlib import Path
 
@@ -143,6 +144,7 @@ def _package_metadata(
     | puppy.Info
     | alpine.Info
     | xbps.Info
+    | Package
     | None,
 ]:
     """Identify the package format and keep the metadata a reader found while probing."""
@@ -164,21 +166,18 @@ def _package_metadata(
             raise ValueError(
                 tr(
                     "The file contents do not match a valid RPM, DEB, Arch, AppImage, snap, "
-                    "Slackware, Pisi Linux, SliTaz, Gentoo, Puppy Linux, Alpine, Void Linux or "
-                    "Solus package. {0}"
+                    "Slackware, Pisi Linux, SliTaz, Gentoo, Puppy Linux, Alpine, Void Linux, "
+                    "Solus or Android package. {0}"
                 ).format(slitaz_error)
             ) from slitaz_error
     if alpine.is_v3(header):
         raise alpine.v3_error()
     if header.startswith(b"PK\x03\x04"):
-        if path.suffix.lower() == ".apk":
-            # Android apps share the .apk extension with Alpine packages.
-            raise ValueError(
-                tr(
-                    "This is an Android app. MultiPak installs Linux packages; its .apk "
-                    "support is for Alpine Linux packages."
-                )
-            )
+        if not _pisi_archive(path):
+            # Android apps (APK, APKM, APKS, XAPK) are ZIPs too; Alpine's .apk is a gzip TAR.
+            from .android_bundle import inspect_android
+
+            return "android", inspect_android(path)
         # PiSi and Solus packages are ZIPs with metadata.xml, files.xml and install.tar.xz;
         # the metadata names the distribution, whatever the file is called.
         try:
@@ -188,8 +187,8 @@ def _package_metadata(
             raise ValueError(
                 tr(
                     "The file contents do not match a valid RPM, DEB, Arch, AppImage, snap, "
-                    "Slackware, Pisi Linux, SliTaz, Gentoo, Puppy Linux, Alpine, Void Linux or "
-                    "Solus package. {0}"
+                    "Slackware, Pisi Linux, SliTaz, Gentoo, Puppy Linux, Alpine, Void Linux, "
+                    "Solus or Android package. {0}"
                 ).format(pisi_error)
             ) from pisi_error
     if alpine.is_candidate(path, header):
@@ -200,8 +199,8 @@ def _package_metadata(
             raise ValueError(
                 tr(
                     "The file contents do not match a valid RPM, DEB, Arch, AppImage, snap, "
-                    "Slackware, Pisi Linux, SliTaz, Gentoo, Puppy Linux, Alpine, Void Linux or "
-                    "Solus package. {0}"
+                    "Slackware, Pisi Linux, SliTaz, Gentoo, Puppy Linux, Alpine, Void Linux, "
+                    "Solus or Android package. {0}"
                 ).format(alpine_error)
             ) from alpine_error
     if info := _xbps_info(path, header, required=path.suffix.lower() == ".xbps"):
@@ -230,11 +229,23 @@ def _package_metadata(
         raise ValueError(
             tr(
                 "The file contents do not match a valid RPM, DEB, Arch, AppImage, snap, "
-                "Slackware, Pisi Linux, SliTaz, Gentoo, Puppy Linux, Alpine, Void Linux or Solus "
-                "package. {0}"
+                "Slackware, Pisi Linux, SliTaz, Gentoo, Puppy Linux, Alpine, Void Linux, Solus or "
+                "Android package. {0}"
             ).format(diagnosis)
         ) from arch_error
     return "arch", None
+
+
+def _pisi_archive(path: Path) -> bool:
+    """A ZIP with PiSi's metadata.xml and files.xml, or named like a PiSi/Solus package."""
+    if path.name.lower().endswith((".pisi", ".eopkg")):
+        return True
+    try:
+        with zipfile.ZipFile(path) as archive:
+            names = set(archive.namelist())
+    except (zipfile.BadZipFile, OSError, ValueError):
+        return False
+    return {"metadata.xml", "files.xml"} <= names
 
 
 def package_kind(path: Path) -> PackageKind:
@@ -388,6 +399,9 @@ def inspect_package(path: Path, runner: Runner) -> Package:
     if not path.is_file():
         raise ValueError(tr("Select a regular file."))
     kind, info = _package_metadata(path)
+    if kind == "android":
+        assert isinstance(info, Package)
+        return info
     if kind == "appimage":
         from .appimage import inspect_appimage
 

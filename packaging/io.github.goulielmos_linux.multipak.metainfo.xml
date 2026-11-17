@@ -8,9 +8,9 @@
   <summary>Install packages from other distros</summary>
   <summary xml:lang="pt_BR">Instale pacotes de outras distros</summary>
   <description>
-    <p>Install packages made for other Linux distributions on atomic systems, without changing the base system. Open a package file and the Installation Wizard takes care of it.</p>
-    <p>Supported: RPM, DEB, Arch Linux, Alpine, Void, Solus, Slackware, Gentoo, Pisi, SliTaz and Puppy packages, installed with their dependencies in Distrobox containers; AppImages, with any missing libraries provided in a shared container; and snaps, without snapd.</p>
-    <p>The Application Manager is where you update and uninstall applications and adjust MultiPak's settings. It shows which applications have a newer version and updates them one by one or all at once.</p>
+    <p>Install packages made for other Linux distributions, and Android apps, on atomic systems, without changing the base system. Open a package file and the Installation Wizard takes care of it.</p>
+    <p>Supported: RPM, DEB, Arch Linux, Alpine, Void, Solus, Slackware, Gentoo, Pisi, SliTaz and Puppy packages, installed with their dependencies in Distrobox containers; AppImages, with any missing libraries provided in a shared container; snaps, without snapd; and Android apps, in containers based on Waydroid.</p>
+    <p>The Application Manager is where you update and uninstall applications, manage the Waydroid integration and adjust MultiPak's settings. It shows which applications have a newer version and updates them one by one or all at once.</p>
   </description>
   <launchable type="desktop-id">io.github.goulielmos_linux.multipak.desktop</launchable>
   <developer id="io.github.goulielmos_linux"><name>Goulielmos</name></developer>
@@ -18,27 +18,27 @@
   <url type="bugtracker">https://github.com/goulielmos-linux/multipak/issues</url>
   <screenshots>
     <screenshot type="default">
-      <image type="source" width="800" height="648">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.1.0/application-manager.png</image>
+      <image type="source" width="800" height="648">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.2.0/application-manager.png</image>
       <caption>Manage applications, containers and preferences</caption>
     </screenshot>
     <screenshot>
-      <image type="source" width="554" height="251">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.1.0/installation-welcome.png</image>
+      <image type="source" width="554" height="251">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.2.0/installation-welcome.png</image>
       <caption>Review the package and search the app store</caption>
     </screenshot>
     <screenshot>
-      <image type="source" width="554" height="393">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.1.0/installation-settings.png</image>
+      <image type="source" width="554" height="393">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.2.0/installation-settings.png</image>
       <caption>Choose installation settings</caption>
     </screenshot>
     <screenshot>
-      <image type="source" width="554" height="527">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.1.0/installation-summary.png</image>
+      <image type="source" width="554" height="527">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.2.0/installation-summary.png</image>
       <caption>Review the installation before continuing</caption>
     </screenshot>
     <screenshot>
-      <image type="source" width="554" height="260">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.1.0/installation-progress.png</image>
+      <image type="source" width="554" height="260">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.2.0/installation-progress.png</image>
       <caption>Follow installation progress</caption>
     </screenshot>
     <screenshot>
-      <image type="source" width="554" height="264">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.1.0/installation-completed.png</image>
+      <image type="source" width="554" height="264">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.2.0/installation-completed.png</image>
       <caption>Confirm the installation completed</caption>
     </screenshot>
   </screenshots>

@@ -93,7 +93,7 @@ def test_suggestion_is_high_and_mentions_the_unofficial_image(tmp_path, x86_64):
     package = metadata.inspect_package(make_pisi(tmp_path / "d.eopkg", xml=SOLUS_METADATA), None)
     strength, text = suggestion_details(package, SOLUS_ENVIRONMENT, "Solus")
     assert strength == "High"
-    assert "unofficial image" in text
+    assert "silkeh/solus" in text
 
 
 # Environment and catalog

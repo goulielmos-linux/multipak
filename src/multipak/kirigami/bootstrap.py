@@ -15,7 +15,10 @@ spec.loader.exec_module(module)
 from multipak.localization import tr  # noqa: E402
 
 try:
-    if "--manager" in sys.argv[1:]:
+    if "--android-settings" in sys.argv[1:]:
+        sys.argv.remove("--android-settings")
+        from multipak.kirigami.android_settings import main
+    elif "--manager" in sys.argv[1:]:
         sys.argv.remove("--manager")
         from multipak.kirigami.manager import main
     else:

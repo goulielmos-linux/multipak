@@ -1,0 +1,40 @@
+MultiPak named-instance runtime, experimental version 1.1.0
+
+Upstream: Waydroid 1.6.3
+https://github.com/waydroid/waydroid/tree/5b7e2e71be3f6bfaaaab3b461251dacaf1ce4991
+Copyright: the Waydroid authors, as identified in the source files.
+License: GNU GPL version 3 or later; see LICENSE.
+
+Modified by MultiPak through 2026-11-11. This runtime requires an explicit instance
+ID and stores its state separately from the system Waydroid installation.
+Changes cover per-instance paths, D-Bus names, LXC names, binderfs devices,
+networks, image release selection and desktop entries. Session mount sources
+are derived from authenticated identities; private Android data is separated
+from the APK/icon exchange, and desktop sockets are pinned before mounting. Hardware-specific
+global service operations are disabled in this experimental runtime.
+
+The named-instance architecture was informed by Waydroid PR #1990:
+https://github.com/waydroid/waydroid/pull/1990
+The old PR patch is not applied directly to this source tree.
+
+SELinux image mount labeling follows the Fedora Waydroid package:
+https://src.fedoraproject.org/rpms/waydroid
+Only existing policy types are used; no additional SELinux policy module is
+installed. A local file-context mapping assigns the existing waydroid_data_t
+type to the private data and exchange directories on hosts with that policy.
+
+Modified upstream files:
+  data/scripts/waydroid-net.sh
+  tools/actions/container_manager.py
+  tools/actions/initializer.py
+  tools/actions/session_manager.py
+  tools/actions/upgrader.py
+  tools/config/__init__.py
+  tools/helpers/drivers.py
+  tools/helpers/images.py
+  tools/helpers/ipc.py
+  tools/helpers/lxc.py
+  tools/helpers/net.py
+  tools/services/user_manager.py
+  tools/helpers/mount.py
+  tools/actions/app_manager.py
