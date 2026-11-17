@@ -26,20 +26,20 @@ from your launcher.
 ### Supported packages
 
 | Package | Extensions | How it works |
-| --- | --- | :---: |
-| RPM (Fedora, Mageia, openSUSE, ALT Linux) | `.rpm` | [📖](docs/howrpmcompatibilityworks.md) |
-| DEB (Debian, Ubuntu) | `.deb` | [📖](docs/howdebcompatibilityworks.md) |
-| Arch Linux | `.pkg.tar`, `.pkg.tar.zst`, `.pkg.tar.xz`, `.pkg.tar.gz`, `.pkg.tar.bz2` | [📖](docs/howarchcompatibilityworks.md) |
-| Alpine Linux | `.apk` | [📖](docs/howalpinecompatibilityworks.md) |
-| Void Linux | `.xbps` | [📖](docs/howvoidcompatibilityworks.md) |
-| Solus | `.eopkg` | [📖](docs/howsoluscompatibilityworks.md) |
-| Slackware | `.txz`, `.tgz`, `.tar.xz`, `.tar.gz` | [📖](docs/howslackwarecompatibilityworks.md) |
-| Gentoo | `.gpkg.tar` | [📖](docs/howgentoocompatibilityworks.md) |
-| Pisi Linux | `.pisi` | [📖](docs/howpisicompatibilityworks.md) |
-| SliTaz | `.tazpkg` | [📖](docs/howslitazcompatibilityworks.md) |
-| Puppy Linux | `.pet` | [📖](docs/howpuppycompatibilityworks.md) |
-| Snap | `.snap` | [📖](docs/howsnapcompatibilityworks.md) |
-| AppImage (types 1 and 2) | `.AppImage` | [📖](docs/howappimagecompatibilityworks.md) |
+| :---: | :---: | :---: |
+| RPM (Fedora, Mageia, openSUSE, ALT Linux) | `.rpm` | [↗](docs/howrpmcompatibilityworks.md) |
+| DEB (Debian, Ubuntu) | `.deb` | [↗](docs/howdebcompatibilityworks.md) |
+| Arch Linux | `.pkg.tar`, `.pkg.tar.zst`, `.pkg.tar.xz`, `.pkg.tar.gz`, `.pkg.tar.bz2` | [↗](docs/howarchcompatibilityworks.md) |
+| Alpine Linux | `.apk` | [↗](docs/howalpinecompatibilityworks.md) |
+| Void Linux | `.xbps` | [↗](docs/howvoidcompatibilityworks.md) |
+| Solus | `.eopkg` | [↗](docs/howsoluscompatibilityworks.md) |
+| Slackware | `.txz`, `.tgz`, `.tar.xz`, `.tar.gz` | [↗](docs/howslackwarecompatibilityworks.md) |
+| Gentoo | `.gpkg.tar` | [↗](docs/howgentoocompatibilityworks.md) |
+| Pisi Linux | `.pisi` | [↗](docs/howpisicompatibilityworks.md) |
+| SliTaz | `.tazpkg` | [↗](docs/howslitazcompatibilityworks.md) |
+| Puppy Linux | `.pet` | [↗](docs/howpuppycompatibilityworks.md) |
+| Snap | `.snap` | [↗](docs/howsnapcompatibilityworks.md) |
+| AppImage (types 1 and 2) | `.AppImage` | [↗](docs/howappimagecompatibilityworks.md) |
 
 ## Screenshots
 

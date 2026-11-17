@@ -26,20 +26,20 @@ atualizar ou desinstalar aplicativos e ajustar as configurações do MultiPak, a
 ### Pacotes suportados
 
 | Pacote | Extensões | Como funciona |
-| --- | --- | :---: |
-| RPM (Fedora, Mageia, openSUSE, ALT Linux) | `.rpm` | [📖](docs/howrpmcompatibilityworks.pt-BR.md) |
-| DEB (Debian, Ubuntu) | `.deb` | [📖](docs/howdebcompatibilityworks.pt-BR.md) |
-| Arch Linux | `.pkg.tar`, `.pkg.tar.zst`, `.pkg.tar.xz`, `.pkg.tar.gz`, `.pkg.tar.bz2` | [📖](docs/howarchcompatibilityworks.pt-BR.md) |
-| Alpine Linux | `.apk` | [📖](docs/howalpinecompatibilityworks.pt-BR.md) |
-| Void Linux | `.xbps` | [📖](docs/howvoidcompatibilityworks.pt-BR.md) |
-| Solus | `.eopkg` | [📖](docs/howsoluscompatibilityworks.pt-BR.md) |
-| Slackware | `.txz`, `.tgz`, `.tar.xz`, `.tar.gz` | [📖](docs/howslackwarecompatibilityworks.pt-BR.md) |
-| Gentoo | `.gpkg.tar` | [📖](docs/howgentoocompatibilityworks.pt-BR.md) |
-| Pisi Linux | `.pisi` | [📖](docs/howpisicompatibilityworks.pt-BR.md) |
-| SliTaz | `.tazpkg` | [📖](docs/howslitazcompatibilityworks.pt-BR.md) |
-| Puppy Linux | `.pet` | [📖](docs/howpuppycompatibilityworks.pt-BR.md) |
-| Snap | `.snap` | [📖](docs/howsnapcompatibilityworks.pt-BR.md) |
-| AppImage (tipos 1 e 2) | `.AppImage` | [📖](docs/howappimagecompatibilityworks.pt-BR.md) |
+| :---: | :---: | :---: |
+| RPM (Fedora, Mageia, openSUSE, ALT Linux) | `.rpm` | [↗](docs/howrpmcompatibilityworks.pt-BR.md) |
+| DEB (Debian, Ubuntu) | `.deb` | [↗](docs/howdebcompatibilityworks.pt-BR.md) |
+| Arch Linux | `.pkg.tar`, `.pkg.tar.zst`, `.pkg.tar.xz`, `.pkg.tar.gz`, `.pkg.tar.bz2` | [↗](docs/howarchcompatibilityworks.pt-BR.md) |
+| Alpine Linux | `.apk` | [↗](docs/howalpinecompatibilityworks.pt-BR.md) |
+| Void Linux | `.xbps` | [↗](docs/howvoidcompatibilityworks.pt-BR.md) |
+| Solus | `.eopkg` | [↗](docs/howsoluscompatibilityworks.pt-BR.md) |
+| Slackware | `.txz`, `.tgz`, `.tar.xz`, `.tar.gz` | [↗](docs/howslackwarecompatibilityworks.pt-BR.md) |
+| Gentoo | `.gpkg.tar` | [↗](docs/howgentoocompatibilityworks.pt-BR.md) |
+| Pisi Linux | `.pisi` | [↗](docs/howpisicompatibilityworks.pt-BR.md) |
+| SliTaz | `.tazpkg` | [↗](docs/howslitazcompatibilityworks.pt-BR.md) |
+| Puppy Linux | `.pet` | [↗](docs/howpuppycompatibilityworks.pt-BR.md) |
+| Snap | `.snap` | [↗](docs/howsnapcompatibilityworks.pt-BR.md) |
+| AppImage (tipos 1 e 2) | `.AppImage` | [↗](docs/howappimagecompatibilityworks.pt-BR.md) |
 
 ## Capturas de tela
 
