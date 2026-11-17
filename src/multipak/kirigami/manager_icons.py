@@ -9,7 +9,7 @@ from PySide6.QtGui import QIcon
 GENERIC_ICON = QUrl.fromLocalFile(
     str(Path(__file__).with_name("assets") / "application.svg")
 ).toString()
-_GENERIC_NAMES = {"application-x-executable", "application-x-generic"}
+_GENERIC_NAMES = {"application-x-executable", "application-x-generic", "waydroid"}
 
 
 def _source(value):

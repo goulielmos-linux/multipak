@@ -274,7 +274,9 @@ class _Parser:
         while self.index < len(self.lines):
             number, raw = self.lines[self.index]
             self.index += 1
-            if raw.strip() and len(raw) - len(raw.lstrip(" ")) <= indent:
+            # YAML allows the continuation lines of a quoted scalar at the indentation of
+            # the block that holds it (gtk2-common-themes closes its description in column 0).
+            if raw.strip() and len(raw) - len(raw.lstrip(" ")) < indent:
                 raise YamlError(f"Unfinished quoted value before line {number}")
             closing = _closing_quote(quote + raw)
             if closing is None:

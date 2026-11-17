@@ -26,7 +26,7 @@ from . import (
 )
 from .container_progress import ImageProgress, PackageProgress
 from .desktop import export_desktops, register_container_icon, remove_container_icon
-from .distrobox_setup import DistroboxMissing
+from .distrobox_setup import DistroboxMissing, outdated_components
 from .environment_choices import container_base, default_environment, next_container_name
 from .environments import (
     CUSTOM_LABEL,
@@ -149,6 +149,26 @@ PISI_INSTALL = ["sudo", "-n", "pisi", "install", "--no-color", "--yes-all", "--i
 
 
 class Engine:
+    def install_android(
+        self,
+        package: Package,
+        *,
+        allow_translation=False,
+        instance_id="",
+        android_profile="",
+        android_label="",
+    ) -> Transaction:
+        from . import android
+
+        return android.install(
+            self,
+            package,
+            allow_translation=allow_translation,
+            instance_id=instance_id,
+            android_profile=android_profile,
+            android_label=android_label,
+        )
+
     def install_snap(self, package: Package, components=()) -> Transaction:
         """components: optional components of the snap to install with it."""
         from . import snap
@@ -219,6 +239,8 @@ class Engine:
                 if executable == "distrobox":
                     raise DistroboxMissing(tr("Install Distrobox on the system to continue."))
                 raise RuntimeError(tr("Install {0} on the system to continue.").format(executable))
+        if message := outdated_components(self.runner):
+            raise DistroboxMissing(message)
         # Require the session user's local rootless Podman store.
         info = self.runner.run(["podman", "info", "--format", "json"], timeout=30)
         data = json.loads(info)
@@ -664,6 +686,10 @@ class Engine:
 
     def retry(self, tx: Transaction) -> Transaction:
         """Resume creation, initialization or package work using the retained local snapshot."""
+        if tx.method == "waydroid":
+            from . import android
+
+            return android.retry(self, tx)
         if tx.method == "snap" and tx.package_kind == "snap":
             from . import snap
 
@@ -1211,6 +1237,10 @@ class Engine:
 
     def cleanup(self, tx: Transaction, *, preserve_environment: bool = False) -> None:
         """Destroy only owned resources. Preserve the journal if any deletion fails."""
+        if tx.method == "waydroid":
+            from . import android
+
+            return android.cleanup(self, tx)
         if tx.method == "snap" and tx.package_kind == "snap":
             from . import snap
 

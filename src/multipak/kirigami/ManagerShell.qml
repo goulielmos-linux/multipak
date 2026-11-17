@@ -11,14 +11,14 @@ Kirigami.Page {
     signal aboutRequested()
     signal closeRequested()
     signal adminCommandRequested(string arguments)
-    // install, remove, update, snaps, associations or language
+    // install, remove, update, waydroid, snaps, associations or language
     property string section: "install"
     readonly property real outerMargin: Kirigami.Units.largeSpacing * 2
     readonly property real sidebarWidth: Kirigami.Units.gridUnit * 12
     readonly property real preferredWindowWidth: Math.max(header.implicitWidth + outerMargin * 2,
         sidebarWidth + Kirigami.Units.gridUnit * 34)
     readonly property real preferredWindowHeight: Kirigami.Units.gridUnit * 36
-    readonly property bool navigable: !manager.working
+    readonly property bool navigable: !manager.working && !manager.android.busy
     padding: 0
 
     function open(name) {
@@ -39,6 +39,9 @@ Kirigami.Page {
             manager.openList(name);
         } else if (name === "snaps") {
             manager.openList("services");
+        } else if (name === "waydroid") {
+            manager.goHome();
+            manager.openAndroidEnvironments();
         } else if (name === "associations") {
             manager.openAssociations();
         } else if (name === "language") {
@@ -54,6 +57,7 @@ Kirigami.Page {
 
     Connections {
         target: manager
+        function onAndroidEnvironmentsRequested() { shell.section = "waydroid"; }
         function onAssociationSettingsRequested() {
             languages.reset();
             shell.section = "associations";
@@ -201,6 +205,7 @@ Kirigami.Page {
                         Layout.topMargin: Kirigami.Units.smallSpacing
                         Layout.bottomMargin: Kirigami.Units.smallSpacing
                     }
+                    NavItem { key: "waydroid"; iconName: "waydroid"; text: qsTr("Waydroid integration") }
                     NavItem {
                         key: "snaps"
                         iconName: "material-raven"
@@ -229,13 +234,18 @@ Kirigami.Page {
                 objectName: "managerContent"
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                currentIndex: shell.section === "associations" ? 1
-                    : shell.section === "language" ? 2
+                currentIndex: shell.section === "waydroid" ? 1
+                    : shell.section === "associations" ? 2
+                    : shell.section === "language" ? 3
                     : 0
 
                 ManagerPage {
                     onCloseRequested: shell.closeRequested()
                     onAdminCommandRequested: arguments => shell.adminCommandRequested(arguments)
+                }
+                AndroidEnvironmentsPage {
+                    embedded: true
+                    onAboutRequested: shell.aboutRequested()
                 }
                 AssociationPage {
                     embedded: true

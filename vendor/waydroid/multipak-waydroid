@@ -1,0 +1,37 @@
+#!/usr/bin/python3 -Es
+# SPDX-License-Identifier: GPL-3.0-or-later
+import argparse
+import os
+from pathlib import Path
+import sys
+sys.path.insert(0,str(Path(__file__).resolve().parent))
+from multipak_instance import configure, BASE, Instance
+import json
+if sys.argv[1:] == ["list", "--json"]:
+    items=[]
+    for path in sorted(BASE.glob("*/instance.json")):
+        try:
+            obj=configure(path.parent.name)
+            items.append({**obj.to_dict(), "initialized": obj.initialized})
+        except (OSError, ValueError, TypeError, PermissionError):
+            continue
+    print(json.dumps(items))
+    raise SystemExit(0)
+if sys.argv[1:] == ["--runtime-version"]:
+    print("1.1.0-waydroid-1.6.3")
+    raise SystemExit(0)
+if sys.argv[1:] == ["--runtime-digest"]:
+    print(Path(__file__).resolve().parent.name)
+    raise SystemExit(0)
+parser=argparse.ArgumentParser(add_help=False)
+parser.add_argument('--instance',required=True)
+options,arguments=parser.parse_known_args()
+configure(options.instance)
+if not arguments:
+    arguments=["status"]
+if any(arg in ("bugreport", "first-launch") for arg in arguments[:1]):
+    raise SystemExit("This command is unavailable in the named-instance runtime")
+sys.argv=[sys.argv[0],*arguments]
+os.umask(0o022)
+import tools
+raise SystemExit(tools.main())

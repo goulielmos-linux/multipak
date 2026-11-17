@@ -268,7 +268,7 @@ def test_filename_conflict_names_the_other_distribution():
     )
     fedora = next(item for item in ENVIRONMENTS if item.id == "fedora-44")
     _, explanation = suggestion_details(package, fedora, fedora.title)
-    assert "filename indicates Mageia 10" in explanation
+    assert "built for Mageia 10" in explanation
 
 
 def install_in(engine, monkeypatch, tmp_path, environment_id, release):

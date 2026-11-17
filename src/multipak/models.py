@@ -21,6 +21,7 @@ PackageKind = Literal[
     "apk",
     "xbps",
     "eopkg",
+    "android",
 ]
 
 
@@ -77,6 +78,22 @@ def reserved_environment_name(name: str) -> bool:
 
 
 @dataclass(frozen=True)
+class AndroidPart:
+    member: str
+    split_id: str
+    size: int
+    sha256: str
+    kind: str = "feature"
+    target: str = ""
+    qualifier: str = ""
+    abis: tuple[str, ...] = ()
+    dependencies: tuple[str, ...] = ()
+    required_types: tuple[str, ...] = ()
+    split_types: tuple[str, ...] = ()
+    min_sdk: int = 1
+
+
+@dataclass(frozen=True)
 class Package:
     path: Path
     kind: PackageKind
@@ -91,6 +108,13 @@ class Package:
     icon_data: bytes = b""
     icon_extension: str = ""
     appimage_type: int = 0
+    android_version_code: int = 0
+    android_target_sdk: int = 0
+    android_bundle_format: str = ""
+    android_expansions: tuple[AndroidPart, ...] = ()
+    android_variants: tuple[dict, ...] = ()
+    android_min_sdk: int = 1
+    android_parts: tuple[AndroidPart, ...] = ()
     # snap_meta.SnapInfo for snaps; None otherwise.
     snap: object = None
     # Set when the snap was downloaded from the Snap Store.
@@ -193,10 +217,20 @@ class ExistingEnvironment:
 
 
 @dataclass(frozen=True)
+class AndroidPlan:
+    initialized: bool = False
+    translation: str = "native"
+    bridge: str = ""
+    explanation: str = ""
+
+
+@dataclass(frozen=True)
 class PackageInspection:
     package: Package
     existing: tuple[ExistingEnvironment, ...] = ()
     environments: tuple[Environment, ...] = ()
+    android: AndroidPlan | None = None
+    android_environments: tuple[dict, ...] = ()
     # appimage_dependencies.DependencyReport for AppImages; None when not checked.
     dependencies: object = None
     # Every container name in use, Distrobox or not, so new names never collide.
@@ -510,6 +544,12 @@ class Transaction:
     force_new_environment: bool = False
     preserve_environment_on_cleanup: bool = False
     appimage_mode: str = "direct"
+    android_package_id: str = ""
+    android_package_owned: bool = False
+    android_translation_allowed: bool = False
+    android_instance_id: str = ""
+    android_profile: str = ""
+    android_environment_label: str = ""
     # AppImages that need extra system components run in MultiPak's AppImage container.
     appimage_container: bool = False
     appimage_packages: list[str] = field(default_factory=list)

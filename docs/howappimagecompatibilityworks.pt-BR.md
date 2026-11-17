@@ -1,6 +1,6 @@
 # Como o MultiPak roda AppImages
 
-*MultiPak 1.1.0.*
+*MultiPak 1.2.0.*
 
 ---
 
