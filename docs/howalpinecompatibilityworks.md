@@ -55,7 +55,8 @@ without verification, **with a warning**.
 
 ### 1.4 Updating and uninstalling
 
-- **Update**: `distrobox upgrade` (Distrobox knows apk), under **Manager → Update**.
+- **Update**: under **Manager → Update**, MultiPak updates the whole container with
+  Distrobox's own command (`distrobox upgrade`), which uses apk.
 - **New versions**: the Manager queries `apk version` to find which applications have a
   new version and lists each one under **With updates**, **Already up to date** or **No
   update source** (installed from a file that no repository offers). When it opens, it

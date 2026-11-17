@@ -6,7 +6,7 @@
 
 - RPM packages built for Mageia, openSUSE and ALT Linux are installed in a container of
   their own distribution, with its package manager.
-  [See how it works.](docs/howrpmenvironmentsworks.md)
+  [See how it works.](docs/howrpmcompatibilityworks.md)
 - Solus packages (`.eopkg`). [See how it works.](docs/howsoluscompatibilityworks.md)
 - Void Linux packages (`.xbps`): glibc, musl and 32-bit (`i686`).
   [See how it works.](docs/howvoidcompatibilityworks.md)
