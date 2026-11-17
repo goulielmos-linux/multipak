@@ -4,8 +4,8 @@
 
 Versão: 1.1.0
 
-Instale pacotes feitos para outras distribuições Linux em sistemas atômicos, sem
-alterar o sistema base.
+O **MultiPak** é uma ferramenta gráfica para sistemas atômicos que instala pacotes de
+diversos formatos, sem alterar o sistema base.
 
 Abra um arquivo de pacote e o **Assistente de Instalação** cuida do resto. O **Gerenciador de
 Aplicativos**, no lançador de aplicativos, é onde você atualiza e desinstala aplicativos
@@ -83,11 +83,9 @@ ser atualizado; você ainda pode ver e desinstalar seus aplicativos.
 ## Compatibilidade
 
 O MultiPak é voltado ao Universal Blue (Bazzite, Aurora e Bluefin) e aos Fedora Atomic
-Desktops (Silverblue e Kinoite). Ele é desenvolvido no Bazzite e testado em todas essas
-distribuições.
-
-O MultiPak também pode funcionar no openSUSE (Kalpa e Aeon) e no KDE Linux. A compatibilidade
-com essas distribuições ainda não foi testada.
+Desktops (Silverblue e Kinoite). É desenvolvido no Bazzite e testado em todas essas
+distribuições. Também pode funcionar no openSUSE (Kalpa e Aeon) e no KDE Linux, mas
+ainda não foi testado nelas.
 
 Outras distribuições Linux, inclusive as não atômicas, podem funcionar se tiverem o Distrobox
 1.8 ou mais recente e o Podman sem root. Em sistemas rpm-ostree sem o Distrobox, o MultiPak
@@ -117,8 +115,8 @@ Estes documentos estão em inglês.
 - [Desenvolvimento local](docs/development.md)
 - [Arquitetura](docs/architecture.md)
 
-## Autor e licença
+## Licença
 
-Feito por [Goulielmos](https://github.com/goulielmos-linux). O MultiPak é software livre,
-sob a GNU General Public License v3.0 (`GPL-3.0-only`); veja [LICENSE](LICENSE). Componentes
-de terceiros mantêm suas próprias licenças, listadas em [NOTICE](NOTICE).
+O MultiPak é licenciado sob a `GPL-3.0-only`. Componentes de terceiros mantêm as próprias licenças.
+
+Veja [LICENSE](LICENSE) e [NOTICE](NOTICE) para a licença e as atribuições.

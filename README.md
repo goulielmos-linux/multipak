@@ -4,8 +4,8 @@
 
 Version: 1.1.0
 
-Install packages made for other Linux distributions on atomic systems, without changing
-the base system.
+**MultiPak** is a graphical tool for atomic systems that installs packages in many
+different formats, without changing the base system.
 
 Open a package file and the **Installation Wizard** takes care of it. The **Application
 Manager**, in your application launcher, is where you update and uninstall applications
@@ -83,12 +83,10 @@ uninstall your applications.
 
 ## Compatibility
 
-MultiPak focuses on Universal Blue (Bazzite, Aurora, and Bluefin) and Fedora
-Atomic Desktops (Silverblue and Kinoite). MultiPak is developed on Bazzite and
-tested on all of the distributions listed above.
-
-MultiPak may also work on openSUSE (Kalpa and Aeon) and KDE Linux. Compatibility
-with these distributions has yet to be tested.
+MultiPak focuses on Universal Blue (Bazzite, Aurora, and Bluefin) and Fedora Atomic
+Desktops (Silverblue and Kinoite). It is developed on Bazzite and tested on all of them.
+It may also work on openSUSE (Kalpa and Aeon) and KDE Linux, but it has not been tested
+there yet.
 
 Other Linux distributions, including non-atomic ones, may work if they have Distrobox 1.8
 or later and rootless Podman. On rpm-ostree systems without Distrobox, MultiPak offers to
@@ -115,8 +113,8 @@ installing a snap, MultiPak says what it cannot provide for it.
 - [Local development](docs/development.md)
 - [Architecture](docs/architecture.md)
 
-## Author and license
+## License
 
-Made by [Goulielmos](https://github.com/goulielmos-linux). MultiPak is free software under
-the GNU General Public License v3.0 (`GPL-3.0-only`); see [LICENSE](LICENSE). Third-party
-components keep their own licenses, listed in [NOTICE](NOTICE).
+MultiPak is licensed under `GPL-3.0-only`. Third-party components keep their own licenses.
+
+See [LICENSE](LICENSE) and [NOTICE](NOTICE) for the license and attribution.
