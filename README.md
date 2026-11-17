@@ -4,12 +4,12 @@
 
 Version: 1.1.0
 
-**MultiPak** is a graphical tool for atomic systems that installs packages in many
-different formats, without changing the base system.
+**MultiPak** is a graphical tool for atomic systems that installs packages in multiple
+formats without modifying the base system.
 
-Open a package file and the **Installation Wizard** takes care of it. The **Application
-Manager**, in your application launcher, is where you update and uninstall applications
-and adjust MultiPak's settings.
+Just open a package file, and the **Installation Wizard** handles the rest. To update
+apps, uninstall them, or adjust MultiPak's settings, open the **Application Manager**
+from your launcher.
 
 ## Features
 
@@ -28,20 +28,20 @@ and adjust MultiPak's settings.
 ### Supported packages
 
 | Package | Extensions | How it works |
-| --- | --- | --- |
-| RPM (Fedora, Mageia, openSUSE, ALT Linux) | `.rpm` | [See how it works](docs/howrpmcompatibilityworks.md) |
-| DEB (Debian, Ubuntu) | `.deb` | [See how it works](docs/howdebcompatibilityworks.md) |
-| Arch Linux | `.pkg.tar`, `.pkg.tar.zst`, `.pkg.tar.xz`, `.pkg.tar.gz`, `.pkg.tar.bz2` | [See how it works](docs/howarchcompatibilityworks.md) |
-| Alpine Linux | `.apk` | [See how it works](docs/howalpinecompatibilityworks.md) |
-| Void Linux | `.xbps` | [See how it works](docs/howvoidcompatibilityworks.md) |
-| Solus | `.eopkg` | [See how it works](docs/howsoluscompatibilityworks.md) |
-| Slackware | `.txz`, `.tgz`, `.tar.xz`, `.tar.gz` | [See how it works](docs/howslackwarecompatibilityworks.md) |
-| Gentoo | `.gpkg.tar` | [See how it works](docs/howgentoocompatibilityworks.md) |
-| Pisi Linux | `.pisi` | [See how it works](docs/howpisicompatibilityworks.md) |
-| SliTaz | `.tazpkg` | [See how it works](docs/howslitazcompatibilityworks.md) |
-| Puppy Linux | `.pet` | [See how it works](docs/howpuppycompatibilityworks.md) |
-| Snap | `.snap` | [See how this *miracle* works](docs/howsnapcompatibilityworks.md) |
-| AppImage (types 1 and 2) | `.AppImage` | [See how it works](docs/howappimagecompatibilityworks.md) |
+| --- | --- | :---: |
+| RPM (Fedora, Mageia, openSUSE, ALT Linux) | `.rpm` | [📖](docs/howrpmcompatibilityworks.md) |
+| DEB (Debian, Ubuntu) | `.deb` | [📖](docs/howdebcompatibilityworks.md) |
+| Arch Linux | `.pkg.tar`, `.pkg.tar.zst`, `.pkg.tar.xz`, `.pkg.tar.gz`, `.pkg.tar.bz2` | [📖](docs/howarchcompatibilityworks.md) |
+| Alpine Linux | `.apk` | [📖](docs/howalpinecompatibilityworks.md) |
+| Void Linux | `.xbps` | [📖](docs/howvoidcompatibilityworks.md) |
+| Solus | `.eopkg` | [📖](docs/howsoluscompatibilityworks.md) |
+| Slackware | `.txz`, `.tgz`, `.tar.xz`, `.tar.gz` | [📖](docs/howslackwarecompatibilityworks.md) |
+| Gentoo | `.gpkg.tar` | [📖](docs/howgentoocompatibilityworks.md) |
+| Pisi Linux | `.pisi` | [📖](docs/howpisicompatibilityworks.md) |
+| SliTaz | `.tazpkg` | [📖](docs/howslitazcompatibilityworks.md) |
+| Puppy Linux | `.pet` | [📖](docs/howpuppycompatibilityworks.md) |
+| Snap | `.snap` | [📖](docs/howsnapcompatibilityworks.md) |
+| AppImage (types 1 and 2) | `.AppImage` | [📖](docs/howappimagecompatibilityworks.md) |
 
 ## Screenshots
 
