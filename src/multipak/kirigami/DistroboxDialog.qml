@@ -7,6 +7,7 @@ InformationWindow {
     id: dialog
     objectName: "distroboxSetupDialog"
     title: welcome.distroboxRestartRequired ? qsTr("Restart required")
+        : welcome.distroboxUpdateRequired ? qsTr("Update required")
         : welcome.distroboxCanInstall ? qsTr("Install Distrobox") : "Distrobox"
     preferredWidth: Kirigami.Units.gridUnit * 30
 

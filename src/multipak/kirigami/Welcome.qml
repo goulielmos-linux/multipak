@@ -258,6 +258,26 @@ Kirigami.ApplicationWindow {
     }
 
     Component {
+        id: androidComponent
+        AndroidPage {
+            parent: root.pageStack
+            onAboutRequested: aboutDialog.open()
+            onCancelRequested: root.close()
+            onReturnRequested: root.pageStack.pop()
+        }
+    }
+
+    Component {
+        id: androidAdvancedComponent
+        AndroidAdvancedPage {
+            parent: root.pageStack
+            onAboutRequested: aboutDialog.open()
+            onCancelRequested: root.close()
+            onReturnRequested: root.pageStack.pop()
+        }
+    }
+
+    Component {
         id: snapComponent
         SnapPage {
             parent: root.pageStack
@@ -370,6 +390,11 @@ Kirigami.ApplicationWindow {
             }
         }
         function onModeChosen() {
+            if (welcome.isAndroid) {
+                root.pageStack.push(welcome.selectedMode === "standard"
+                    ? androidComponent : androidAdvancedComponent);
+                return;
+            }
             if (welcome.selectedMode === "standard") {
                 root.openEnvironment();
             } else {
@@ -377,6 +402,10 @@ Kirigami.ApplicationWindow {
             }
         }
         function onEnvironmentChosen() {
+            if (welcome.isAndroid) {
+                root.pageStack.push(androidComponent);
+                return;
+            }
             root.openReview();
         }
         function onInstallationRequested() {

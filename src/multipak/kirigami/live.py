@@ -7,6 +7,7 @@ from threading import Lock
 from PySide6.QtCore import Property, QProcess, Qt, QTimer, Signal, Slot
 from PySide6.QtWidgets import QApplication
 
+from multipak.android_translation import preview_plan
 from multipak.catalog import load_catalog, package_environment
 from multipak.distrobox_setup import (
     DistroboxMissing,
@@ -140,6 +141,19 @@ def inspect_installation(engine, path):
         package = download_snap(engine, path, getattr(path, "channel", ""))
     else:
         package = inspect_package(path, engine.runner)
+    if package.kind == "android":
+        from multipak.android_instances import discover as discover_android
+        from multipak.android_instances import discover_system
+
+        environments = list(discover_android(engine.runner))
+        personal = discover_system(engine.runner)
+        if personal:
+            environments.append(personal)
+        return PackageInspection(
+            package,
+            android=preview_plan(package),
+            android_environments=tuple(environments),
+        )
     if package.kind == "snap":
         import platform
 
@@ -372,6 +386,14 @@ class LiveInstaller(Welcome):
         self.package = inspection.package
         self.name, self.version = self.package.name, self.package.version
         self.kind = self.package.kind.upper()
+        if self.isAndroid:
+            self._android_environments = inspection.android_environments
+            self.reset_android_default()
+            self.android_plan = inspection.android or preview_plan(self.package)
+            self.method, self.mode = "waydroid", "standard"
+            self.environment, self._selection = None, None
+            self._set_state("ready")
+            return
         if self.isSnap:
             self.method, self.mode = "snap", "standard"
             self.environment, self._selection = None, None
@@ -460,12 +482,34 @@ class LiveInstaller(Welcome):
         ):
             return
         package, selection = self.package, self._selection
+        if self.isAndroid:
+            from multipak.android_instances import identifier
+
+            personal = self.androidUsesPersonalEnvironment
+            if personal and self.mode != "advanced":
+                return
+            instance_id = "" if personal else self._android_environment or identifier()
+            android_profile = "" if personal else self._android_profile
+            android_label = "Waydroid" if personal else self.androidEnvironmentName
         appimage_options = self.appimage_options()
         snap_components = self.snap_component_choice() if self.isSnap else []
         self._logs = ""
         self.logsChanged.emit()
 
         def install(engine):
+            if package.kind == "android":
+                if personal:
+                    from multipak.android import CONFIG, ROOTFS
+
+                    engine.runner.run(["test", "-s", CONFIG])
+                    engine.runner.run(["test", "-d", ROOTFS])
+                return engine.install_android(
+                    package,
+                    allow_translation=True,
+                    instance_id=instance_id,
+                    android_profile=android_profile,
+                    android_label=android_label,
+                )
             if package.kind == "snap":
                 return engine.install_snap(package, snap_components)
             if package.kind == "appimage":
@@ -489,6 +533,7 @@ class LiveInstaller(Welcome):
         self._distrobox_can_install = requirement.can_install
         self._distrobox_restart_required = requirement.restart_required
         self._distrobox_message = requirement.message
+        self._distrobox_update_required = requirement.update_required
         self._set_state("ready")
         if self._close_pending:
             self.closeRequested.emit()
@@ -584,7 +629,9 @@ class LiveInstaller(Welcome):
         self.transaction = None
         self._result_title = tr("Installation completed")
         self._result_message = (
-            tr("The snap was installed and added to the application launcher.")
+            tr("The Android application was installed and added to the application launcher.")
+            if tx.method == "waydroid"
+            else tr("The snap was installed and added to the application launcher.")
             if tx.method == "snap"
             else tr("The AppImage was installed and added to the application launcher.")
             if tx.method == "appimage"
@@ -594,7 +641,7 @@ class LiveInstaller(Welcome):
         )
         self._result_note = (
             tr("You can now open it from the application launcher.")
-            if tx.launchers
+            if tx.launchers or tx.method == "waydroid"
             else ""
             if tx.method == "snap"  # Its warning already says there is no shortcut.
             else tr(
@@ -699,6 +746,9 @@ class LiveInstaller(Welcome):
                 if not installation_allowed(self):
                     return
                 tx = self.transaction
+                if tx.method == "waydroid":
+                    tx.android_translation_allowed = True
+                    self.store.save(tx)
                 self._run(lambda engine: engine.retry(tx), self._installed, "install")
         elif self.package is None or self._mode == "inspect":
             self.inspect()

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/vnd.apkm">
+    <comment>Android APK bundle</comment>
+    <comment xml:lang="pt_BR">Conjunto de APKs Android</comment>
+    <sub-class-of type="application/zip"/>
+    <glob pattern="*.apkm" weight="80"/>
+    <icon name="package-x-generic"/>
+  </mime-type>
+  <mime-type type="application/x-apks">
+    <comment>Android APK set</comment>
+    <sub-class-of type="application/zip"/>
+    <glob pattern="*.apks" weight="80"/>
+  </mime-type>
+  <mime-type type="application/xapk-package-archive">
+    <comment>Android XAPK bundle</comment>
+    <sub-class-of type="application/zip"/>
+    <glob pattern="*.xapk" weight="80"/>
+  </mime-type>
+</mime-info>
