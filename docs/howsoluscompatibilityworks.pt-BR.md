@@ -1,6 +1,6 @@
 # Como o MultiPak instala pacotes do Solus
 
-*MultiPak 1.1.0.*
+*MultiPak 1.2.0.*
 
 ---
 
@@ -98,10 +98,10 @@ com explicação.
 
 ### 2.3 Detecção e ambiente
 
-O cabeçalho `PK\x03\x04` com sufixo `.apk` é um app de Android (mensagem própria);
-qualquer outro ZIP vai para `pisi.read_info`. Família `solus` → tipo `eopkg`, dica
-`solus-rolling` com origem `metadata`, confiança **Alta**, texto que avisa da imagem
-não oficial. A lista de arquiteturas aceitas é só `{x86_64}`.
+O cabeçalho `PK\x03\x04` com sufixo `.apk` é um app de Android e segue para o caminho do
+Android; qualquer outro ZIP vai para `pisi.read_info`. Família `solus` → tipo `eopkg`,
+dica `solus-rolling` com origem `metadata`, confiança **Alta**, texto que avisa da
+imagem não oficial. A lista de arquiteturas aceitas é só `{x86_64}`.
 
 ### 2.4 Imagem local (`solus_image.ensure_image`)
 

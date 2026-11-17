@@ -1,6 +1,6 @@
 # Como o MultiPak instala pacotes do Alpine Linux
 
-*MultiPak 1.1.0.*
+*MultiPak 1.2.0.*
 
 ---
 
@@ -16,7 +16,7 @@ arquivos gzip colados: a assinatura (opcional), a ficha `.PKGINFO` e os arquivos
 programa.
 
 Não confundir com o `.apk` do **Android**, que é um arquivo ZIP: o MultiPak percebe a
-diferença pelo conteúdo e avisa que aplicativos Android não são suportados.
+diferença pelo conteúdo e instala o aplicativo Android pelo Waydroid.
 
 ### 1.2 O que o MultiPak faz?
 
@@ -94,7 +94,7 @@ Caminhos de código são relativos a `src/multipak`.
 Os segmentos gzip são lidos em sequência com `tarfile` em modo *stream* (os TAR do
 abuild não têm marca de fim). Só o `.PKGINFO` é lido. A marca inicial
 `ADB.`/`ADBd`/`ADBc` (v3) gera `alpine.v3_error()` antes de qualquer leitura; um ZIP com
-sufixo `.apk` é recusado como aplicativo Android.
+sufixo `.apk` segue para o caminho do Android (`android_bundle.inspect_android`).
 
 ### 2.3 Estimativa da release
 

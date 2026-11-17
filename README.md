@@ -2,14 +2,14 @@
 
 **English** | [Português (Brasil)](README.pt-BR.md)
 
-Version: 1.1.0
+Version: 1.2.0 (in development)
 
 **MultiPak** is a graphical tool for atomic systems that installs packages in many
 different formats, without changing the base system.
 
 Open a package file and the **Installation Wizard** takes care of it. The **Application
-Manager**, in your application launcher, is where you update and uninstall applications
-and adjust MultiPak's settings.
+Manager**, in your application launcher, is where you update and uninstall applications,
+manage the Waydroid integration and adjust MultiPak's settings.
 
 ## Features
 
@@ -18,6 +18,8 @@ and adjust MultiPak's settings.
 - **Installs snaps without snapd**, from a file, a link or the Snap Store, background
   services included.
 - **Runs AppImages**, even those that need libraries your system lacks.
+- **Installs Android apps** in Android containers based on Waydroid, managed from the
+  Waydroid integration.
 - **Always up to date:** new distribution releases show up on their own, without a
   MultiPak update (except Slackware and Pisi Linux).
 - **Shows everything before installing**: the application, the container and how sure
@@ -32,7 +34,7 @@ and adjust MultiPak's settings.
 | RPM (Fedora, Mageia, openSUSE, ALT Linux) | `.rpm` | [See how it works](docs/howrpmcompatibilityworks.md) |
 | DEB (Debian, Ubuntu) | `.deb` | [See how it works](docs/howdebcompatibilityworks.md) |
 | Arch Linux | `.pkg.tar`, `.pkg.tar.zst`, `.pkg.tar.xz`, `.pkg.tar.gz`, `.pkg.tar.bz2` | [See how it works](docs/howarchcompatibilityworks.md) |
-| Alpine Linux | `.apk` | [See how it works](docs/howalpinecompatibilityworks.md) |
+| Alpine Linux | `.apk`\* | [See how it works](docs/howalpinecompatibilityworks.md) |
 | Void Linux | `.xbps` | [See how it works](docs/howvoidcompatibilityworks.md) |
 | Solus | `.eopkg` | [See how it works](docs/howsoluscompatibilityworks.md) |
 | Slackware | `.txz`, `.tgz`, `.tar.xz`, `.tar.gz` | [See how it works](docs/howslackwarecompatibilityworks.md) |
@@ -42,26 +44,30 @@ and adjust MultiPak's settings.
 | Puppy Linux | `.pet` | [See how it works](docs/howpuppycompatibilityworks.md) |
 | Snap | `.snap` | [See how this *miracle* works](docs/howsnapcompatibilityworks.md) |
 | AppImage (types 1 and 2) | `.AppImage` | [See how it works](docs/howappimagecompatibilityworks.md) |
+| Android | `.apk`\*, `.apkm`, `.apks`, `.xapk` | — |
+
+\* Alpine packages and Android apps share the `.apk` extension; MultiPak tells them apart
+by their contents.
 
 ## Screenshots
 
 ### Application Manager
-![Application Manager](docs/screenshots/1.1.0/application-manager.png)
+![Application Manager](docs/screenshots/1.2.0/application-manager.png)
 
 ### Installation Wizard
-![Installation Wizard](docs/screenshots/1.1.0/installation-welcome.png)
+![Installation Wizard](docs/screenshots/1.2.0/installation-welcome.png)
 
 ### Installation settings
-![Installation settings](docs/screenshots/1.1.0/installation-settings.png)
+![Installation settings](docs/screenshots/1.2.0/installation-settings.png)
 
 ### Installation summary
-![Installation summary](docs/screenshots/1.1.0/installation-summary.png)
+![Installation summary](docs/screenshots/1.2.0/installation-summary.png)
 
 ### Installation progress
-![Installation progress](docs/screenshots/1.1.0/installation-progress.png)
+![Installation progress](docs/screenshots/1.2.0/installation-progress.png)
 
 ### Installation completed
-![Installation completed](docs/screenshots/1.1.0/installation-completed.png)
+![Installation completed](docs/screenshots/1.2.0/installation-completed.png)
 
 ## Installation
 
@@ -72,7 +78,7 @@ Manager.
 2. Open it with a Flatpak installer, such as Bazaar, Discover, GNOME Software or
    Warehouse, and click **Install**.
 
-Or, in a terminal: `flatpak install --user multipak-1.1.0-x86_64.flatpak`
+Or, in a terminal: `flatpak install --user multipak-1.2.0-x86_64.flatpak`
 
 ## Updates
 
@@ -97,10 +103,18 @@ Direct RPM installation, without a container, is available only on rpm-ostree sy
 Snaps only need bubblewrap, which Flatpak already requires; snapd is not used. Before
 installing a snap, MultiPak says what it cannot provide for it.
 
+Android apps need Waydroid, a Wayland session, systemd and PolicyKit. MultiPak creates
+its own Android 13 or Android 11 containers and never changes the system's Waydroid;
+creating one asks for authorization and downloads Android images. Optional ARM
+translation is available for Android 13 on x86_64.
+
 ## Important notes
 
 - Install packages only from sources you trust. Distrobox containers and snaps share your
   home folder, devices and desktop session, so they are not a security sandbox.
+- Android apps keep Android's own separation between apps and cannot see your home
+  folder, but they share the network, display, sound and graphics card, and their
+  container is started with system privileges, as with Waydroid.
 - Direct RPM installation through rpm-ostree is a last resort: it can cause dependency
   conflicts, affect system updates and needs a restart.
 - When you uninstall the last application of a container, MultiPak offers to delete the

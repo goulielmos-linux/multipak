@@ -1,6 +1,7 @@
 """Prepare the fixed Distrobox dependency through the host's rpm-ostree service."""
 
 import os
+import re
 from dataclasses import dataclass
 
 from . import host
@@ -16,12 +17,38 @@ class DistroboxRequirement:
     can_install: bool
     restart_required: bool
     message: str
+    update_required: bool = False
+
+
+def _version(text: str) -> tuple[int, int] | None:
+    match = re.search(r"(\d+)\.(\d+)", text)
+    return (int(match[1]), int(match[2])) if match else None
+
+
+def outdated_components(runner) -> str:
+    """Explain how to update Distrobox or Podman when they are older than MultiPak needs.
+
+    MultiPak relies on Distrobox 1.8 and on ``podman pull --policy``, added in Podman 5.
+    """
+    found = {
+        name: runner.run([name, "version" if name == "distrobox" else "--version"], timeout=30)
+        for name in ("distrobox", "podman")
+    }
+    distrobox, podman = (_version(found[name]) or (99, 0) for name in found)
+    if distrobox >= (1, 8) and podman >= (5, 0):
+        return ""
+    return tr(
+        "MultiPak needs Distrobox 1.8 and Podman 5 or newer. This system has Distrobox {0} "
+        "and Podman {1}. Update them on your system to continue."
+    ).format(*(found[name].split()[-1] if found[name].split() else "?" for name in found))
 
 
 def distrobox_requirement(engine):
     from .system import _requested_packages, _system_status, system_install_available
 
     if host.which("distrobox"):
+        if message := outdated_components(engine.runner):
+            return DistroboxRequirement(False, False, message, update_required=True)
         return DistroboxRequirement(
             False, False, tr("Distrobox is available. You can continue installing the application.")
         )
@@ -29,7 +56,10 @@ def distrobox_requirement(engine):
         return DistroboxRequirement(
             False,
             False,
-            tr("Install Distrobox on your system to install applications in containers."),
+            tr(
+                "MultiPak needs Distrobox 1.8 or newer to install applications in "
+                "containers. Install it on your system and open the package again."
+            ),
         )
     status = _system_status(engine)
     target = status["deployments"][0]
@@ -61,10 +91,9 @@ def distrobox_requirement(engine):
         True,
         False,
         tr(
-            "MultiPak needs Distrobox to install applications in containers. It will be "
-            "installed on your system using rpm-ostree. System authorization may be "
-            "required, and you will need to restart your computer to complete the "
-            "installation."
+            "MultiPak needs Distrobox 1.8 or newer to install applications in containers. "
+            "Do you want to install it now with rpm-ostree? System authorization may be "
+            "required, and you will need to restart your computer to finish."
         ),
     )
 
@@ -79,11 +108,11 @@ def install_distrobox(engine):
             tr("Finish the current application operation before installing Distrobox.")
         )
     with engine.store.lock():
+        if host.which("distrobox"):
+            return False
         requirement = distrobox_requirement(engine)
         if requirement.restart_required:
             return True
-        if host.which("distrobox"):
-            return False
         if not requirement.can_install:
             raise RuntimeError(requirement.message)
         engine.progress(-1, tr("Installing Distrobox using rpm-ostree…"))

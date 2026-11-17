@@ -13,7 +13,7 @@ QtQml = pytest.importorskip("PySide6.QtQml")
 from PySide6.QtCore import QLibraryInfo  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from multipak.kirigami import main, manager  # noqa: E402
+from multipak.kirigami import android_settings, main, manager  # noqa: E402
 from multipak.kirigami.shutdown import release_engine  # noqa: E402
 
 SOURCE = Path(__file__).resolve().parents[1] / "src"
@@ -68,6 +68,14 @@ def test_entry_points_release_the_engine_even_when_the_loop_fails(
     assert released[0][1:] == (engine, window)
 
 
+def test_android_settings_window_releases_its_engine():
+    import inspect
+
+    code = inspect.getsource(android_settings.main)
+    assert "finally:" in code
+    assert "release_engine(app, engine, window)" in code
+
+
 def kde_style_available():
     imports = Path(QLibraryInfo.path(QLibraryInfo.LibraryPath.QmlImportsPath))
     return (imports / "org/kde/desktop").is_dir() and (imports / "org/kde/kirigami").is_dir()
@@ -93,3 +101,23 @@ def test_closing_with_the_kde_style_exits_cleanly(tmp_path, module):
     )
     assert result.returncode == 0, result.stderr[-2000:]
     assert (tmp_path / "shot.png").is_file()
+
+
+def test_review_page_never_puts_the_placeholder_inside_a_sentence():
+    """Seen in a Linux Mint VM: 'Container The name will be assigned during setup will be…'."""
+    from multipak.kirigami.main import Welcome
+    from multipak.models import ENVIRONMENTS, ExistingEnvironment, Package
+
+    application()
+    ubuntu = next(env for env in ENVIRONMENTS if env.id == "ubuntu-latest")
+    welcome = Welcome(package=Package(Path("app.deb"), "deb", "app", "1", "amd64"))
+    welcome.configure((ubuntu,), (), ubuntu)
+    assert welcome.containerDescription == (
+        "A new container will be created and named during setup."
+    )
+    existing = ExistingEnvironment("MultiPak-Ubuntu-26.04", "ubuntu", "ubuntu", "26.04")
+    welcome.configure((ubuntu,), (existing,), ubuntu)
+    if welcome.containerExists:
+        assert welcome.containerDescription == (
+            "Container MultiPak-Ubuntu-26.04 will be reused for this installation."
+        )
