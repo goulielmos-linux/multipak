@@ -1,11 +1,9 @@
-# MultiPak
+# MultiPak 1.1.0
 
 [English](README.md) | **Português (Brasil)**
 
-Versão: 1.1.0
-
-O **MultiPak** é uma ferramenta gráfica para sistemas atômicos que instala pacotes em
-múltiplos formatos sem alterar o sistema base.
+O **MultiPak** é uma ferramenta gráfica para sistemas Linux atômicos que instala pacotes
+em múltiplos formatos sem alterar o sistema base.
 
 Apenas abra um arquivo de pacote e o **Assistente de Instalação** cuida do resto. Para
 atualizar ou desinstalar aplicativos e ajustar as configurações do MultiPak, acesse o

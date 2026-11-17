@@ -1,11 +1,9 @@
-# MultiPak
+# MultiPak 1.1.0
 
 **English** | [Português (Brasil)](README.pt-BR.md)
 
-Version: 1.1.0
-
-**MultiPak** is a graphical tool for atomic systems that installs packages in multiple
-formats without modifying the base system.
+**MultiPak** is a graphical tool for atomic Linux systems that installs packages in
+multiple formats without modifying the base system.
 
 Just open a package file, and the **Installation Wizard** handles the rest. To update
 apps, uninstall them, or adjust MultiPak's settings, open the **Application Manager**
