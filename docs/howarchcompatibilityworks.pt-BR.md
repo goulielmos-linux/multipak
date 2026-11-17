@@ -14,7 +14,7 @@ comprimido com zstd (`.pkg.tar.zst`), com os arquivos do programa e uma ficha
 `.PKGINFO` (nome, versão, arquitetura, dependências).
 
 Distribuições derivadas do Arch, como Manjaro, EndeavourOS e CachyOS, usam o mesmo
-formato. A ficha não distingue o Arch delas.
+formato, e o `.PKGINFO` não diz de qual delas o pacote veio.
 
 ### 1.2 O que o MultiPak faz?
 
@@ -33,8 +33,8 @@ formato. A ficha não distingue o Arch delas.
 - Um ambiente só, `arch-rolling` ("Arch Linux (rolling release)"), com o contêiner
   `MultiPak-Arch-Linux`.
 - O Distrobox conhece o pacman e prepara o contêiner sozinho.
-- A sugestão tem confiança **Média**: a ficha mostra que o pacote é da família Arch,
-  mas não se é do Arch ou de uma derivada.
+- A sugestão tem confiança **Média**: o `.PKGINFO` mostra que o pacote é da família
+  Arch, mas não se é do Arch ou de uma distribuição derivada.
 
 ### 1.4 Atualizar e remover
 
@@ -51,8 +51,12 @@ formato. A ficha não distingue o Arch delas.
 
 ### 1.5 O que (ainda) não funciona
 
-- Pacotes de derivadas que dependem de pacotes que só a derivada tem (por exemplo, do
-  repositório do Manjaro ou do CachyOS): o pacman não acha essas dependências no Arch.
+- Pacotes de distribuições derivadas que dependem de pacotes que só elas têm (por
+  exemplo, do repositório do Manjaro ou do CachyOS): o pacman não acha essas
+  dependências no Arch.
+- Pacotes do CachyOS otimizados para processadores mais novos (arquiteturas `x86_64_v3`
+  e `x86_64_v4`): o MultiPak recusa, porque não são `x86_64` comuns e travariam em
+  processadores mais antigos.
 - Pacotes do AUR em forma de código-fonte (`PKGBUILD`): só pacotes já compilados.
 - Pacotes feitos para outra arquitetura: o MultiPak só aceita pacotes para a arquitetura
   do computador (como `x86_64`) ou para qualquer uma (`any`).
@@ -70,7 +74,7 @@ Caminhos de código são relativos a `src/multipak`.
 | `metadata.py` (`_arch_fields`, `_tar_stream`) | descompressão e leitura do `.PKGINFO` |
 | `models.py` (`ROLLING_FAMILIES`) | `arch-rolling`, `MultiPak-Arch-Linux` |
 | `catalog.py` | imagem `docker.io/library/archlinux:latest` |
-| `suggestions.py` | confiança Média e texto sobre as derivadas |
+| `suggestions.py` | confiança Média e texto sobre as distribuições derivadas |
 | `engine.py` (`_install_arch`) | `pacman -Syu` e `pacman -U` |
 | `package_check.py` (`check_pacman`) | versões novas com um banco de dados separado |
 | `guest.py` | estado (`pacman -Q`), arquivos e remoção |
@@ -124,4 +128,5 @@ fim.
 
 - `~/.local/share/multipak/installations/<id>/installation.log`.
 - `distrobox enter MultiPak-Arch-Linux -- pacman -Qi <nome>`.
-- Dependência não encontrada: confira se o pacote não é de uma derivada do Arch.
+- Dependência não encontrada: confira se o pacote não é de uma distribuição derivada do
+  Arch.

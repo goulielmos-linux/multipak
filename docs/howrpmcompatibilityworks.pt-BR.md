@@ -8,8 +8,8 @@
 
 ### 1.1 O que é um RPM?
 
-RPM é o formato de pacote de várias distribuições: Fedora, Mageia, openSUSE, ALT
-Linux, RHEL e derivadas. O formato é o mesmo, mas **cada distribuição tem as suas
+RPM é o formato de pacote de várias distribuições: Fedora, Mageia, openSUSE, ALT Linux,
+RHEL e distribuições derivadas. O formato é o mesmo, mas **cada distribuição tem as suas
 bibliotecas e o seu gerenciador**: um RPM do openSUSE não costuma funcionar num Fedora.
 Por isso não basta "saber instalar RPM": é preciso saber **de onde** ele veio.
 

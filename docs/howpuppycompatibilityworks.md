@@ -1,9 +1,6 @@
 # How MultiPak installs Puppy Linux packages
 
-*Translated from the [Portuguese version](howpuppycompatibilityworks.pt-BR.md), which is
-the reference text.*
-
-*MultiPak 1.1.0.*
+*MultiPak 1.1.0. Translated from the [Portuguese version](howpuppycompatibilityworks.pt-BR.md), which is the reference text.*
 
 ---
 

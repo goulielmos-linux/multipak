@@ -1,9 +1,6 @@
 # How MultiPak installs Arch Linux packages
 
-*Translated from the [Portuguese version](howarchcompatibilityworks.pt-BR.md), which is
-the reference text.*
-
-*MultiPak 1.1.0.*
+*MultiPak 1.1.0. Translated from the [Portuguese version](howarchcompatibilityworks.pt-BR.md), which is the reference text.*
 
 ---
 
@@ -16,7 +13,7 @@ package is a TAR archive, usually compressed with zstd (`.pkg.tar.zst`), holding
 program's files and a `.PKGINFO` file (name, version, architecture, dependencies).
 
 Distributions derived from Arch, such as Manjaro, EndeavourOS and CachyOS, use the same
-format. The metadata does not tell Arch apart from them.
+format, and `.PKGINFO` does not say which of them a package came from.
 
 ### 1.2 What does MultiPak do?
 
@@ -36,7 +33,7 @@ format. The metadata does not tell Arch apart from them.
 - A single environment, `arch-rolling` ("Arch Linux (rolling release)"), with the
   `MultiPak-Arch-Linux` container.
 - Distrobox knows pacman and prepares the container by itself.
-- The suggestion has **Medium** confidence: the metadata shows the package belongs to
+- The suggestion has **Medium** confidence: `.PKGINFO` shows the package belongs to
   the Arch family, but not whether it comes from Arch or from a derivative.
 
 ### 1.4 Updating and uninstalling
@@ -58,6 +55,9 @@ format. The metadata does not tell Arch apart from them.
 - Packages from derivatives that depend on packages only the derivative has (for
   example, from Manjaro's or CachyOS's repositories): pacman cannot find those
   dependencies on Arch.
+- CachyOS packages optimized for newer processors (`x86_64_v3` and `x86_64_v4`
+  architectures): MultiPak refuses them, since they are not plain `x86_64` and would
+  crash on older processors.
 - AUR packages in source form (`PKGBUILD`): only prebuilt packages.
 - Packages built for another architecture: MultiPak accepts only packages for the
   computer's architecture (such as `x86_64`) or for any architecture (`any`).
