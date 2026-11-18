@@ -16,6 +16,8 @@ along with MultiPak. If not, see <https://www.gnu.org/licenses/>.
 
 Third-party components and assets retain their respective licenses and notices.
 
+== Bundled with MultiPak ==
+
 The Flatpak bundles the components below. Their license notices are installed under
 share/licenses/io.github.goulielmos_linux.multipak/ in the Flatpak. Source archives
 and checksums are listed in the Flatpak manifest, and the sources bundle published
@@ -28,26 +30,6 @@ with each Flatpak contains those archives (see docs/development.md).
 - python-zstandard 0.25.0, BSD-3-Clause: https://github.com/indygreg/python-zstandard
   It includes the Zstandard library, BSD-3-Clause OR GPL-2.0-only (Meta Platforms, Inc.
   and affiliates): https://github.com/facebook/zstd
-
-The way MultiPak runs snaps follows snapd's snap-confine, snap-exec and interface
-rules: the list of host directories shown to a strictly confined snap, the NVIDIA
-library globs, the layout rules, the environment and command assembly, the mounts of
-the desktop interfaces, the order of hooks, snapctl's output formats, where components
-are shown, and the D-Bus services each interface uses.
-https://github.com/canonical/snapd
-Canonical Ltd. and snapd contributors. SPDX-License-Identifier: GPL-3.0-only.
-
-Android APK bundle inspection and split classification in
-src/multipak/android_bundle.py are adapted from App Manager's ApkFile.java:
-https://github.com/MuntashirAkon/AppManager/blob/master/app/src/main/java/io/github/muntashirakon/AppManager/apk/ApkFile.java
-App Manager contributors. SPDX-License-Identifier: GPL-3.0-or-later.
-The GPL version 3 license text is included in LICENSE.
-
-ARM native-bridge overlay layout and configuration properties in
-src/multipak/android_translation_helper.py follow Waydroid Extras Script:
-https://github.com/casualsnek/waydroid_script/blob/48dbfaf34a6ddbe78688c530f9ba1c26522aafb2/stuff/ndk.py
-Waydroid Extras Script contributors. SPDX-License-Identifier: GPL-3.0-or-later.
-Proprietary native-bridge binaries are not included in MultiPak.
 
 The named Android runtime bundles modified Waydroid 1.6.3 source.
 https://github.com/waydroid/waydroid/tree/5b7e2e71be3f6bfaaaab3b461251dacaf1ce4991
@@ -68,17 +50,58 @@ Linux Project (fingerprint EC56 49DA 401E 22AB FA67 36EF 6A44 63C0 4010 2233), c
 unchanged from the Slackware 15.0 tree so slackpkg can verify official packages:
 http://www.slackware.com/
 
+== Parts adapted from other projects ==
+
+The way MultiPak runs snaps follows snapd's snap-confine, snap-exec and interface
+rules: the list of host directories shown to a strictly confined snap, the NVIDIA
+library globs, the layout rules, the environment and command assembly, the mounts of
+the desktop interfaces, the order of hooks, snapctl's output formats, where components
+are shown, and the D-Bus services each interface uses.
+https://github.com/canonical/snapd
+Canonical Ltd. and snapd contributors. SPDX-License-Identifier: GPL-3.0-only.
+
+Android APK bundle inspection and split classification in
+src/multipak/android_bundle.py are adapted from App Manager's ApkFile.java:
+https://github.com/MuntashirAkon/AppManager/blob/master/app/src/main/java/io/github/muntashirakon/AppManager/apk/ApkFile.java
+App Manager contributors. SPDX-License-Identifier: GPL-3.0-or-later.
+
+ARM native-bridge overlay layout and configuration properties in
+src/multipak/android_translation_helper.py follow Waydroid Extras Script:
+https://github.com/casualsnek/waydroid_script/blob/48dbfaf34a6ddbe78688c530f9ba1c26522aafb2/stuff/ndk.py
+Waydroid Extras Script contributors. SPDX-License-Identifier: GPL-3.0-or-later.
+Proprietary native-bridge binaries are not included in MultiPak.
+
+== Downloaded when needed ==
+
+Container images are not bundled. MultiPak uses Distrobox and Podman to download the
+official images of Fedora, Ubuntu, Debian, Arch Linux, openSUSE, Mageia, ALT Linux, Void
+Linux, Alpine Linux, Gentoo and Pisi Linux from their registries (quay.io, docker.io,
+ghcr.io). These components keep their own licenses.
+
+The Android system (LineageOS) is not bundled. When an Android container is created,
+MultiPak downloads the LineageOS system and vendor images for Waydroid from
+https://ota.waydro.id/. These components keep their own licenses:
+https://lineageos.org/
+Android is a trademark of Google LLC.
+
+== Downloaded when needed, with extra steps ==
+
+Slackware is not bundled. MultiPak uses an unofficial Slackware 15.0 image
+(docker.io/aclemons/slackware, https://github.com/aclemons/slackware-dockerfiles) and installs
+official Slackware packages in it, checked with the Slackware key above. These components keep
+their own licenses: http://www.slackware.com/
+
 SliTaz GNU/Linux is not bundled. When a SliTaz package is installed for the first time,
 MultiPak downloads the official SliTaz Base ISO and a few packages (GNU Wget, CA
 certificates and their dependencies) from https://mirror.slitaz.org/ and builds a
 local container image from them on the user's computer. These components keep their
-own licenses; SliTaz is mainly distributed under the GPL: https://www.slitaz.org/
+own licenses: https://www.slitaz.org/
 
 Gentoo Linux is not bundled. When a Gentoo package is installed for the first time,
 MultiPak downloads Gentoo's official base system image (docker.io/gentoo/stage3), the
 Portage package tree and Gentoo's official binary packages from
-https://distfiles.gentoo.org/. These components keep their own licenses; Gentoo's own
-software is mainly distributed under the GPL-2: https://www.gentoo.org/
+https://distfiles.gentoo.org/. These components keep their own licenses:
+https://www.gentoo.org/
 
 Puppy Linux is not bundled. MultiPak converts a .pet package chosen by the user into a
 Slackware or Debian package on the user's computer. To find the libraries such a

@@ -4,96 +4,79 @@
 
 ### New package formats
 
-- RPM packages built for Mageia, openSUSE and ALT Linux are installed in a container of
-  their own distribution, with its package manager.
-  [See how it works.](docs/howrpmcompatibilityworks.md)
-- Solus packages (`.eopkg`). [See how it works.](docs/howsoluscompatibilityworks.md)
-- Void Linux packages (`.xbps`): glibc, musl and 32-bit (`i686`).
-  [See how it works.](docs/howvoidcompatibilityworks.md)
-- Alpine Linux packages (`.apk`), in the Alpine release each one was built for.
-  [See how it works.](docs/howalpinecompatibilityworks.md)
-- Puppy Linux packages (`.pet`), converted for the distribution they were built from.
-  [See how it works.](docs/howpuppycompatibilityworks.md)
-- Gentoo binary packages (`.gpkg.tar`), with dependencies from Gentoo's binary packages.
-  [See how it works.](docs/howgentoocompatibilityworks.md)
-- SliTaz packages (`.tazpkg`), in an image MultiPak builds from the official ISO.
-  [See how it works.](docs/howslitazcompatibilityworks.md)
+- Alpine Linux packages (`.apk`). [See how it works.](docs/howalpinecompatibilityworks.md)
+- Android apps (`.apk`, `.apkm`, `.apks`, `.xapk`). [See how it works.](docs/howandroidcompatibilityworks.md)
+- Gentoo binary packages (`.gpkg.tar`). [See how it works.](docs/howgentoocompatibilityworks.md)
 - Pisi Linux packages (`.pisi`). [See how it works.](docs/howpisicompatibilityworks.md)
-- Slackware 15.0 packages (`.txz`, `.tgz`), in a light or a full environment.
-  [See how it works.](docs/howslackwarecompatibilityworks.md)
+- Puppy Linux packages (`.pet`). [See how it works.](docs/howpuppycompatibilityworks.md)
+- RPM packages for Mageia, openSUSE and ALT Linux (`.rpm`). [See how it works.](docs/howrpmcompatibilityworks.md)
+- Slackware packages (`.txz`, `.tgz`). [See how it works.](docs/howslackwarecompatibilityworks.md)
+- SliTaz packages (`.tazpkg`). [See how it works.](docs/howslitazcompatibilityworks.md)
+- Snaps (`.snap`). [See how it works.](docs/howsnapcompatibilityworks.md)
+- Solus packages (`.eopkg`). [See how it works.](docs/howsoluscompatibilityworks.md)
+- Void Linux packages (`.xbps`). [See how it works.](docs/howvoidcompatibilityworks.md)
 
-### Snaps
+### Waydroid modification
 
-- Install snaps without snapd, from a `.snap` file or by name or link from the Snap
-  Store, choosing the channel. [See how this miracle works.](docs/howsnapcompatibilityworks.md)
-- Bases and content snaps are downloaded and shared automatically. Snaps that need
-  system-level permissions are refused before anything is downloaded.
-- Background services run as services of your user; the Application Manager starts and
-  stops them and shows their logs.
-- Administrator commands, such as Nextcloud's occ, run as root only inside the snap's
-  sandbox. Applications with a window are not offered.
-- Update snaps, their bases and content from the Application Manager, and go back to
-  the previous revision.
-- The review page says what MultiPak cannot provide for a snap.
+- MultiPak now integrates Waydroid into its workflow via a bundled, modified Waydroid
+  1.6.3 runtime. You can create separate Android containers, each with its own apps and
+  data, and manage them directly in the Application Manager. While Waydroid must be
+  installed on your system, your existing installation remains completely separate and
+  untouched.
+- MultiPak also gives each Android app playing audio its own volume control in your
+  desktop mixer, shows what Android apps are playing in your desktop's media controls,
+  and lets you choose which webcam and microphone each container uses.
+- Links work between Android and Linux:
+  - From Android to Linux: web (`http://`, `https://`) and email (`mailto:`) links open in
+    your Linux browser and email client.
+  - From Linux to Android: custom links for individual Android apps (such as `myapp://`),
+    as well as `intent://` and `market://` links used by some websites, open in Android.
+  - You choose: by default, MultiPak asks which app to use when a link can open in both,
+    and each Android app can also keep its links inside Android.
+- File transfer now works between Android and Linux: send files from Linux via Dolphin,
+  GNOME Files, or the Application Manager, and from Android using its Share menu.
+- No manual setup for ARM-only apps: when you install one, MultiPak lists the ARM
+  translation layer as a dependency and sets it up automatically (Android 13 on `x86_64`
+  only).
 
-### AppImages
+[See how it works.](docs/howwaydroidintegrationworks.md)
 
-- Before installing, MultiPak checks, without running the AppImage, which libraries or
-  modules it needs that the system lacks.
-  [See how it works.](docs/howappimagecompatibilityworks.md)
-- Missing dependencies are installed in a shared Fedora container, and the application
-  is tested in an isolated copy first.
-- Update AppImages from the Application Manager, from the address they indicate, their
-  project page or a link you enter.
+### New features for AppImages
 
-### Android
+- MultiPak now detects the libraries and Python modules an AppImage is missing in two
+  steps: first by reading the file, without running it, and then by testing the app for
+  about 15 seconds in a throwaway copy of the container, with no internet or access to
+  your files. Whatever is missing is installed from Fedora or PyPI into a shared
+  container.
+- AppImages can now be updated from the Application Manager, using the update address
+  inside the AppImage, its project page or a link you provide.
+- When the AppImages' container is renamed or deleted, the Application Manager offers to
+  repair or delete it.
 
-- Install Android applications through Waydroid: `.apk` files and `.apkm`, `.apks`
-  and `.xapk` bundles. MultiPak reads the package's Android version requirements and
-  architecture and recommends an Android version.
-- Create separate Android containers, each with its own system images, applications,
-  data, network and shortcuts, using a bundled modified Waydroid runtime. The system
-  Waydroid installation remains available as a separate option.
-- Optionally set up ARM translation for applications built only for ARM (Android 13
-  on x86_64).
-- Add Android containers to the Application Manager: create, open, stop, update and
-  remove them. Uninstall Android applications while keeping their data, and offer to
-  remove a container after its last application.
-- Show the modified Waydroid runtime and LXC versions in About, with an explanation of
-  the Waydroid changes.
-- Associate Android package files with MultiPak. The new file type starts selected
-  without changing existing choices.
-- Android `.apk` apps and Alpine Linux `.apk` packages share the extension: MultiPak
-  tells them apart by their contents (an Android app is a ZIP, an Alpine package a gzip
-  TAR), and the Android file type is a choice of its own in the file associations.
+[See how it works.](docs/howappimagecompatibilityworks.md)
 
 ### Application Manager
 
-- Waydroid integration in the side bar, with the Waydroid logo as its icon.
-- A new layout: a side bar with Install, Uninstall, Update, Snap services, File
-  associations, Language and About, with its own icons.
-- Install from a file or from the Snap Store; snaps from the snapcraft.io site open
-  directly in MultiPak.
-- Update lists applications, not containers, and shows which ones have a newer version,
-  asking each container's package manager. Updating one updates its whole container,
-  after listing the other applications that share it.
-- Each application in a list has its own buttons: update, uninstall, start or stop a
-  service, show its log.
-- About lists Lua and popt, built into the Flatpak with RPM.
+- A new layout with a side bar, close to the style of KDE System Settings.
+- Three new features:
+  - Waydroid integration: manage your Android containers and their settings in one place.
+  - Snap services: manage the background services of installed snaps.
+  - Update now lists apps grouped into categories (such as "With updates" and "Already
+    up to date"). Although updates are shown for each app, updating an app installed in
+    a container still updates the whole container, so MultiPak now lists the other apps
+    it affects first.
 
 ### Containers
 
-- Only containers that MultiPak created are treated as its own. When one is renamed or
-  deleted, its applications are marked "container not found" in the Application Manager
-  and removed only when you ask, and a container that takes its name is never updated by
-  mistake.
-- When the container of an AppImage was renamed or deleted, the Application Manager
-  offers to repair or delete it.
+- MultiPak now only manages the containers it created.
+  [See how it works.](docs/howcontainermanagementworks.md)
 
 ### Fixes
 
-- Closing an update notice no longer postpones it; only Remind me later does.
-- When an operation fails, details that only repeat the message are no longer offered.
+- Closing an update notice no longer postpones it; only "Remind me later" does.
+- In some situations, such as when an operation fails before anything runs, the "Show
+  details" button no longer appears, since the details would only repeat the error
+  message.
 
 ## 1.0.3
 

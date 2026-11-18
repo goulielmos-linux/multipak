@@ -5,12 +5,23 @@
   <project_license>GPL-3.0-only</project_license>
   <name>MultiPak</name>
   <icon type="stock">io.github.goulielmos_linux.multipak</icon>
-  <summary>Install packages from other distros</summary>
-  <summary xml:lang="pt_BR">Instale pacotes de outras distros</summary>
+  <summary>Run apps from any Linux distro or Android</summary>
+  <summary xml:lang="pt_BR">Use apps de qualquer distro Linux e Android</summary>
+  <summary xml:lang="pt_PT">Use apps de qualquer distro Linux ou do Android</summary>
+  <summary xml:lang="es">Usa apps de cualquier distro Linux o de Android</summary>
   <description>
-    <p>Install packages made for other Linux distributions, and Android apps, on atomic systems, without changing the base system. Open a package file and the Installation Wizard takes care of it.</p>
-    <p>Supported: RPM, DEB, Arch Linux, Alpine, Void, Solus, Slackware, Gentoo, Pisi, SliTaz and Puppy packages, installed with their dependencies in Distrobox containers; AppImages, with any missing libraries provided in a shared container; snaps, without snapd; and Android apps, in containers based on Waydroid.</p>
-    <p>The Application Manager is where you update and uninstall applications, manage the Waydroid integration and adjust MultiPak's settings. It shows which applications have a newer version and updates them one by one or all at once.</p>
+    <p>MultiPak is a graphical tool for atomic Linux systems that installs packages in multiple formats without modifying the base system. Just open a package file, and the Installation Wizard handles the rest.</p>
+    <p xml:lang="pt_BR">O MultiPak é uma ferramenta gráfica para sistemas Linux atômicos que instala pacotes em múltiplos formatos sem alterar o sistema base. Apenas abra um arquivo de pacote e o Assistente de Instalação cuida do resto.</p>
+    <p xml:lang="pt_PT">O MultiPak é uma ferramenta gráfica para sistemas Linux atómicos que instala pacotes em diversos formatos sem alterar o sistema base. Basta abrir um ficheiro de pacote e o Assistente de Instalação trata do resto.</p>
+    <p xml:lang="es">MultiPak es una herramienta gráfica para sistemas Linux atómicos que instala paquetes de distintos formatos sin modificar el sistema base. Basta con abrir un archivo de paquete para que el Asistente de instalación se encargue del resto.</p>
+    <p>For Android apps, MultiPak now offers powerful Waydroid integration, which you can configure directly in the Application Manager. Create as many containers running Android 13 or Android 11 as you need, each with its own apps and data. Each container supports per-app volume and media playback controls on the Linux desktop, as well as two-way sharing of links and files between Android and Linux. Android 13 containers also set up ARM translation automatically when you install an app that needs it.</p>
+    <p xml:lang="pt_BR">Para apps Android, o MultiPak agora oferece uma poderosa Integração com o Waydroid, configurável direto no Gerenciador de Aplicativos. Crie quantos contêineres com Android 13 ou Android 11 precisar, cada um com seus próprios apps e dados. Cada contêiner tem volume por app e controles de mídia no desktop Linux, além de compartilhamento de links e arquivos entre o Android e o Linux nos dois sentidos. Os contêineres com Android 13 também configuram a tradução ARM automaticamente quando você instala um app que precisa dela.</p>
+    <p xml:lang="pt_PT">Para as aplicações Android, o MultiPak oferece agora uma integração avançada com o Waydroid, que pode configurar diretamente no Gestor de Aplicações. Crie tantos contentores com Android 13 ou Android 11 quantos precisar, cada um com as suas próprias aplicações e dados. Cada contentor permite controlar o volume e a reprodução multimédia de cada aplicação a partir do ambiente de trabalho Linux, bem como partilhar ligações e ficheiros nos dois sentidos entre o Android e o Linux. Os contentores com Android 13 também configuram a tradução ARM automaticamente quando instala uma aplicação que precisa dela.</p>
+    <p xml:lang="es">Para las aplicaciones Android, MultiPak ofrece ahora una potente integración con Waydroid, que puedes configurar directamente en su Administrador de aplicaciones. Crea tantos contenedores con Android 13 o Android 11 como necesites, cada uno con sus propias aplicaciones y datos. Cada contenedor permite controlar el volumen y la reproducción multimedia de cada aplicación desde el escritorio Linux, así como compartir enlaces y archivos de forma bidireccional entre Android y Linux. Los contenedores con Android 13 también configuran la traducción ARM automáticamente cuando instalas una aplicación que la necesita.</p>
+    <p>MultiPak supports RPM and DEB packages; packages for Arch Linux, Alpine, Void, Solus, Slackware, Gentoo, Pisi, SliTaz, and Puppy; AppImages (with missing libraries provided through a shared container); snaps (without snapd); and Android apps.</p>
+    <p xml:lang="pt_BR">O MultiPak suporta pacotes RPM e DEB; pacotes para Arch Linux, Alpine, Void, Solus, Slackware, Gentoo, Pisi, SliTaz e Puppy; AppImages (com as bibliotecas que faltarem fornecidas por um contêiner compartilhado); snaps (sem snapd); e apps Android.</p>
+    <p xml:lang="pt_PT">O MultiPak suporta pacotes RPM e DEB; pacotes para Arch Linux, Alpine, Void, Solus, Slackware, Gentoo, Pisi, SliTaz e Puppy; AppImages (com as bibliotecas em falta disponibilizadas num contentor partilhado); snaps (sem snapd); e aplicações Android.</p>
+    <p xml:lang="es">MultiPak admite paquetes RPM y DEB; paquetes para Arch Linux, Alpine, Void, Solus, Slackware, Gentoo, Pisi, SliTaz y Puppy; AppImages (con las bibliotecas que falten proporcionadas mediante un contenedor compartido); snaps (sin snapd); y aplicaciones Android.</p>
   </description>
   <launchable type="desktop-id">io.github.goulielmos_linux.multipak.desktop</launchable>
   <developer id="io.github.goulielmos_linux"><name>Goulielmos</name></developer>
@@ -20,30 +31,94 @@
     <screenshot type="default">
       <image type="source" width="958" height="806">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.1.0/application-manager.png</image>
       <caption>Manage applications, containers and preferences</caption>
+      <caption xml:lang="pt_BR">Gerencie aplicativos, contêineres e preferências</caption>
+      <caption xml:lang="pt_PT">Gira aplicações, contentores e preferências</caption>
+      <caption xml:lang="es">Administra aplicaciones, contenedores y preferencias</caption>
     </screenshot>
     <screenshot>
       <image type="source" width="684" height="414">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.1.0/installation-welcome.png</image>
       <caption>Review the package and search the app store</caption>
+      <caption xml:lang="pt_BR">Revise o pacote e procure na loja de aplicativos</caption>
+      <caption xml:lang="pt_PT">Consulte as informações do pacote e pesquise na loja de aplicações</caption>
+      <caption xml:lang="es">Revisa el paquete y busca en la tienda de aplicaciones</caption>
     </screenshot>
     <screenshot>
       <image type="source" width="684" height="558">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.1.0/installation-settings.png</image>
       <caption>Choose installation settings</caption>
+      <caption xml:lang="pt_BR">Escolha as configurações da instalação</caption>
+      <caption xml:lang="pt_PT">Escolha as definições de instalação</caption>
+      <caption xml:lang="es">Elige la configuración de instalación</caption>
     </screenshot>
     <screenshot>
       <image type="source" width="684" height="694">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.1.0/installation-summary.png</image>
       <caption>Review the installation before continuing</caption>
+      <caption xml:lang="pt_BR">Revise a instalação antes de continuar</caption>
+      <caption xml:lang="pt_PT">Reveja os detalhes da instalação antes de continuar</caption>
+      <caption xml:lang="es">Revisa los detalles de la instalación antes de continuar</caption>
     </screenshot>
     <screenshot>
       <image type="source" width="684" height="420">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.1.0/installation-progress.png</image>
       <caption>Follow installation progress</caption>
+      <caption xml:lang="pt_BR">Acompanhe o progresso da instalação</caption>
+      <caption xml:lang="pt_PT">Acompanhe o progresso da instalação</caption>
+      <caption xml:lang="es">Sigue el progreso de la instalación</caption>
     </screenshot>
     <screenshot>
       <image type="source" width="684" height="426">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.1.0/installation-completed.png</image>
-      <caption>Confirm the installation completed</caption>
+      <caption>Confirm that the installation is complete</caption>
+      <caption xml:lang="pt_BR">Confirme que a instalação terminou</caption>
+      <caption xml:lang="pt_PT">Confirme que a instalação foi concluída</caption>
+      <caption xml:lang="es">Comprueba que la instalación se haya completado</caption>
     </screenshot>
   </screenshots>
   <categories><category>System</category><category>PackageManager</category></categories>
   <provides><binary>multipak-manager</binary><binary>multipak-installer</binary></provides>
-  <releases><release version="1.1.0" date="2026-11-15" type="stable"><description><p>Install Android apps in separate Waydroid containers linked to the desktop; install snaps without snapd, with channel choice, updates and background services; a new review flow for AppImages; clearer dependency lists and package icons in the review; a new Application Manager with a side bar and updates listed by application.</p></description></release><release version="1.0.2" date="2026-11-12" type="stable"><description><p>Fix signed RPM inspection and migrate file associations and AppImage shortcuts from the old Alpha Flatpak.</p></description></release><release version="1.0.1" date="2026-11-11" type="stable"><description><p>Package security fixes, an updated About window, installation and unified settings in the Application Manager, and reliability fixes for cleanup after failed installations, free disk space checks and file associations.</p></description></release><release version="1.0.0a1" date="2026-11-09" type="development"/></releases>
+  <releases>
+    <release version="1.1.0" date="2026-11-18" type="stable">
+      <description>
+        <p>New package formats, Waydroid integration for Android apps, smarter AppImage installs and a redesigned Application Manager.</p>
+        <p xml:lang="pt_BR">Novos formatos de pacote, Integração Waydroid para apps Android, instalação mais inteligente de AppImages e um Gerenciador de Aplicativos redesenhado.</p>
+        <p xml:lang="pt_PT">Novos formatos de pacotes, integração com o Waydroid para aplicações Android, instalação mais inteligente de AppImages e um Gestor de Aplicações redesenhado.</p>
+        <p xml:lang="es">Nuevos formatos de paquetes, integración con Waydroid para aplicaciones Android, instalación de AppImages más inteligente y un Administrador de aplicaciones rediseñado.</p>
+      </description>
+      <url type="details">https://github.com/goulielmos-linux/multipak/releases/tag/v1.1.0</url>
+    </release>
+    <release version="1.0.3" date="2026-11-16" type="stable">
+      <description>
+        <p>Fix RPM package inspection in the Flatpak build.</p>
+        <p xml:lang="pt_BR">Corrige a inspeção de pacotes RPM na versão Flatpak.</p>
+        <p xml:lang="pt_PT">Corrige a inspeção de pacotes RPM na versão Flatpak.</p>
+        <p xml:lang="es">Corrige la inspección de paquetes RPM en la versión Flatpak.</p>
+      </description>
+      <url type="details">https://github.com/goulielmos-linux/multipak/releases/tag/v1.0.3</url>
+    </release>
+    <release version="1.0.2" date="2026-11-12" type="stable">
+      <description>
+        <p>Fix inspection of signed RPM packages and migrate data from the old Alpha Flatpak.</p>
+        <p xml:lang="pt_BR">Corrige a inspeção de pacotes RPM assinados e migra os dados do antigo Flatpak Alpha.</p>
+        <p xml:lang="pt_PT">Corrige a inspeção de pacotes RPM assinados e migra os dados do antigo Flatpak Alpha.</p>
+        <p xml:lang="es">Corrige la inspección de paquetes RPM firmados y migra los datos del antiguo Flatpak Alpha.</p>
+      </description>
+      <url type="details">https://github.com/goulielmos-linux/multipak/releases/tag/v1.0.2</url>
+    </release>
+    <release version="1.0.1" date="2026-11-11" type="stable">
+      <description>
+        <p>Security and reliability fixes, a redesigned About window and unified settings.</p>
+        <p xml:lang="pt_BR">Correções de segurança e confiabilidade, uma janela Sobre redesenhada e configurações unificadas.</p>
+        <p xml:lang="pt_PT">Correções de segurança e fiabilidade, uma janela «Acerca de» redesenhada e definições unificadas.</p>
+        <p xml:lang="es">Correcciones de seguridad y confiabilidad, una ventana «Acerca de» rediseñada y configuración unificada.</p>
+      </description>
+      <url type="details">https://github.com/goulielmos-linux/multipak/releases/tag/v1.0.1</url>
+    </release>
+    <release version="1.0.0a1" date="2026-11-09" type="stable">
+      <description>
+        <p>Initial release.</p>
+        <p xml:lang="pt_BR">Primeiro lançamento.</p>
+        <p xml:lang="pt_PT">Lançamento inicial.</p>
+        <p xml:lang="es">Lanzamiento inicial.</p>
+      </description>
+      <url type="details">https://github.com/goulielmos-linux/multipak/releases/tag/v1.0.0a1</url>
+    </release>
+  </releases>
   <content_rating type="oars-1.1"/>
 </component>

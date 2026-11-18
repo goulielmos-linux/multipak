@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Not installed. Spanish (Spain), French and Simplified Chinese store texts, kept for when the interface has these languages. -->
+<component type="desktop-application">
+  <id>io.github.goulielmos_linux.multipak</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  <name>MultiPak</name>
+  <icon type="stock">io.github.goulielmos_linux.multipak</icon>
+  <summary>Run apps from any Linux distro or Android</summary>
+  <summary xml:lang="es_ES">Ejecuta apps de cualquier distro Linux o de Android</summary>
+  <summary xml:lang="fr">Lancez des applis de toutes les distros ou d’Android</summary>
+  <summary xml:lang="zh_CN">运行来自任意 Linux 发行版或 Android 的应用</summary>
+  <description>
+    <p>MultiPak is a graphical tool for atomic Linux systems that installs packages in multiple formats without modifying the base system. Just open a package file, and the Installation Wizard handles the rest.</p>
+    <p xml:lang="es_ES">MultiPak es una herramienta gráfica para sistemas Linux atómicos que permite instalar paquetes de distintos formatos sin modificar el sistema base. Solo tienes que abrir un archivo de paquete y el Asistente de instalación se encargará del resto.</p>
+    <p xml:lang="fr">MultiPak est un outil graphique pour les systèmes Linux atomiques qui permet d’installer des paquets de différents formats sans modifier le système de base. Il suffit d’ouvrir un fichier de paquet pour que l’assistant d’installation s’occupe du reste.</p>
+    <p xml:lang="zh_CN">MultiPak 是一款适用于原子化 Linux 系统的图形化工具，可在不修改基础系统的情况下安装多种格式的软件包。只需打开软件包文件，安装向导便会处理其余步骤。</p>
+    <p>For Android apps, MultiPak now offers powerful Waydroid integration, which you can configure directly in the Application Manager. Create as many containers running Android 13 or Android 11 as you need, each with its own apps and data. Each container supports per-app volume and media playback controls on the Linux desktop, as well as two-way sharing of links and files between Android and Linux. Android 13 containers also set up ARM translation automatically when you install an app that needs it.</p>
+    <p xml:lang="es_ES">Para las aplicaciones Android, MultiPak ofrece ahora una potente integración con Waydroid, que puedes configurar directamente en su Gestor de aplicaciones. Crea tantos contenedores con Android 13 o Android 11 como necesites, cada uno con sus propias aplicaciones y datos. Cada contenedor permite controlar el volumen y la reproducción multimedia de cada aplicación desde el escritorio Linux, así como compartir enlaces y archivos de forma bidireccional entre Android y Linux. Los contenedores con Android 13 también configuran la traducción ARM automáticamente cuando instalas una aplicación que la necesita.</p>
+    <p xml:lang="fr">Pour les applications Android, MultiPak propose désormais une intégration poussée avec Waydroid, configurable directement dans son gestionnaire d’applications. Créez autant de conteneurs exécutant Android 13 ou Android 11 que nécessaire, chacun avec ses propres applications et données. Chaque conteneur permet de régler le volume et de contrôler la lecture multimédia de chaque application depuis le bureau Linux, ainsi que de partager des liens et des fichiers dans les deux sens entre Android et Linux. Les conteneurs exécutant Android 13 configurent aussi automatiquement la traduction ARM lorsque vous installez une application qui en a besoin.</p>
+    <p xml:lang="zh_CN">对于 Android 应用，MultiPak 现已提供强大的 Waydroid 集成功能，可直接在应用管理器中进行配置。你可以根据需要创建任意数量的 Android 13 或 Android 11 容器，每个容器都有各自独立的应用和数据。每个容器都支持在 Linux 桌面上分别调节各应用的音量、控制媒体播放，并可与 Linux 双向共享链接和文件；安装需要 ARM 转译的应用时，Android 13 容器还会自动配置 ARM 转译。</p>
+    <p>MultiPak supports RPM and DEB packages; packages for Arch Linux, Alpine, Void, Solus, Slackware, Gentoo, Pisi, SliTaz, and Puppy; AppImages (with missing libraries provided through a shared container); snaps (without snapd); and Android apps.</p>
+    <p xml:lang="es_ES">MultiPak admite paquetes RPM y DEB; paquetes para Arch Linux, Alpine, Void, Solus, Slackware, Gentoo, Pisi, SliTaz y Puppy; AppImages (con las bibliotecas que falten suministradas desde un contenedor compartido); snaps (sin snapd); y aplicaciones Android.</p>
+    <p xml:lang="fr">MultiPak prend en charge les paquets RPM et DEB ; les paquets destinés à Arch Linux, Alpine, Void, Solus, Slackware, Gentoo, Pisi, SliTaz et Puppy ; les AppImages (avec les bibliothèques manquantes fournies par un conteneur partagé) ; les snaps (sans snapd) ; et les applications Android.</p>
+    <p xml:lang="zh_CN">MultiPak 支持 RPM 和 DEB 软件包；适用于 Arch Linux、Alpine、Void、Solus、Slackware、Gentoo、Pisi、SliTaz 和 Puppy 的软件包；AppImage（缺少的库由共享容器提供）；snap 软件包（无需 snapd）；以及 Android 应用。</p>
+  </description>
+  <launchable type="desktop-id">io.github.goulielmos_linux.multipak.desktop</launchable>
+  <developer id="io.github.goulielmos_linux"><name>Goulielmos</name></developer>
+  <url type="homepage">https://github.com/goulielmos-linux/multipak</url>
+  <url type="bugtracker">https://github.com/goulielmos-linux/multipak/issues</url>
+  <screenshots>
+    <screenshot type="default">
+      <image type="source" width="958" height="806">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.1.0/application-manager.png</image>
+      <caption>Manage applications, containers and preferences</caption>
+      <caption xml:lang="es_ES">Gestiona aplicaciones, contenedores y preferencias</caption>
+      <caption xml:lang="fr">Gérez les applications, les conteneurs et les préférences</caption>
+      <caption xml:lang="zh_CN">管理应用、容器和偏好设置</caption>
+    </screenshot>
+    <screenshot>
+      <image type="source" width="684" height="414">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.1.0/installation-welcome.png</image>
+      <caption>Review the package and search the app store</caption>
+      <caption xml:lang="es_ES">Revisa el paquete y busca en la tienda de aplicaciones</caption>
+      <caption xml:lang="fr">Examinez le paquet et effectuez une recherche dans la boutique d’applications</caption>
+      <caption xml:lang="zh_CN">查看软件包并在应用商店中搜索</caption>
+    </screenshot>
+    <screenshot>
+      <image type="source" width="684" height="558">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.1.0/installation-settings.png</image>
+      <caption>Choose installation settings</caption>
+      <caption xml:lang="es_ES">Selecciona los ajustes de instalación</caption>
+      <caption xml:lang="fr">Choisissez les paramètres d’installation</caption>
+      <caption xml:lang="zh_CN">选择安装设置</caption>
+    </screenshot>
+    <screenshot>
+      <image type="source" width="684" height="694">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.1.0/installation-summary.png</image>
+      <caption>Review the installation before continuing</caption>
+      <caption xml:lang="es_ES">Comprueba los detalles de la instalación antes de continuar</caption>
+      <caption xml:lang="fr">Vérifiez les détails de l’installation avant de poursuivre</caption>
+      <caption xml:lang="zh_CN">继续前请查看安装详情</caption>
+    </screenshot>
+    <screenshot>
+      <image type="source" width="684" height="420">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.1.0/installation-progress.png</image>
+      <caption>Follow installation progress</caption>
+      <caption xml:lang="es_ES">Sigue el progreso de la instalación</caption>
+      <caption xml:lang="fr">Suivez la progression de l’installation</caption>
+      <caption xml:lang="zh_CN">查看安装进度</caption>
+    </screenshot>
+    <screenshot>
+      <image type="source" width="684" height="426">https://raw.githubusercontent.com/goulielmos-linux/multipak/main/docs/screenshots/1.1.0/installation-completed.png</image>
+      <caption>Confirm that the installation is complete</caption>
+      <caption xml:lang="es_ES">Comprueba que la instalación haya finalizado</caption>
+      <caption xml:lang="fr">Confirmez que l’installation est terminée</caption>
+      <caption xml:lang="zh_CN">确认安装已完成</caption>
+    </screenshot>
+  </screenshots>
+  <categories><category>System</category><category>PackageManager</category></categories>
+  <provides><binary>multipak-manager</binary><binary>multipak-installer</binary></provides>
+  <releases>
+    <release version="1.1.0" date="2026-11-18" type="stable">
+      <description>
+        <p>New package formats, Waydroid integration for Android apps, smarter AppImage installs and a redesigned Application Manager.</p>
+        <p xml:lang="es_ES">Nuevos formatos de paquetes, integración con Waydroid para aplicaciones Android, instalación de AppImages más inteligente y un Gestor de aplicaciones rediseñado.</p>
+        <p xml:lang="fr">Nouveaux formats de paquets, intégration de Waydroid pour les applications Android, installation plus intelligente des AppImages et refonte du gestionnaire d’applications.</p>
+        <p xml:lang="zh_CN">新增软件包格式、面向 Android 应用的 Waydroid 集成功能、更智能的 AppImage 安装方式，以及重新设计的应用管理器。</p>
+      </description>
+      <url type="details">https://github.com/goulielmos-linux/multipak/releases/tag/v1.1.0</url>
+    </release>
+    <release version="1.0.3" date="2026-11-16" type="stable">
+      <description>
+        <p>Fix RPM package inspection in the Flatpak build.</p>
+        <p xml:lang="es_ES">Corrige la inspección de paquetes RPM en la versión Flatpak.</p>
+        <p xml:lang="fr">Corrige l’analyse des paquets RPM dans la version Flatpak.</p>
+        <p xml:lang="zh_CN">修复 Flatpak 版本中的 RPM 软件包检查问题。</p>
+      </description>
+      <url type="details">https://github.com/goulielmos-linux/multipak/releases/tag/v1.0.3</url>
+    </release>
+    <release version="1.0.2" date="2026-11-12" type="stable">
+      <description>
+        <p>Fix inspection of signed RPM packages and migrate data from the old Alpha Flatpak.</p>
+        <p xml:lang="es_ES">Corrige la inspección de paquetes RPM firmados y migra los datos del antiguo Flatpak Alpha.</p>
+        <p xml:lang="fr">Corrige l’analyse des paquets RPM signés et migre les données de l’ancienne version alpha du Flatpak.</p>
+        <p xml:lang="zh_CN">修复已签名 RPM 软件包的检查问题，并从旧版 Alpha Flatpak 迁移数据。</p>
+      </description>
+      <url type="details">https://github.com/goulielmos-linux/multipak/releases/tag/v1.0.2</url>
+    </release>
+    <release version="1.0.1" date="2026-11-11" type="stable">
+      <description>
+        <p>Security and reliability fixes, a redesigned About window and unified settings.</p>
+        <p xml:lang="es_ES">Correcciones de seguridad y fiabilidad, una ventana «Acerca de» rediseñada y ajustes unificados.</p>
+        <p xml:lang="fr">Correctifs de sécurité et de fiabilité, refonte de la fenêtre « À propos » et paramètres unifiés.</p>
+        <p xml:lang="zh_CN">修复安全性与可靠性问题，重新设计“关于”窗口，并统一各项设置。</p>
+      </description>
+      <url type="details">https://github.com/goulielmos-linux/multipak/releases/tag/v1.0.1</url>
+    </release>
+    <release version="1.0.0a1" date="2026-11-09" type="stable">
+      <description>
+        <p>Initial release.</p>
+        <p xml:lang="es_ES">Versión inicial.</p>
+        <p xml:lang="fr">Première version.</p>
+        <p xml:lang="zh_CN">首次发布。</p>
+      </description>
+      <url type="details">https://github.com/goulielmos-linux/multipak/releases/tag/v1.0.0a1</url>
+    </release>
+  </releases>
+  <content_rating type="oars-1.1"/>
+</component>
