@@ -1,3 +1,4 @@
+# Modified by MultiPak on 2026-11-18 for named Android environments and desktop integration.
 # Copyright 2021 Oliver Smith
 # SPDX-License-Identifier: GPL-3.0-or-later
 # PYTHON_ARGCOMPLETE_OK
@@ -103,6 +104,27 @@ def main():
         elif args.action == "app-config":
             import multipak_input
             multipak_input.run(args)
+        elif args.action == "diagnose":
+            import multipak_desktop
+            multipak_desktop.run(args)
+        elif args.action == "links":
+            import multipak_links
+            multipak_links.run(args)
+        elif args.action == "keyboard":
+            import multipak_input
+            multipak_input.keyboard_run(args)
+        elif args.action == "send":
+            import multipak_files
+            multipak_files.run(args)
+        elif args.action == "microphone":
+            import multipak_microphone
+            multipak_microphone.run(args)
+        elif args.action == "camera":
+            import multipak_camera
+            multipak_camera.run(args)
+        elif args.action == "open-uri":
+            import multipak_links
+            multipak_links.open_uri(args)
         elif args.action == "prop":
             if args.subaction == "get":
                 actions.prop.get(args)

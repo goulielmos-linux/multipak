@@ -2,17 +2,28 @@
 
 import hashlib
 import json
+import re
 import threading
 import uuid
 from contextlib import ExitStack
 from dataclasses import replace
 
 from . import snap, snap_application, snap_components, snap_ctl, snap_store
-from .localization import tr
+from .localization import mark, tr
 from .models import Transaction
 from .process import Cancelled, Runner
 from .snap_daemons import Services, runner_call
-from .snap_meta import NAME, REVISION, check_layouts, interfaces, plug_attributes, system_files
+from .snap_meta import (
+    NAME,
+    REVISION,
+    check_layouts,
+    interfaces,
+    plug_attributes,
+    reaches_network,
+    runnable_services,
+    service_sockets,
+    system_files,
+)
 from .store import remove_tree
 
 
@@ -31,25 +42,176 @@ def _paths(info):
     return paths
 
 
+# What common interfaces let an application do, in plain words. In MultiPak's
+# compatibility layer every interface a snap declares counts as connected.
+INTERFACE_LABELS = {
+    "audio-playback": mark("Play sound"),
+    "audio-record": mark("Record sound from the microphone"),
+    "avahi-control": mark("Announce and find services on the local network"),
+    "avahi-observe": mark("Find services on the local network"),
+    "bluez": mark("Use Bluetooth devices"),
+    "browser-support": mark("Run a web browser engine"),
+    "camera": mark("Use the camera"),
+    "content": mark("Use files shared by another snap"),
+    "cups-control": mark("Manage printers and print jobs"),
+    "desktop": mark("Use the desktop: fonts, themes and notifications"),
+    "gpg-keys": mark("Read your GnuPG keys"),
+    "hardware-observe": mark("Read information about the computer's hardware"),
+    "home": mark("Read and change the files in your home folder"),
+    "joystick": mark("Use game controllers"),
+    "locale-control": mark("Change the system language settings"),
+    "login-session-control": mark("Control login sessions"),
+    "mount-observe": mark("See the mounted disks and folders"),
+    "network": mark("Access the internet and the network"),
+    "network-bind": mark("Accept network connections"),
+    "network-manager": mark("Manage the network connections"),
+    "network-observe": mark("See the network settings and connections"),
+    "opengl": mark("Use the graphics card"),
+    "password-manager-service": mark("Read and store passwords in your keyring"),
+    "process-control": mark("Control other programs running on the computer"),
+    "pulseaudio": mark("Play and record sound"),
+    "raw-usb": mark("Access USB devices directly"),
+    "removable-media": mark("Read and change files on USB drives and other disks"),
+    "screen-inhibit-control": mark("Keep the screen from turning off"),
+    "serial-port": mark("Use serial ports"),
+    "shutdown": mark("Shut down or restart the computer"),
+    "ssh-keys": mark("Read your SSH keys"),
+    "ssh-public-keys": mark("Read your public SSH keys"),
+    "system-observe": mark("See the programs running on the computer"),
+    "u2f-devices": mark("Use security keys"),
+    "unity7": mark("Use the desktop of an X11 session"),
+    "wayland": mark("Show windows in a Wayland session"),
+    "x11": mark("Show windows and read the X11 session"),
+}
+# Shown with their own lines: the paths they give, and the D-Bus names (session_bus_names).
+_DETAILED_INTERFACES = {"system-files", "personal-files"}
+_SHOWN_TEXT = re.compile(r"[^\x00-\x1f\x7f]{1,80}")
+
+
+def _shown(text):
+    """Text from the package, fit for one line: at most 80 characters, no control ones."""
+    text = str(text)
+    return text if _SHOWN_TEXT.fullmatch(text) else repr(text[:80])
+
+
+def _path(path):
+    return "~/" + path[len("$HOME/") :] if path.startswith("$HOME/") else path
+
+
+def _item(text, warning=False):
+    return {"text": text, "warning": warning}
+
+
+def _sockets(info):
+    return {address: (name, listen) for name, listen, address in service_sockets(info)}
+
+
+def _socket_item(name, listen, address):
+    if address[0] == "unix":
+        return _item(tr("Create the local socket {0} for the service {1}").format(listen, name))
+    if not reaches_network(address):
+        return _item(tr("Accept connections only from this computer (port {0})").format(address[2]))
+    if not address[1]:
+        text = tr("Accept connections from other computers on the network (port {0})")
+        return _item(text.format(address[2]), warning=True)
+    text = tr("Accept connections from other computers on the network (address {0}, port {1})")
+    return _item(text.format(address[1], address[2]), warning=True)
+
+
+def _layouts(info):
+    return {(layout.path, layout.kind, layout.source) for layout in info.layouts}
+
+
+def _layout_item(path, kind, source):
+    if kind == "tmpfs":
+        return _item(
+            tr("Replace {0} with an empty temporary folder inside the app").format(_shown(path))
+        )
+    if kind == "symlink":
+        return _item(
+            tr("Replace {0} with a link to {1} inside the app").format(_shown(path), _shown(source))
+        )
+    return _item(tr("Replace {0} with {1} inside the app").format(_shown(path), _shown(source)))
+
+
+def _bus_names(info):
+    names = set(info.session_bus_names)
+    for name in runnable_services(info):
+        app = info.app(name)
+        if app.scope == "user":
+            names.update(app.bus_names)
+    return names
+
+
 def new_permissions(old, new):
-    """Explain what the user must approve, including read-to-write changes."""
-    messages = []
+    """What the new revision may do that the old one could not, one dict each:
+    text (one line in plain words) and warning (other computers can connect to it).
+
+    Only what is new: something the old revision already had is left out, while a
+    path that changes from reading to writing is shown."""
+    items = []
     if new.classic and not old.classic:
-        messages.append(tr("Classic confinement"))
-    previous = _paths(old)
+        items.append(_item(tr("Run without confinement (classic), with full access to the system")))
+
+    services = runnable_services(new)
+    previous = set(runnable_services(old))
+    for name in services:
+        if name not in previous:
+            items.append(_item(tr("Start a background service: {0}").format(name)))
+    for name in services:
+        app, before = new.app(name), old.app(name)
+        if app.timer and not (name in previous and before.timer):
+            items.append(
+                _item(
+                    tr("Start the service {0} automatically on a schedule ({1})").format(
+                        name, _shown(app.timer)
+                    )
+                )
+            )
+
+    sockets = _sockets(old)
+    for address, (name, listen) in sorted(
+        _sockets(new).items(), key=lambda entry: (not reaches_network(entry[0]), entry[1])
+    ):
+        if address not in sockets:
+            items.append(_socket_item(name, listen, address))
+
+    for bus_name in sorted(_bus_names(new) - _bus_names(old)):
+        items.append(_item(tr("Use the D-Bus name {0} in your session").format(bus_name)))
+
+    for user in sorted(set(new.system_usernames) - set(old.system_usernames)):
+        items.append(_item(tr("Create the system user {0}").format(_shown(user))))
+
+    for layout in sorted(_layouts(new) - _layouts(old)):
+        items.append(_layout_item(*layout))
+
+    previous_paths = _paths(old)
     added = sorted(
         (scope, path, write)
-        for scope, path, write in _paths(new) - previous
-        if write or (scope, path, True) not in previous
+        for scope, path, write in _paths(new) - previous_paths
+        if write or (scope, path, True) not in previous_paths
     )
-    for scope, path, write in added:
-        label = tr("System files") if scope == "system-files" else tr("Personal files")
-        access = tr("Write access") if write else tr("Read access")
-        messages.append(tr("{0} · {1}: {2}").format(label, access, path))
-    for scope in sorted((interfaces(new) - interfaces(old)) & {"system-files", "personal-files"}):
-        if not any(kind == scope for kind, _, _ in added):
-            messages.append(tr("System files") if scope == "system-files" else tr("Personal files"))
-    return tuple(messages)
+    for _scope, path, write in added:
+        text = tr("Write to {0}") if write else tr("Read {0}")
+        items.append(_item(text.format(_shown(_path(path)))))
+
+    for interface in sorted(interfaces(new) - interfaces(old)):
+        if interface in _DETAILED_INTERFACES and any(kind == interface for kind, _, _ in added):
+            continue
+        label = INTERFACE_LABELS.get(interface)
+        if label:
+            text = tr("{0} ({1})").format(tr(label), interface)
+        else:
+            text = tr("Use the {0} interface").format(_shown(interface))
+        items.append(_item(text))
+    return tuple(items)
+
+
+def permissions_title(name, permissions):
+    """The dialog's sentence: how many new permissions the new version of name needs."""
+    if len(permissions) == 1:
+        return tr("The new version of {0} needs 1 new permission:").format(name)
+    return tr("The new version of {0} needs {1} new permissions:").format(name, len(permissions))
 
 
 def _installed(store, selected):

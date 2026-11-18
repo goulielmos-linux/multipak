@@ -30,6 +30,10 @@ apps:
 NEW = OLD.replace("1.0", "2.0")
 
 
+def texts(old, new):
+    return [item["text"] for item in snap_refresh.new_permissions(old, new)]
+
+
 def test_permission_changes_are_reported_by_path_and_access():
     old = parse(
         OLD
@@ -57,12 +61,184 @@ plugs:
   home:
 """
     )
-    assert snap_refresh.new_permissions(old, new) == (
-        "Classic confinement",
-        "Personal files · Read access: $HOME/.new",
-        "System files · Write access: /etc/demo",
+    assert texts(old, new) == [
+        "Run without confinement (classic), with full access to the system",
+        "Read ~/.new",
+        "Write to /etc/demo",
+        "Read and change the files in your home folder (home)",
+    ]
+    # Writing that becomes reading is no new permission, but reading that becomes
+    # writing is; the same plugs ask for nothing.
+    assert texts(new, old) == ["Write to ~/.demo"]
+    assert snap_refresh.new_permissions(new, new) == ()
+
+
+def test_a_new_interface_counts_as_connected():
+    old = parse(OLD + "plugs:\n  home:\n")
+    new = parse(OLD + "plugs:\n  home:\n  camera:\n  my-plug:\n    interface: odd-thing\n")
+    assert texts(old, new) == ["Use the camera (camera)", "Use the odd-thing interface"]
+    # A system-files plug without new paths still shows its interface.
+    assert texts(parse(OLD), parse(OLD + "plugs:\n  network-bind:\n")) == [
+        "Accept network connections (network-bind)"
+    ]
+
+
+SERVICES = """name: demo
+version: '1.0'
+apps:
+  demo:
+    command: bin/demo
+"""
+
+
+def test_new_services_timers_and_users_are_reported():
+    new = parse(
+        SERVICES
+        + """  worker:
+    command: bin/worker
+    daemon: simple
+  cleaner:
+    command: bin/clean
+    daemon: oneshot
+    daemon-scope: user
+    timer: '00:00-24:00/2'
+  broken:
+    command: bin/broken
+    daemon: dbus
+system-usernames:
+  snap_daemon: shared
+"""
     )
-    assert snap_refresh.new_permissions(old, parse(OLD + "plugs:\n  home:\n")) == ()
+    assert texts(parse(SERVICES), new) == [
+        "Start a background service: worker",
+        "Start a background service: cleaner",
+        "Start the service cleaner automatically on a schedule (00:00-24:00/2)",
+        "Create the system user snap_daemon",
+    ]
+    # A timer added to a service that already ran is new; the service itself is not.
+    timed = parse(OLD + "    timer: '23:00'\n")
+    assert texts(parse(OLD), timed) == [
+        "Start the service worker automatically on a schedule (23:00)"
+    ]
+    assert texts(timed, parse(OLD.replace("1.0", "2.0") + "    timer: '22:00'\n")) == []
+
+
+def sockets(*listens):
+    lines = "".join(
+        f"      s{number}:\n        listen-stream: '{listen}'\n"
+        for number, listen in enumerate(listens)
+    )
+    return parse(OLD + "    sockets:\n" + lines)
+
+
+def test_ports_open_to_the_network_are_told_apart_from_local_ones():
+    items = snap_refresh.new_permissions(
+        parse(OLD), sockets("8080", "127.0.0.1:9000", "[::1]:9001", "$SNAP_DATA/run.sock")
+    )
+    assert items == (
+        {
+            "text": "Accept connections from other computers on the network (port 8080)",
+            "warning": True,
+        },
+        {
+            "text": "Create the local socket $SNAP_DATA/run.sock for the service worker",
+            "warning": False,
+        },
+        {
+            "text": "Accept connections only from this computer (port 9000)",
+            "warning": False,
+        },
+        {
+            "text": "Accept connections only from this computer (port 9001)",
+            "warning": False,
+        },
+    )
+    assert texts(parse(OLD), sockets("0.0.0.0:8443")) == [
+        "Accept connections from other computers on the network (address 0.0.0.0, port 8443)"
+    ]
+    # The same port, now open to the network instead of only to this computer.
+    assert texts(sockets("127.0.0.1:8080"), sockets("8080")) == [
+        "Accept connections from other computers on the network (port 8080)"
+    ]
+    assert texts(sockets("8080"), sockets("8080")) == []
+
+
+def test_new_session_bus_names_and_layouts_are_reported():
+    new = parse(
+        SERVICES
+        + """  tray:
+    command: bin/tray
+    daemon: dbus
+    daemon-scope: user
+    bus-name: org.example.Tray
+slots:
+  owned:
+    interface: dbus
+    bus: session
+    name: org.example.Demo
+layout:
+  /usr/share/demo:
+    bind: $SNAP/usr/share/demo
+  /etc/demo.conf:
+    symlink: $SNAP_DATA/demo.conf
+  /var/cache/demo:
+    type: tmpfs
+"""
+    )
+    assert texts(parse(SERVICES), new) == [
+        "Start a background service: tray",
+        "Use the D-Bus name org.example.Demo in your session",
+        "Use the D-Bus name org.example.Tray in your session",
+        "Replace /etc/demo.conf with a link to $SNAP_DATA/demo.conf inside the app",
+        "Replace /usr/share/demo with $SNAP/usr/share/demo inside the app",
+        "Replace /var/cache/demo with an empty temporary folder inside the app",
+    ]
+    assert texts(new, new) == []
+
+
+def test_the_title_counts_the_permissions():
+    one = ({"text": "a", "warning": False},)
+    assert snap_refresh.permissions_title("Demo", one) == (
+        "The new version of Demo needs 1 new permission:"
+    )
+    assert snap_refresh.permissions_title("Demo", one * 3) == (
+        "The new version of Demo needs 3 new permissions:"
+    )
+
+
+def test_the_title_and_the_items_are_translated():
+    from multipak.localization import activate_language
+
+    activate_language("pt_BR")
+    try:
+        assert snap_refresh.permissions_title("Demo", ({},) * 3) == (
+            "A nova versão de Demo exige 3 novas autorizações:"
+        )
+        assert texts(parse(OLD), sockets("8080")) == [
+            "Aceitar conexões de outros computadores da rede (porta 8080)"
+        ]
+    finally:
+        activate_language("en")
+
+
+def test_the_network_ports_show_when_installing():
+    pytest.importorskip("PySide6.QtCore")
+    from multipak.kirigami.main import Welcome
+    from multipak.models import Package
+    from multipak.snap_meta import limitations, network_ports
+
+    info = sockets("8080", "127.0.0.1:9000", "192.168.0.2:9100")
+    expected = [
+        "This application accepts connections from other computers on the network (port 8080).",
+        "This application accepts connections from other computers on the network "
+        "(address 192.168.0.2, port 9100).",
+    ]
+    assert network_ports(info) == expected
+    # Shown on its own above the folded alerts, and kept with the installed snap.
+    welcome = Welcome(package=Package(Path("a.snap"), "snap", "demo", "1", "amd64", snap=info))
+    assert welcome.snapNetworkWarning == "<p>" + "<br>".join(expected) + "</p>"
+    assert all(sentence in limitations(info) for sentence in expected)
+    assert network_ports(sockets("127.0.0.1:9000")) == []
 
 
 @pytest.fixture
@@ -185,7 +361,17 @@ def test_declining_new_permissions_never_stops_the_services(prepared, store):
     p.remote.text += "confinement: classic\n"
     requests = []
     assert snap_refresh.refresh(p.engine, p.tx, "15", lambda *args: requests.append(args)) is None
-    assert requests == [("demo", ("Classic confinement",))]
+    assert requests == [
+        (
+            "demo",
+            (
+                {
+                    "text": "Run without confinement (classic), with full access to the system",
+                    "warning": False,
+                },
+            ),
+        )
+    ]
     assert p.events == [("lookup", "demo", "latest/beta"), ("download", "15")]
     assert p.active == {"11": True}
     assert store.transactions() == [p.tx]

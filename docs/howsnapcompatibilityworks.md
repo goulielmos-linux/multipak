@@ -1,6 +1,6 @@
 # How MultiPak installs and runs snaps
 
-*MultiPak 1.2.0. Translated from the [Portuguese version](howsnapcompatibilityworks.pt-BR.md), which is the reference text.*
+*MultiPak 1.1.0. Translated from the [Portuguese version](howsnapcompatibilityworks.pt-BR.md), which is the reference text.*
 
 ---
 
@@ -37,7 +37,10 @@ Think of a snap as a sealed box:
 
 ### 1.3 Classic snaps
 
-Most snaps stay confined to the bubble described above. Some, called **classic** snaps,
+Most snaps run in the bubble described above. The bubble gives the program the view of
+the system it expects; it is **not a security sandbox**: the program still sees your
+home folder, your devices and your desktop session, as the README says. Install only
+snaps from sources you trust. Some, called **classic** snaps,
 are published to run **without confinement**, like a normally installed program: they
 see the whole system. This is the case for code editors and development tools (VS Code,
 IntelliJ, `go`, `node`), which need to use the computer's compilers and files.
@@ -88,6 +91,11 @@ keeps the services running while it downloads and prepares everything, and stops
 only for a few seconds during the switch. If the new version fails to configure itself,
 it **rolls back automatically** to the previous one. You can also choose **Revert to
 previous version** under **Manager → Update**, with the snap selected.
+
+If the new version asks for something the installed one did not have (a background
+service, a network port, access to more files…), MultiPak lists each new permission in
+plain words before updating and waits for **Approve** or **Decline**. Declining (or
+closing the window) leaves the current version installed, exactly as it was.
 
 ### 1.7 Is it a "translation layer"?
 
@@ -289,22 +297,70 @@ channel (`snaps/<id>/channels/<channel>`):
   `~/.config/autostart/multipak-snap-<id>-services.desktop` file runs
   `multipak-snap --services login <id>` when the session starts, starting every enabled
   service (those already running are skipped).
+- **Session D-Bus names:** for a user service with `daemon: dbus` (its `bus-name`, or
+  the `name` of a session `dbus` slot), the compatibility layer writes
+  `~/.local/share/dbus-1/services/<name>.service`, marked with the snap's ID, so that
+  asking the bus for the name starts the service, as snapd's `activates-on` does. That
+  folder takes precedence over the system's, so a name is written only if nothing else
+  has it: no file of another program in the folder, no name the session bus already
+  knows (`ListNames`: owned by a running program; `ListActivatableNames`: in a service
+  file of the system or of another program) and nothing under `org.freedesktop.`
+  (portals, secrets, notifications…). A refused name is reported in the log and its
+  service is not started by the bus. The snap's own file, written before, is kept on
+  updates. snapd needs a Store review for a `dbus` slot; a local `.snap` has none, so
+  without these checks it could take a desktop service's name away from it.
 - Command line: `multipak-snap --services list|start|stop|restart <id> [service…]`.
 
 ### 2.7 Updating and rollback (`snap_refresh.py`)
 
 1. Downloads and extracts the new revision into a staging directory (`.refresh`), along
    with new bases and content, **while the services keep running**.
-2. Runs the old revision's `pre-refresh`. If it refuses, nothing changes and the
+2. Compares the new `snap.yaml` with the installed one (`new_permissions`) and, if the
+   new revision may do something the old one could not, asks the user to approve it
+   (see "New permissions" below). Declining stops here: nothing was switched, the
+   services were never stopped, and the downloaded files are removed.
+3. Runs the old revision's `pre-refresh`. If it refuses, nothing changes and the
    services keep running.
-3. Stops the services, waits for the processes to end, copies `$SNAP_DATA` to the new
+4. Stops the services, waits for the processes to end, copies `$SNAP_DATA` to the new
    revision and switches revisions.
-4. Runs the new revision's `post-refresh` with the services stopped (as snapd does). If
+5. Runs the new revision's `post-refresh` with the services stopped (as snapd does). If
    it fails, it **undoes the switch** and goes back to the previous revision.
-5. Starts the services. The previous revision is kept for **Revert to previous
+6. Starts the services. The previous revision is kept for **Revert to previous
    version**.
 
 In practice, the service is down for only a few seconds.
+
+**New permissions.** snapd asks the Store which interfaces it may connect on its own;
+the compatibility layer has no such assertions and counts every interface a snap
+declares as connected. So `new_permissions(old, new)` returns, one item each, only what
+is new in the new revision (something the old one already had is left out, but a path
+that goes from reading to writing is shown):
+
+- classic confinement;
+- background services MultiPak will run (`daemon`, including `daemon-scope: user`), and a
+  `timer` on a service that had none;
+- sockets (`sockets:` → `listen-stream`). A port alone, or any address that is not
+  loopback, listens on every address (`::`, IPv4 included): other computers on the
+  network can connect, and the item is marked as a warning. `127.0.0.1:port`,
+  `[::1]:port` and socket paths are local only;
+- session D-Bus names (`bus-name`, `activates-on`, and the `name` of a session `dbus`
+  slot);
+- `system-usernames`;
+- `layout` entries (bind, bind-file, symlink and tmpfs);
+- `system-files` and `personal-files` paths, with read or write access;
+- any other new interface, with a plain description for the common ones
+  (`network`, `camera`, `home`…) and its name for the rest.
+
+Each item is a `{text, warning}` dict. The Manager's dialog (`snapPermissionsDialog`)
+shows "The new version of <app> needs N new permissions:", the scrollable list (each
+item completes that sentence, such as "Start a background service: worker"; warnings in
+red, with a warning icon) and the **Decline** and **Approve** buttons. Closing the
+window counts as Decline. In the list, a port open to the network reads "Accept
+connections from other computers on the network (port 8080)". Such ports also appear
+when installing a new snap, as a whole sentence ("This application accepts connections
+from other computers on the network (port 8080).", `snap_meta.network_warning`): as a
+warning above the folded alerts on the review page (`Welcome.snapNetworkWarning`), and
+among the warnings kept with the installed snap (`limitations`).
 
 ### 2.8 Uninstallation
 

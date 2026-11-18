@@ -1,6 +1,7 @@
 """Read cgroup v2 resource counters without starting or entering Android."""
 
 import math
+import os
 import time
 
 from .android_instances import valid_id
@@ -30,6 +31,11 @@ def sample(runner, rows):
         except (OSError, RuntimeError, TimeoutError, ValueError, IndexError, StopIteration):
             continue
     return result
+
+
+def total_memory():
+    """The computer's memory in bytes (the same kernel inside Flatpak)."""
+    return os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES")
 
 
 def cpu_percent(previous, current):

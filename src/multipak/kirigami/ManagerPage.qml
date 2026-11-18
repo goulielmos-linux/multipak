@@ -273,7 +273,7 @@ Kirigami.ScrollablePage {
                                     readonly property bool running: modelData.running === true
                                     visible: manager.mode === "services"
                                     enabled: !manager.working && modelData.supported === true
-                                    icon.source: BreezeIcons.source(running ? "material-stop" : "material-play-arrow", Kirigami.Theme.backgroundColor)
+                                    icon.source: BreezeIcons.source(running ? "media-playback-stop" : "media-playback-start", Kirigami.Theme.backgroundColor)
                                     text: running ? qsTr("Stop %1").arg(modelData.title) : qsTr("Start %1").arg(modelData.title)
                                     display: Controls.AbstractButton.IconOnly
                                     onClicked: manager.controlServiceRow(index, running ? "stop" : "start")
@@ -285,7 +285,7 @@ Kirigami.ScrollablePage {
                                     objectName: "managerRowLogButton" + index
                                     visible: manager.mode === "services"
                                     enabled: !manager.working && modelData.supported === true
-                                    icon.source: BreezeIcons.source("material-description", Kirigami.Theme.backgroundColor)
+                                    icon.source: BreezeIcons.source("view-list-text", Kirigami.Theme.backgroundColor)
                                     text: qsTr("Show the log of %1").arg(modelData.title)
                                     display: Controls.AbstractButton.IconOnly
                                     onClicked: manager.showServiceLogRow(index)
@@ -297,7 +297,7 @@ Kirigami.ScrollablePage {
                                     objectName: "managerRowRemoveButton" + index
                                     visible: manager.mode === "remove"
                                     enabled: !manager.working && modelData.removable === true
-                                    icon.source: BreezeIcons.source("material-delete", Kirigami.Theme.backgroundColor)
+                                    icon.source: BreezeIcons.source("trash-empty", Kirigami.Theme.backgroundColor)
                                     text: qsTr("Uninstall %1").arg(modelData.title)
                                     display: Controls.AbstractButton.IconOnly
                                     onClicked: manager.removeRow(index)
@@ -309,7 +309,7 @@ Kirigami.ScrollablePage {
                                     objectName: "managerRowUpdateButton" + index
                                     visible: manager.mode === "update" && modelData.updatable === true
                                     enabled: !manager.working
-                                    icon.source: BreezeIcons.source("material-update", Kirigami.Theme.backgroundColor)
+                                    icon.source: BreezeIcons.source("system-software-update", Kirigami.Theme.backgroundColor)
                                     text: qsTr("Update %1").arg(modelData.title)
                                     display: Controls.AbstractButton.IconOnly
                                     onClicked: manager.updateRow(index)
@@ -325,10 +325,18 @@ Kirigami.ScrollablePage {
         }
 
         RowLayout {
+            id: updateTools
             objectName: "managerUpdateTools"
-            visible: page.listed && (manager.mode === "update" || manager.rows.length > 0)
+            visible: page.listed
+                && (manager.mode === "update" || manager.rows.length > 0 || manager.logs.length > 0)
             spacing: Kirigami.Units.smallSpacing
             Layout.fillWidth: true
+            Controls.ToolButton {
+                objectName: "managerDetailsButton"
+                visible: manager.logs.length > 0
+                text: details.visible ? qsTr("Hide details") : qsTr("Show details")
+                onClicked: details.expanded = !details.expanded
+            }
             Controls.BusyIndicator {
                 visible: manager.checkingUpdates
                 running: visible
@@ -345,7 +353,7 @@ Kirigami.ScrollablePage {
                 objectName: "managerRefreshButton"
                 visible: manager.mode !== "update"
                 text: qsTr("Reload list")
-                icon.source: BreezeIcons.source("material-refresh", Kirigami.Theme.backgroundColor)
+                icon.source: BreezeIcons.source("view-refresh", Kirigami.Theme.backgroundColor)
                 enabled: !manager.working
                 onClicked: manager.refresh()
             }
@@ -353,7 +361,7 @@ Kirigami.ScrollablePage {
                 objectName: "managerCheckUpdatesButton"
                 visible: manager.mode === "update"
                 text: qsTr("Check for updates")
-                icon.source: BreezeIcons.source("material-refresh", Kirigami.Theme.backgroundColor)
+                icon.source: BreezeIcons.source("view-refresh", Kirigami.Theme.backgroundColor)
                 enabled: !manager.working
                 onClicked: manager.refresh()
             }
@@ -361,7 +369,7 @@ Kirigami.ScrollablePage {
                 objectName: "managerUpdateAllButton"
                 visible: manager.mode === "update"
                 text: qsTr("Update all")
-                icon.source: BreezeIcons.source("material-update", Kirigami.Theme.backgroundColor)
+                icon.source: BreezeIcons.source("system-software-update", Kirigami.Theme.backgroundColor)
                 enabled: manager.canUpdateAll
                 highlighted: true
                 onClicked: manager.updateAll()
@@ -424,9 +432,10 @@ Kirigami.ScrollablePage {
             Layout.fillWidth: true
         }
 
+        // Only where the button row above is hidden (Install and Commands).
         Controls.ToolButton {
-            objectName: "managerDetailsButton"
-            visible: manager.logs.length > 0
+            objectName: "managerDetailsButtonBelow"
+            visible: manager.logs.length > 0 && !updateTools.visible
             text: details.visible ? qsTr("Hide details") : qsTr("Show details")
             onClicked: details.expanded = !details.expanded
         }
@@ -437,6 +446,9 @@ Kirigami.ScrollablePage {
             logObjectName: "managerLog"
             text: manager.logs
             property bool expanded: false
+            // The same page serves every section: each one opens with the details closed.
+            readonly property string section: manager.mode
+            onSectionChanged: expanded = false
             visible: expanded && manager.logs.length > 0
             Layout.fillWidth: true
             Layout.preferredHeight: Kirigami.Units.gridUnit * 8

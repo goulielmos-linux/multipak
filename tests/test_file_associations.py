@@ -60,6 +60,20 @@ def test_selection_registers_all_formats_and_keeps_other_associations(settings):
     assert {m.attrib["value"] for m in mime.findall(".//{*}match")} >= {"AI\\001", "AI\\002"}
 
 
+def test_a_linked_mimeapps_list_stays_a_link(settings, tmp_path):
+    # Dotfiles managers (stow, chezmoi) keep the file elsewhere and link it.
+    dotfiles = tmp_path / "dotfiles/mimeapps.list"
+    dotfiles.parent.mkdir()
+    dotfiles.write_text("[Default Applications]\napplication/pdf=viewer.desktop;\n")
+    settings.path.parent.mkdir(parents=True)
+    settings.path.symlink_to(dotfiles)
+    settings.apply(selection())
+    assert settings.path.is_symlink()
+    config = read_config(dotfiles)
+    assert config["Default Applications"]["application/pdf"] == "viewer.desktop;"
+    assert any(value == DESKTOP_ID + ";" for value in config["Default Applications"].values())
+
+
 def test_deselect_restores_prior_handler_and_removes_only_our_association(settings):
     settings.path.parent.mkdir(parents=True)
     settings.path.write_text(

@@ -66,14 +66,46 @@ class Platform:
         self.keyboard = value
 
 
-def test_keyboard_defaults_off_once_then_respects_container_changes(inputs, tmp_path):
+def test_keyboard_follows_the_container_menu_at_each_launch(inputs, tmp_path):
     platform = Platform()
-    inputs.initialize_keyboard(platform)
-    assert platform.keyboard == "0"
-    assert json.loads((tmp_path / "input-preferences.json").read_text()) == {"keyboard": False}
-    platform.keyboard = "1"
-    inputs.initialize_keyboard(platform)
+    inputs.apply_keyboard(platform)
+    assert platform.keyboard == "0"  # Off until chosen.
+    (tmp_path / "input-preferences.json").write_text(json.dumps({"keyboard": True}))
+    inputs.apply_keyboard(platform)
     assert platform.keyboard == "1"
+    platform.keyboard = "0"  # Changed inside Android: the menu wins at the next launch.
+    inputs.apply_keyboard(platform)
+    assert platform.keyboard == "1"
+
+
+def test_the_keyboard_command_saves_and_applies_when_android_runs(
+    inputs, tmp_path, monkeypatch, capsys
+):
+    platform, calls = Platform(), []
+    manager = SimpleNamespace(
+        GetSession=lambda: {"state": "FROZEN"},
+        Unfreeze=lambda: calls.append("unfreeze"),
+        Freeze=lambda: calls.append("freeze"),
+    )
+    tools = SimpleNamespace(
+        helpers=SimpleNamespace(ipc=SimpleNamespace(DBusContainerService=lambda: manager))
+    )
+    interfaces = SimpleNamespace(IPlatform=SimpleNamespace(get_service=lambda _args: platform))
+    for name, module in {
+        "tools": tools,
+        "tools.helpers": tools.helpers,
+        "tools.helpers.ipc": tools.helpers.ipc,
+        "tools.interfaces": interfaces,
+    }.items():
+        monkeypatch.setitem(sys.modules, name, module)
+    inputs.keyboard_run(SimpleNamespace(mode="on"))
+    assert platform.keyboard == "1" and calls == ["unfreeze", "freeze"]
+    assert json.loads(capsys.readouterr().out) == {"keyboard": True}
+    manager.GetSession = lambda: {}  # Android off: saved for the next launch only.
+    inputs.keyboard_run(SimpleNamespace(mode="off"))
+    assert platform.keyboard == "1" and json.loads(capsys.readouterr().out) == {"keyboard": False}
+    inputs.keyboard_run(SimpleNamespace(mode="get"))
+    assert json.loads(capsys.readouterr().out) == {"keyboard": False}
 
 
 def test_touch_changes_preserve_other_apps_and_keyboard_is_container_wide(inputs):
@@ -84,6 +116,7 @@ def test_touch_changes_preserve_other_apps_and_keyboard_is_container_wide(inputs
         "keyboard": False,
         "navigation": False,
         "arrows": False,
+        "links_android": False,
         "touch_changed": True,
     }
     assert platform.touch == "org.other.app,org.example.game"
@@ -141,7 +174,8 @@ def test_configuration_routes_only_to_selected_instance_and_checks_result(monkey
     runner = SimpleNamespace(
         run=lambda args, **kw: (
             calls.append((args, kw))
-            or '{"touch":true,"keyboard":false,"navigation":false,"arrows":false}'
+            or '{"touch":true,"keyboard":false,"navigation":false,"arrows":false,'
+            '"links_android":false}'
         )
     )
     assert (
@@ -162,6 +196,8 @@ def test_configuration_routes_only_to_selected_instance_and_checks_result(monkey
         "--keyboard",
         "off",
     ]
+    settings.configure(runner, "androida", "org.example.game", touch=True)
+    assert "--keyboard" not in calls[-1][0]
     runner.run = lambda *_a, **_kw: '{"touch":"true","keyboard":false}'
     with pytest.raises(RuntimeError, match="confirm"):
         settings.configure(runner, "androida", "org.example.game")
@@ -282,19 +318,84 @@ def test_mapper_install_is_scoped_cached_and_preserves_preferences(inputs, tmp_p
 
     def install(path):
         paths.append(path)
-        assert path.startswith("/data/waydroid_tmp/multipak-gestures-")
-        assert path.endswith("/gestures.apk")
+        assert path.startswith("/data/waydroid_tmp/multipak-controller-")
+        assert path.endswith("/controller.apk")
         installed.append(inputs.MAPPER)
         return 0
 
     platform.installApp = install
-    inputs.initialize_keyboard(platform)
+    inputs.apply(platform, "org.example.game", True, False)
     inputs.ensure_mapper(platform, manager)
     inputs.ensure_mapper(platform, manager)
     assert len(paths) == 1
     saved = json.loads((tmp_path / "input-preferences.json").read_text())
-    assert saved["keyboard"] is False and len(saved["gestures_apk_sha256"]) == 64
+    assert saved["keyboard"] is False and len(saved["controller_apk_sha256"]) == 64
     assert not list((tmp_path / "exchange/apks").iterdir())
+
+
+def test_a_container_with_the_old_app_moves_to_the_controller(inputs, tmp_path):
+    installed = ["org.example.game", inputs.OLD_MAPPER]
+    platform = Platform()
+    platform.secure = {
+        "multipak_arrow_packages": "org.example.game",
+        "enabled_accessibility_services": "org.other/.Reader:"
+        + inputs.OLD_MAPPER
+        + "/.ArrowService",
+        "accessibility_enabled": "1",
+    }
+    platform.installApp = lambda path: installed.append(inputs.MAPPER) or 0
+    manager = SimpleNamespace(
+        ListPackages=lambda: list(installed),
+        RemoveOldHelper=lambda: installed.remove(inputs.OLD_MAPPER),
+    )
+    (tmp_path / "input-preferences.json").write_text(json.dumps({"gestures_apk_sha256": "old"}))
+    assert inputs.ensure_mapper(platform, manager)
+    assert installed == ["org.example.game", inputs.MAPPER]
+    assert (
+        platform.secure["enabled_accessibility_services"] == "org.other/.Reader:" + inputs.SERVICE
+    )
+    assert platform.secure["multipak_arrow_packages"] == "org.example.game"
+    assert inputs.read(platform, "org.example.game")["arrows"]
+    saved = json.loads((tmp_path / "input-preferences.json").read_text())
+    assert "gestures_apk_sha256" not in saved and len(saved["controller_apk_sha256"]) == 64
+    assert not inputs.ensure_mapper(platform, manager)
+
+
+def test_a_new_app_listed_a_moment_later_is_installed(inputs):
+    installed, pending = [inputs.OLD_MAPPER], []
+    platform = Platform()
+    platform.installApp = lambda path: pending.append(inputs.MAPPER) or 0
+
+    def listing():
+        if pending and len(pending) < 3:
+            pending.append(None)  # Android lists the new app on the third look.
+        elif pending and inputs.MAPPER not in installed:
+            installed.append(inputs.MAPPER)
+        return list(installed)
+
+    manager = SimpleNamespace(
+        ListPackages=listing, RemoveOldHelper=lambda: installed.remove(inputs.OLD_MAPPER)
+    )
+    assert inputs.ensure_mapper(platform, manager)
+    assert installed == [inputs.MAPPER]
+
+
+def test_an_old_app_that_stays_is_tried_again_next_time(inputs):
+    installed = [inputs.OLD_MAPPER]
+    platform = Platform()
+
+    def install(path):
+        if inputs.MAPPER not in installed:  # Installing again only updates it.
+            installed.append(inputs.MAPPER)
+        return 0
+
+    platform.installApp = install
+    manager = SimpleNamespace(ListPackages=lambda: list(installed), RemoveOldHelper=lambda: None)
+    with pytest.raises(RuntimeError, match="old"):
+        inputs.ensure_mapper(platform, manager)
+    manager.RemoveOldHelper = lambda: installed.remove(inputs.OLD_MAPPER)
+    assert inputs.ensure_mapper(platform, manager)
+    assert installed == [inputs.MAPPER]
 
 
 def test_read_does_not_report_arrows_enabled_when_service_was_reset(inputs):
@@ -302,3 +403,101 @@ def test_read_does_not_report_arrows_enabled_when_service_was_reset(inputs):
     inputs.set_arrows(platform, "org.example.game", True)
     platform.secure[inputs.ACCESSIBILITY] = ""
     assert inputs.read(platform, "org.example.game")["arrows"] is False
+
+
+def test_links_in_android_keep_other_apps_and_need_confirmation(inputs):
+    platform = Platform()
+    inputs.set_links_in_android(platform, "org.example.bank", True)
+    inputs.set_links_in_android(platform, "org.other.app", True)
+    assert platform.secure[inputs.LINKS_ANDROID] == "org.example.bank,org.other.app"
+    assert inputs.read(platform, "org.example.bank")["links_android"] is True
+    inputs.set_links_in_android(platform, "org.example.bank", False)
+    assert platform.secure[inputs.LINKS_ANDROID] == "org.other.app"
+    assert inputs.read(platform, "org.example.bank")["links_android"] is False
+    with pytest.raises(ValueError):
+        inputs.set_links_in_android(platform, "not a package", True)
+    platform.settingsPutString = lambda *_: None
+    with pytest.raises(RuntimeError, match="confirm"):
+        inputs.set_links_in_android(platform, "org.example.bank", True)
+
+
+def test_apply_changes_links_in_android_only_when_asked(inputs):
+    platform = Platform()
+    platform.secure[inputs.LINKS_ANDROID] = "org.other.app"
+    inputs.apply(platform, "org.example.bank", False, True)
+    assert platform.secure[inputs.LINKS_ANDROID] == "org.other.app"
+    result = inputs.apply(platform, "org.example.bank", False, True, links_android=True)
+    assert result["links_android"] is True
+    assert platform.secure[inputs.LINKS_ANDROID] == "org.example.bank,org.other.app"
+
+
+def test_configuration_passes_links_in_android(monkeypatch):
+    calls = []
+    monkeypatch.setattr(settings, "discover", lambda _: [{"id": "androida", "label": "A"}])
+    monkeypatch.setattr(settings, "ensure_runtime", lambda _: None)
+    reply = (
+        '{"touch":false,"keyboard":false,"navigation":false,"arrows":false,"links_android":true}'
+    )
+    runner = SimpleNamespace(run=lambda args, **kw: calls.append(args) or reply)
+    result = settings.configure(
+        runner, "androida", "org.example.bank", touch=False, keyboard=False, links_android=True
+    )
+    assert result["links_android"] is True
+    assert calls[0][-2:] == ["--links-android", "on"]
+
+
+def test_media_volume_starts_at_maximum_only_once(inputs, tmp_path):
+    calls = []
+    manager = SimpleNamespace(MediaVolumeMax=lambda: calls.append(1))
+    assert inputs.initialize_volume(manager) is True
+    # Later changes made inside Android are kept: the next sessions do nothing.
+    assert inputs.initialize_volume(manager) is False
+    assert calls == [1]
+    assert json.loads((tmp_path / "input-preferences.json").read_text())["media_volume"] is True
+
+
+def test_media_volume_failure_is_retried_next_session(inputs):
+    def broken():
+        raise RuntimeError("not ready")
+
+    with pytest.raises(RuntimeError):
+        inputs.initialize_volume(SimpleNamespace(MediaVolumeMax=broken))
+    calls = []
+    assert inputs.initialize_volume(SimpleNamespace(MediaVolumeMax=lambda: calls.append(1)))
+    assert calls == [1]
+
+
+def test_the_old_app_is_removed_with_a_fixed_command():
+    source = (VENDOR / "tools/actions/container_manager.py").read_text()
+    method = source[source.index("def RemoveOldHelper") :].split("\n    @", 1)[0]
+    assert "self._authorize(sender, conn)" in method
+    assert 'self._cmd("package", "uninstall", multipak_input.OLD_MAPPER)' in method
+
+
+def test_media_volume_uses_only_fixed_commands():
+    source = (VENDOR / "tools/actions/container_manager.py").read_text()
+    method = source[source.index("def MediaVolumeMax") :].split("\n    @", 1)[0]
+    assert 'volume = ("media_session", "volume", "--stream", "3")' in method
+    assert 'for probe in (("--get",), ("--set", "999")):' in method
+    assert 'self._cmd(*volume, "--set", str(highest))' in method
+    assert "self._authorize(sender, conn)" in method
+    session = (VENDOR / "tools/services/user_manager.py").read_text()
+    assert "multipak_input.initialize_volume(tools.helpers.ipc.DBusContainerService())" in session
+
+
+def test_the_container_cannot_shut_down_the_host_filesystem():
+    # Waydroid issue 2438: LineageOS 20 sends F2FS_IOC_SHUTDOWN, which reaches a host f2fs /data.
+    rules = (VENDOR / "data/configs/waydroid.seccomp").read_text().splitlines()
+    assert rules[:2] == ["2", "blacklist"]
+    shutdown = (2 << 30) | (4 << 16) | (ord("X") << 8) | 125
+    assert shutdown == 0x8004587D
+    assert f"ioctl errno 1 [1,{0xFFFFFFFF},SCMP_CMP_MASKED_EQ,{shutdown}]" in rules
+    assert "reboot" in rules
+
+
+def test_media_volume_range_is_read_from_both_android_versions(inputs):
+    # Real answers: Android 13 --get, and the refusal Android 11 gives for a too-high index.
+    assert inputs.media_volume_max("[V] volume is 4 in range [0..15]\n") == 15
+    refused = "usage: ...\nError: invalid volume index 999 for stream 3 (should be in [0..25])\n"
+    assert inputs.media_volume_max(refused) == 25
+    assert inputs.media_volume_max("") is None

@@ -1,4 +1,4 @@
-# MultiPak 1.2.0
+# MultiPak 1.1.0
 
 [English](README.md) | **Português (Brasil)**
 
@@ -19,7 +19,8 @@ configurações do MultiPak, acesse o **Gerenciador de Aplicativos** no seu lan�
   com serviços em segundo plano incluídos.
 - **Roda AppImages**, mesmo os que precisam de bibliotecas que faltam no seu sistema.
 - **Instala aplicativos Android** em contêineres Android baseados no Waydroid,
-  gerenciados pela Integração Waydroid.
+  gerenciados pela Integração Waydroid, cujo visual foi inspirado no
+  [Kontainer](https://github.com/DenysMb/Kontainer).
 - **Sempre atualizado:** novas versões das distribuições aparecem sozinhas, sem precisar
   atualizar o MultiPak (exceto Slackware e Pisi Linux).
 - **Mostra tudo antes de instalar**: o aplicativo, o contêiner e quão seguro o MultiPak
@@ -52,22 +53,22 @@ diferencia pelo conteúdo.
 ## Capturas de tela
 
 ### Gerenciador de Aplicativos
-![Gerenciador de Aplicativos](docs/screenshots/1.2.0/application-manager.png)
+![Gerenciador de Aplicativos](docs/screenshots/1.1.0/application-manager.png)
 
 ### Assistente de Instalação
-![Assistente de Instalação](docs/screenshots/1.2.0/installation-welcome.png)
+![Assistente de Instalação](docs/screenshots/1.1.0/installation-welcome.png)
 
 ### Configurações da instalação
-![Configurações da instalação](docs/screenshots/1.2.0/installation-settings.png)
+![Configurações da instalação](docs/screenshots/1.1.0/installation-settings.png)
 
 ### Resumo da instalação
-![Resumo da instalação](docs/screenshots/1.2.0/installation-summary.png)
+![Resumo da instalação](docs/screenshots/1.1.0/installation-summary.png)
 
 ### Instalação em andamento
-![Instalação em andamento](docs/screenshots/1.2.0/installation-progress.png)
+![Instalação em andamento](docs/screenshots/1.1.0/installation-progress.png)
 
 ### Instalação concluída
-![Instalação concluída](docs/screenshots/1.2.0/installation-completed.png)
+![Instalação concluída](docs/screenshots/1.1.0/installation-completed.png)
 
 ## Instalação
 
@@ -77,7 +78,7 @@ O MultiPak é um único Flatpak, com o Assistente de Instalação e o Gerenciado
 2. Abra-o com um instalador de Flatpak, como Bazaar, Discover, GNOME Software ou Warehouse,
    e clique em **Instalar**.
 
-Ou, no terminal: `flatpak install --user multipak-1.2.0-x86_64.flatpak`
+Ou, no terminal: `flatpak install --user multipak-1.1.0-x86_64.flatpak`
 
 ## Atualizações
 

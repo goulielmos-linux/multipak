@@ -108,10 +108,28 @@ msgstr ""
 msgid "About the Application Manager — MultiPak"
 msgstr ""
 
-msgid "About the Waydroid adaptations"
+msgid "About the Waydroid changes"
 msgstr ""
 
 msgid "About the recommended environment"
+msgstr ""
+
+msgid "Accept connections from other computers on the network (address {0}, port {1})"
+msgstr ""
+
+msgid "Accept connections from other computers on the network (port {0})"
+msgstr ""
+
+msgid "Accept connections only from this computer (port {0})"
+msgstr ""
+
+msgid "Accept network connections"
+msgstr ""
+
+msgid "Access USB devices directly"
+msgstr ""
+
+msgid "Access the internet and the network"
 msgstr ""
 
 msgid "Adding Slackware's full package sets…"
@@ -183,10 +201,16 @@ msgstr ""
 msgid "Android (version not recognized by MultiPak)"
 msgstr ""
 
+msgid "Android 11: some camera apps, such as the Camera app, may not work."
+msgstr ""
+
 msgid "Android application settings — MultiPak"
 msgstr ""
 
 msgid "Android application uninstalled. Its data and the Android environment were preserved."
+msgstr ""
+
+msgid "Android applications record from this microphone. A change applies to the next recording."
 msgstr ""
 
 msgid "Android applications require a Wayland desktop session."
@@ -225,7 +249,16 @@ msgstr ""
 msgid "Android did not confirm the input preferences."
 msgstr ""
 
+msgid "Android did not confirm the keyboard preference."
+msgstr ""
+
+msgid "Android did not confirm the microphone."
+msgstr ""
+
 msgid "Android did not confirm the selected system version."
+msgstr ""
+
+msgid "Android did not confirm the webcam."
 msgstr ""
 
 msgid "Android environment creation was not confirmed."
@@ -234,10 +267,16 @@ msgstr ""
 msgid "Android environment removal was not confirmed."
 msgstr ""
 
+msgid "Android is off. Start a session to send files."
+msgstr ""
+
 msgid "Android is still starting…"
 msgstr ""
 
 msgid "Android returned an unrecognized state. Refresh to try again."
+msgstr ""
+
+msgid "Android sees only this webcam. A change applies when Android restarts."
 msgstr ""
 
 msgid "Android session stopped before it became ready: {0}"
@@ -253,6 +292,9 @@ msgid "Android — Waydroid"
 msgstr ""
 
 msgid "Android: {0}"
+msgstr ""
+
+msgid "Announce and find services on the local network"
 msgstr ""
 
 msgid "Another application uses this container. It will be kept."
@@ -312,6 +354,9 @@ msgstr ""
 msgid "Applying preferences…"
 msgstr ""
 
+msgid "Approve"
+msgstr ""
+
 msgid "Arch Linux packages (.pkg.tar, .pkg.tar.zst, .pkg.tar.xz, .pkg.tar.gz and .pkg.tar.bz2)"
 msgstr ""
 
@@ -324,7 +369,13 @@ msgstr ""
 msgid "Arguments, for example: status"
 msgstr ""
 
+msgid "Ask which app to use when a link can open in Android or on Linux"
+msgstr ""
+
 msgid "Authors"
+msgstr ""
+
+msgid "Automatic (the first webcam that works)"
 msgstr ""
 
 msgid "Automatic ARM translation setup currently supports Android 13 on x86_64."
@@ -366,6 +417,12 @@ msgstr ""
 msgid "CPU: %1    RAM: %2"
 msgstr ""
 
+msgid "Camera and microphone"
+msgstr ""
+
+msgid "Camera and microphone: %1"
+msgstr ""
+
 msgid "Cancel"
 msgstr ""
 
@@ -373,6 +430,9 @@ msgid "Cancel installation"
 msgstr ""
 
 msgid "Cancelling installation"
+msgstr ""
+
+msgid "Change the system language settings"
 msgstr ""
 
 msgid "Changes operating system files. This can cause dependency conflicts or prevent applications from working after an update."
@@ -459,13 +519,13 @@ msgstr ""
 msgid "Choose file…"
 msgstr ""
 
+msgid "Choose the files to send."
+msgstr ""
+
 msgid "Choose the language used by MultiPak."
 msgstr ""
 
 msgid "Choose which file types should open in the MultiPak Installation Wizard."
-msgstr ""
-
-msgid "Classic confinement"
 msgstr ""
 
 msgid "Classic snaps run without MultiPak's sandbox, so MultiPak does not run them as administrator."
@@ -549,6 +609,9 @@ msgstr ""
 msgid "Container name"
 msgstr ""
 
+msgid "Container not found: it was deleted or renamed. Uninstalling removes only the shortcut and MultiPak's record."
+msgstr ""
+
 msgid "Container removed. Its home folder was preserved."
 msgstr ""
 
@@ -565,6 +628,12 @@ msgid "Continue"
 msgstr ""
 
 msgid "Continue with direct installation"
+msgstr ""
+
+msgid "Control login sessions"
+msgstr ""
+
+msgid "Control other programs running on the computer"
 msgstr ""
 
 msgid "Converting the Puppy Linux package…"
@@ -660,6 +729,9 @@ msgstr ""
 msgid "Could not load the Kirigami manager."
 msgstr ""
 
+msgid "Could not load the window."
+msgstr ""
+
 msgid "Could not locate the AppImage contents."
 msgstr ""
 
@@ -667,6 +739,9 @@ msgid "Could not migrate the old MultiPak. Try again or close this window."
 msgstr ""
 
 msgid "Could not move {0} to the trash: {1}"
+msgstr ""
+
+msgid "Could not open the address: {0}"
 msgstr ""
 
 msgid "Could not open the application installer."
@@ -750,6 +825,9 @@ msgstr ""
 msgid "Could not save the update reminder."
 msgstr ""
 
+msgid "Could not send {0}."
+msgstr ""
+
 msgid "Could not start the snap's services:\n{0}"
 msgstr ""
 
@@ -763,6 +841,9 @@ msgid "Could not update file associations: {0}"
 msgstr ""
 
 msgid "Could not update file types: shared-mime-info is missing."
+msgstr ""
+
+msgid "Could not update the choice for Android app links: {0}"
 msgstr ""
 
 msgid "Could not update the old AppImage shortcuts. Try again or close this window."
@@ -801,6 +882,12 @@ msgstr ""
 msgid "Create container"
 msgstr ""
 
+msgid "Create the local socket {0} for the service {1}"
+msgstr ""
+
+msgid "Create the system user {0}"
+msgstr ""
+
 msgid "Creating the Android container…"
 msgstr ""
 
@@ -817,6 +904,9 @@ msgid "Customize the installation or choose a different method."
 msgstr ""
 
 msgid "DEB metadata exceeds the permitted limit."
+msgstr ""
+
+msgid "Decline"
 msgstr ""
 
 msgid "Decompressed metadata exceeds the limit."
@@ -895,6 +985,9 @@ msgid "Distrobox was installed using rpm-ostree. Restart your computer, then reo
 msgstr ""
 
 msgid "Distrobox was not found."
+msgstr ""
+
+msgid "Done"
 msgstr ""
 
 msgid "Downloading Android"
@@ -1017,6 +1110,9 @@ msgstr ""
 msgid "Finalizing the installation record…"
 msgstr ""
 
+msgid "Find services on the local network"
+msgstr ""
+
 msgid "Finding the libraries the application needs…"
 msgstr ""
 
@@ -1072,6 +1168,9 @@ msgid "Identification confidence:"
 msgstr ""
 
 msgid "Identification confidence: {0}.\n\n{1}"
+msgstr ""
+
+msgid "If you decline, the current version stays installed and nothing changes."
 msgstr ""
 
 msgid "Ignoring the content source {0}."
@@ -1362,10 +1461,16 @@ msgstr ""
 msgid "Invalid {0} package name, version, release or architecture."
 msgstr ""
 
+msgid "Its container was not found. Only the shortcut and MultiPak's record will be removed; if the container comes back, the application will not be listed anymore."
+msgstr ""
+
 msgid "KDE interface components."
 msgstr ""
 
 msgid "Keep container"
+msgstr ""
+
+msgid "Keep the screen from turning off"
 msgstr ""
 
 msgid "Kirigami preview"
@@ -1392,6 +1497,9 @@ msgstr ""
 msgid "Links of this kind are not opened for snaps: {0}"
 msgstr ""
 
+msgid "Linux default"
+msgstr ""
+
 msgid "List of dependencies declared by the package"
 msgstr ""
 
@@ -1413,6 +1521,12 @@ msgstr ""
 msgid "Low"
 msgstr ""
 
+msgid "Manage printers and print jobs"
+msgstr ""
+
+msgid "Manage the network connections"
+msgstr ""
+
 msgid "Manage your applications and set your preferences."
 msgstr ""
 
@@ -1420,6 +1534,9 @@ msgid "Manager"
 msgstr ""
 
 msgid "Medium"
+msgstr ""
+
+msgid "Microphone"
 msgstr ""
 
 msgid "Missing dependencies"
@@ -1500,7 +1617,7 @@ msgstr ""
 msgid "MultiPak uses a local repository for this XBPS file. Its signature was not verified. Install only packages from sources you trust."
 msgstr ""
 
-msgid "MultiPak uses an adapted version of Waydroid to create and manage separate Android containers.\n\nEach container has its own:\n• System images\n• Applications and data\n• Network\n• Desktop shortcuts\n\nThe original system Waydroid environment remains available as a separate option."
+msgid "MultiPak uses a modified version of Waydroid 1.6.3. The changes allow several separate Android containers, each with its own images, applications and data, network and shortcuts. They also integrate Android with Linux: links, notifications, media controls, volume per app, sending files and the choice of microphone and webcam.\n\nThe Waydroid installed on the system stays separate and is still offered as an option when installing."
 msgstr ""
 
 msgid "MultiPak will create it again so that {0} works again."
@@ -1518,6 +1635,9 @@ msgstr ""
 msgid "Native installation"
 msgstr ""
 
+msgid "New permissions"
+msgstr ""
+
 msgid "No Android containers yet"
 msgstr ""
 
@@ -1525,6 +1645,9 @@ msgid "No AppImage for this computer was found at this address."
 msgstr ""
 
 msgid "No applications are available to uninstall."
+msgstr ""
+
+msgid "No camera"
 msgstr ""
 
 msgid "No compatible environment is available in the catalog."
@@ -1543,6 +1666,9 @@ msgid "No installed snap has commands that MultiPak can run as administrator."
 msgstr ""
 
 msgid "No pending Distrobox installation was found. Check the system status before restarting."
+msgstr ""
+
+msgid "No program opens this address."
 msgstr ""
 
 msgid "No snaps were installed through MultiPak."
@@ -1584,7 +1710,13 @@ msgstr ""
 msgid "Nothing installed by MultiPak can be updated."
 msgstr ""
 
+msgid "Only files can be sent: {0} is a folder."
+msgstr ""
+
 msgid "Only files in the home folder can be opened: {0}"
+msgstr ""
+
+msgid "Only for addresses that another app or program also opens."
 msgstr ""
 
 msgid "Only this application will close and open again. Unsaved progress may be lost. Apply any pending changes first. The system may ask for authorization."
@@ -1597,6 +1729,15 @@ msgid "Open the MultiPak Application Manager to repair it."
 msgstr ""
 
 msgid "Open the package without --page or --screenshot; these options are for previews only."
+msgstr ""
+
+msgid "Open this address with:"
+msgstr ""
+
+msgid "Open this application's links in Android"
+msgstr ""
+
+msgid "Open with — MultiPak"
 msgstr ""
 
 msgid "Opening Android…"
@@ -1632,10 +1773,13 @@ msgstr ""
 msgid "Packages added: {0}"
 msgstr ""
 
-msgid "Personal files"
+msgid "Pisi Linux packages (.pisi)"
 msgstr ""
 
-msgid "Pisi Linux packages (.pisi)"
+msgid "Play and record sound"
+msgstr ""
+
+msgid "Play sound"
 msgstr ""
 
 msgid "Preferences applied."
@@ -1734,7 +1878,28 @@ msgstr ""
 msgid "Python module {0}"
 msgstr ""
 
-msgid "Read access"
+msgid "Read and change files on USB drives and other disks"
+msgstr ""
+
+msgid "Read and change the files in your home folder"
+msgstr ""
+
+msgid "Read and store passwords in your keyring"
+msgstr ""
+
+msgid "Read information about the computer's hardware"
+msgstr ""
+
+msgid "Read your GnuPG keys"
+msgstr ""
+
+msgid "Read your SSH keys"
+msgstr ""
+
+msgid "Read your public SSH keys"
+msgstr ""
+
+msgid "Read {0}"
 msgstr ""
 
 msgid "Read-only system files"
@@ -1744,6 +1909,9 @@ msgid "Reads RPM packages."
 msgstr ""
 
 msgid "Ready to install"
+msgstr ""
+
+msgid "Record sound from the microphone"
 msgstr ""
 
 msgid "Refresh"
@@ -1770,13 +1938,13 @@ msgstr ""
 msgid "Remove Android container?"
 msgstr ""
 
+msgid "Remove container"
+msgstr ""
+
 msgid "Remove container?"
 msgstr ""
 
 msgid "Remove the old MultiPak"
-msgstr ""
-
-msgid "Remove…"
 msgstr ""
 
 msgid "Removing container {0}…"
@@ -1809,6 +1977,15 @@ msgstr ""
 msgid "Repairing {0}…"
 msgstr ""
 
+msgid "Replace {0} with a link to {1} inside the app"
+msgstr ""
+
+msgid "Replace {0} with an empty temporary folder inside the app"
+msgstr ""
+
+msgid "Replace {0} with {1} inside the app"
+msgstr ""
+
 msgid "Requesting a system restart…"
 msgstr ""
 
@@ -1824,7 +2001,10 @@ msgstr ""
 msgid "Resolving dependencies and installing the application…"
 msgstr ""
 
-msgid "Resource usage for the entire Android container. CPU at 100% means one fully occupied core."
+msgid "Restart Android"
+msgstr ""
+
+msgid "Restart container"
 msgstr ""
 
 msgid "Restart later"
@@ -1848,6 +2028,9 @@ msgstr ""
 msgid "Restart your computer to complete the uninstallation."
 msgstr ""
 
+msgid "Restarting Android…"
+msgstr ""
+
 msgid "Restoring the container name…"
 msgstr ""
 
@@ -1863,6 +2046,9 @@ msgstr ""
 msgid "Run MultiPak as a regular user."
 msgstr ""
 
+msgid "Run a web browser engine"
+msgstr ""
+
 msgid "Run as a regular user with rootless Podman."
 msgstr ""
 
@@ -1870,6 +2056,9 @@ msgid "Run as administrator"
 msgstr ""
 
 msgid "Run as administrator?"
+msgstr ""
+
+msgid "Run without confinement (classic), with full access to the system"
 msgstr ""
 
 msgid "Running"
@@ -1914,6 +2103,15 @@ msgstr ""
 msgid "Security update required"
 msgstr ""
 
+msgid "See the mounted disks and folders"
+msgstr ""
+
+msgid "See the network settings and connections"
+msgstr ""
+
+msgid "See the programs running on the computer"
+msgstr ""
+
 msgid "See which"
 msgstr ""
 
@@ -1956,7 +2154,25 @@ msgstr ""
 msgid "Selected base image"
 msgstr ""
 
+msgid "Send files"
+msgstr ""
+
+msgid "Send files to %1"
+msgstr ""
+
+msgid "Sending to %1"
+msgstr ""
+
+msgid "Sending {0}."
+msgstr ""
+
+msgid "Sending…"
+msgstr ""
+
 msgid "Services missing on this system"
+msgstr ""
+
+msgid "Shortcut and record removed."
 msgstr ""
 
 msgid "Shortcuts created: {0}"
@@ -1972,6 +2188,15 @@ msgid "Show the log of %1"
 msgstr ""
 
 msgid "Show the virtual keyboard"
+msgstr ""
+
+msgid "Show windows and read the X11 session"
+msgstr ""
+
+msgid "Show windows in a Wayland session"
+msgstr ""
+
+msgid "Shut down or restart the computer"
 msgstr ""
 
 msgid "Since MultiPak could not determine whether the package was built for Fedora or another RPM-based distribution, it will use the latest Fedora release ({0}) as the default environment. If the application does not work, reinstall it from the advanced settings and choose another release or distribution."
@@ -2022,9 +2247,6 @@ msgstr ""
 msgid "Snap update cancelled."
 msgstr ""
 
-msgid "Snap update permissions"
-msgstr ""
-
 msgid "Snap with classic confinement"
 msgstr ""
 
@@ -2047,6 +2269,15 @@ msgid "Start"
 msgstr ""
 
 msgid "Start %1"
+msgstr ""
+
+msgid "Start a background service: {0}"
+msgstr ""
+
+msgid "Start at login"
+msgstr ""
+
+msgid "Start the service {0} automatically on a schedule ({1})"
 msgstr ""
 
 msgid "Started after installation and when you ask."
@@ -2104,9 +2335,6 @@ msgid "Suspended"
 msgstr ""
 
 msgid "System authorization requires PolicyKit (pkexec)."
-msgstr ""
-
-msgid "System files"
 msgstr ""
 
 msgid "System language"
@@ -2589,6 +2817,9 @@ msgstr ""
 msgid "The managed copy and shortcuts for this installation were removed. The original file and your personal data were preserved."
 msgstr ""
 
+msgid "The microphones could not be listed."
+msgstr ""
+
 msgid "The name cannot start with a dot (.), hyphen (-) or underscore (_)."
 msgstr ""
 
@@ -2611,6 +2842,12 @@ msgid "The new image still exists; cleanup is incomplete."
 msgstr ""
 
 msgid "The new revision does not provide the installed component {0}."
+msgstr ""
+
+msgid "The new version of {0} needs 1 new permission:"
+msgstr ""
+
+msgid "The new version of {0} needs {1} new permissions:"
 msgstr ""
 
 msgid "The new version requires new dependencies."
@@ -2940,6 +3177,15 @@ msgstr ""
 msgid "This AppImage installation is unavailable."
 msgstr ""
 
+msgid "This address cannot be opened."
+msgstr ""
+
+msgid "This application accepts connections from other computers on the network (address {0}, port {1})."
+msgstr ""
+
+msgid "This application accepts connections from other computers on the network (port {0})."
+msgstr ""
+
 msgid "This application has no compatible Android architecture."
 msgstr ""
 
@@ -2989,6 +3235,9 @@ msgid "This application requires an ARM translation layer. Reopen the package an
 msgstr ""
 
 msgid "This application requires {0} or later, and MultiPak can only create up to {1}. Therefore, it cannot be installed."
+msgstr ""
+
+msgid "This application's container is available again."
 msgstr ""
 
 msgid "This application's container was replaced."
@@ -3237,9 +3486,6 @@ msgstr ""
 msgid "Update container"
 msgstr ""
 
-msgid "Update container…"
-msgstr ""
-
 msgid "Update required"
 msgstr ""
 
@@ -3282,6 +3528,9 @@ msgstr ""
 msgid "Updating {0}… Please wait."
 msgstr ""
 
+msgid "Use Bluetooth devices"
+msgstr ""
+
 msgid "Use MultiPak's recommendation (%1)"
 msgstr ""
 
@@ -3291,19 +3540,49 @@ msgstr ""
 msgid "Use arrow keys as swipe gestures"
 msgstr ""
 
+msgid "Use files shared by another snap"
+msgstr ""
+
+msgid "Use game controllers"
+msgstr ""
+
 msgid "Use only as a last resort."
+msgstr ""
+
+msgid "Use security keys"
+msgstr ""
+
+msgid "Use serial ports"
 msgstr ""
 
 msgid "Use system management for rpm-ostree operations."
 msgstr ""
 
+msgid "Use the D-Bus name {0} in your session"
+msgstr ""
+
+msgid "Use the camera"
+msgstr ""
+
 msgid "Use the default MultiPak container"
+msgstr ""
+
+msgid "Use the desktop of an X11 session"
+msgstr ""
+
+msgid "Use the desktop: fonts, themes and notifications"
+msgstr ""
+
+msgid "Use the graphics card"
 msgstr ""
 
 msgid "Use the mouse as touch input"
 msgstr ""
 
 msgid "Use the standard MultiPak container"
+msgstr ""
+
+msgid "Use the {0} interface"
 msgstr ""
 
 msgid "Used by RPM for package scripts."
@@ -3384,10 +3663,10 @@ msgstr ""
 msgid "Waiting for the current step to finish before cleaning up…"
 msgstr ""
 
-msgid "Waydroid (adapted)"
+msgid "Waydroid (existing environment)"
 msgstr ""
 
-msgid "Waydroid (existing environment)"
+msgid "Waydroid (modified)"
 msgstr ""
 
 msgid "Waydroid could not complete the operation: {0}"
@@ -3408,6 +3687,9 @@ msgstr ""
 msgid "Waydroid returned an invalid application identifier."
 msgstr ""
 
+msgid "Webcam"
+msgstr ""
+
 msgid "Welcome"
 msgstr ""
 
@@ -3417,7 +3699,7 @@ msgstr ""
 msgid "With updates"
 msgstr ""
 
-msgid "Write access"
+msgid "Write to {0}"
 msgstr ""
 
 msgid "XBPS package metadata exceeds the read limit."
@@ -3528,6 +3810,9 @@ msgstr ""
 msgid "the configuration is too large"
 msgstr ""
 
+msgid "the files"
+msgstr ""
+
 msgid "the snap's services cannot be managed from here"
 msgstr ""
 
@@ -3541,6 +3826,12 @@ msgid "unset which option?"
 msgstr ""
 
 msgid "{0:.1f} MB downloaded"
+msgstr ""
+
+msgid "{0} (disconnected)"
+msgstr ""
+
+msgid "{0} ({1})"
 msgstr ""
 
 msgid "{0} can have problems and change often."
@@ -3570,9 +3861,6 @@ msgstr ""
 msgid "{0} package metadata exceeds the read limit."
 msgstr ""
 
-msgid "{0} requests new permissions:"
-msgstr ""
-
 msgid "{0} returned to version {1} (revision {2})."
 msgstr ""
 
@@ -3588,7 +3876,7 @@ msgstr ""
 msgid "{0} will be installed the next time you start your computer."
 msgstr ""
 
-msgid "{0} · {1}: {2}"
+msgid "{0} — does not work in this Android (it needs {1})"
 msgstr ""
 
 msgid "{0} — {1}%\n{2} MB of {3} MB · {4} {5}"

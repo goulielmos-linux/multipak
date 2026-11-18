@@ -1,6 +1,6 @@
 # Como o MultiPak instala e roda snaps
 
-*MultiPak 1.2.0.*
+*MultiPak 1.1.0.*
 
 ---
 
@@ -36,7 +36,10 @@ Pense no snap como uma caixa lacrada:
 
 ### 1.3 Snaps clássicos
 
-A maioria dos snaps roda presa à bolha descrita acima. Alguns, chamados **clássicos**,
+A maioria dos snaps roda na bolha descrita acima. A bolha dá ao programa a visão do
+sistema que ele espera; ela **não é uma barreira de segurança**: o programa continua
+vendo sua pasta pessoal, seus dispositivos e sua sessão do desktop, como diz o README.
+Instale só snaps de fontes em que você confia. Alguns, chamados **clássicos**,
 são publicados para rodar **sem isolamento**, como um programa instalado normalmente:
 enxergam o sistema inteiro. É o caso de editores de código e ferramentas de
 desenvolvimento (VS Code, IntelliJ, `go`, `node`), que precisam usar os compiladores e
@@ -90,6 +93,11 @@ ele mantém os serviços no ar enquanto baixa e prepara tudo e só os para por a
 segundos na troca. Se a versão nova falhar ao se configurar, ele **volta sozinho**
 para a anterior. Também dá para pedir "Voltar à versão anterior", em **Gerenciador →
 Atualizar**, com o snap selecionado.
+
+Se a versão nova pedir algo que a instalada não tinha (um serviço em segundo plano, uma
+porta de rede, acesso a mais arquivos…), o MultiPak mostra cada nova autorização em
+linguagem simples antes de atualizar e espera **Aprovar** ou **Recusar**. Recusar (ou
+fechar a janela) deixa a versão atual instalada, do jeito que estava.
 
 ### 1.7 É uma "camada de tradução"?
 
@@ -290,21 +298,70 @@ abriu aquela bolha, enquanto ela existir, e cada bolha tem o seu canal
   `~/.config/autostart/multipak-snap-<id>-services.desktop` roda
   `multipak-snap --services login <id>` quando a sessão começa, iniciando todos os
   serviços habilitados (os já ativos são pulados).
+- **Nomes no D-Bus de sessão:** para um serviço de usuário com `daemon: dbus` (seu
+  `bus-name`, ou o `name` de um slot `dbus` de sessão), a camada de compatibilidade
+  grava `~/.local/share/dbus-1/services/<nome>.service`, marcado com o ID do snap, para
+  que pedir o nome ao barramento inicie o serviço, como o `activates-on` do snapd. Essa
+  pasta tem prioridade sobre a do sistema, então um nome só é gravado se ninguém mais o
+  tiver: nenhum arquivo de outro programa na pasta, nenhum nome que o barramento de
+  sessão já conheça (`ListNames`: de um programa rodando; `ListActivatableNames`: num
+  arquivo de serviço do sistema ou de outro programa) e nada sob `org.freedesktop.`
+  (portais, segredos, notificações…). Um nome recusado aparece no log e o barramento
+  não inicia aquele serviço. O arquivo do próprio snap, gravado antes, é mantido nas
+  atualizações. O snapd exige revisão da Store para um slot `dbus`; um `.snap` local
+  não passa por nenhuma, então sem essas checagens ele poderia tomar o nome de um
+  serviço do desktop.
 - Linha de comando: `multipak-snap --services list|start|stop|restart <id> [serviço…]`.
 
 ### 2.7 Atualização e reversão (`snap_refresh.py`)
 
 1. Baixa e extrai a revisão nova num diretório de preparo (`.refresh`), com bases e
    conteúdo novos, **com os serviços no ar**.
-2. Roda `pre-refresh` da revisão antiga. Se ele recusar, nada muda e os serviços não
+2. Compara o `snap.yaml` novo com o instalado (`new_permissions`) e, se a revisão nova
+   puder fazer algo que a antiga não fazia, pede a aprovação do usuário (ver "Novas
+   autorizações" abaixo). Recusar para aqui: nada foi trocado, os serviços não chegaram
+   a parar e os arquivos baixados são apagados.
+3. Roda `pre-refresh` da revisão antiga. Se ele recusar, nada muda e os serviços não
    param.
-3. Para os serviços, espera os processos terminarem, copia `$SNAP_DATA` para a
+4. Para os serviços, espera os processos terminarem, copia `$SNAP_DATA` para a
    revisão nova e troca a revisão.
-4. Roda `post-refresh` da nova com os serviços parados (como o snapd). Se falhar,
+5. Roda `post-refresh` da nova com os serviços parados (como o snapd). Se falhar,
    **desfaz a troca** e volta à revisão anterior.
-5. Inicia os serviços. A revisão anterior fica guardada para "Voltar à versão anterior".
+6. Inicia os serviços. A revisão anterior fica guardada para "Voltar à versão anterior".
 
 Na prática, o serviço fica parado só alguns segundos.
+
+**Novas autorizações.** O snapd pergunta à Loja quais interfaces pode conectar sozinho;
+a camada de compatibilidade não tem essas declarações e conta toda interface declarada
+pelo snap como conectada. Por isso `new_permissions(old, new)` devolve, um item por
+linha, só o que é novo na revisão nova (o que a antiga já tinha fica de fora, mas um
+caminho que passa de leitura para escrita aparece):
+
+- confinamento classic;
+- serviços em segundo plano que o MultiPak vai rodar (`daemon`, inclusive
+  `daemon-scope: user`), e um `timer` num serviço que não tinha;
+- sockets (`sockets:` → `listen-stream`). Só o número da porta, ou qualquer endereço que
+  não seja de loopback, escuta em todos os endereços (`::`, com IPv4 incluído): outros
+  computadores da rede podem se conectar, e o item vem marcado como aviso.
+  `127.0.0.1:porta`, `[::1]:porta` e caminhos de socket são só locais;
+- nomes D-Bus de sessão (`bus-name`, `activates-on` e o `name` de um slot `dbus` de
+  sessão);
+- `system-usernames`;
+- entradas de `layout` (bind, bind-file, symlink e tmpfs);
+- caminhos de `system-files` e `personal-files`, com acesso de leitura ou de escrita;
+- qualquer outra interface nova, com uma descrição simples para as comuns
+  (`network`, `camera`, `home`…) e o nome para as demais.
+
+Cada item é um dict `{text, warning}`. O diálogo do Gerenciador (`snapPermissionsDialog`)
+mostra "A nova versão de <app> exige N novas autorizações:", a lista rolável (cada item
+completa essa frase, como "Iniciar um serviço em segundo plano: worker"; avisos em
+vermelho, com ícone de alerta) e os botões **Recusar** e **Aprovar**. Fechar a janela
+vale como Recusar. Na lista, uma porta aberta à rede aparece como "Aceitar conexões de
+outros computadores da rede (porta 8080)". Essas portas também aparecem na instalação de
+um snap novo, numa frase completa ("Este aplicativo aceita conexões de outros
+computadores da rede (porta 8080).", `snap_meta.network_warning`): como aviso acima
+dos alertas recolhidos na página de revisão (`Welcome.snapNetworkWarning`) e entre os
+avisos guardados com o snap instalado (`limitations`).
 
 ### 2.8 Desinstalação
 

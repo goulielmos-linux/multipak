@@ -58,8 +58,9 @@ Kirigami.ApplicationWindow {
         function onUpdateClosingRequested() { updateClosingDialog.open(); }
         function onUpdateDependenciesRequested() { updateDependenciesDialog.open(); }
         function onGroupUpdateRequested() { groupUpdateDialog.open(); }
-        function onSnapPermissionsRequested(message) {
-            snapPermissionsDialog.message = message;
+        function onSnapPermissionsRequested(heading, permissions) {
+            snapPermissionsDialog.heading = heading;
+            snapPermissionsDialog.permissions = permissions;
             snapPermissionsDialog.open();
         }
         function onContainerRemovalRequested() { containerRemovalDialog.open(); }
@@ -418,39 +419,86 @@ Kirigami.ApplicationWindow {
     InformationWindow {
         id: snapPermissionsDialog
         objectName: "snapPermissionsDialog"
-        property string message: ""
+        // One {text, warning} per new permission; warning: other computers can connect.
+        property string heading: ""
+        property var permissions: []
         property bool proceeding: false
         transientParent: root
-        title: qsTr("Snap update permissions")
+        title: qsTr("New permissions")
         onShown: {
             proceeding = false;
-            cancelSnapPermissionsButton.forceActiveFocus();
+            declineSnapPermissionsButton.forceActiveFocus();
         }
+        // Closing the window declines, as the Decline button does.
         onClosing: if (!proceeding) manager.answerSnapPermissions(false)
+        Controls.Label {
+            objectName: "snapPermissionsHeading"
+            text: snapPermissionsDialog.heading
+            textFormat: Text.PlainText
+            wrapMode: Text.Wrap
+            font.bold: true
+            Layout.fillWidth: true
+        }
         Controls.ScrollView {
+            id: snapPermissionsScroll
             contentWidth: availableWidth
             Layout.fillWidth: true
-            Layout.preferredHeight: Math.min(newSnapPermissions.implicitHeight,
+            Layout.preferredHeight: Math.min(snapPermissionsList.implicitHeight,
                                             Kirigami.Units.gridUnit * 14)
-            Controls.Label {
-                id: newSnapPermissions
-                width: parent.width
-                text: snapPermissionsDialog.message
-                textFormat: Text.PlainText
-                wrapMode: Text.Wrap
+            ColumnLayout {
+                id: snapPermissionsList
+                width: snapPermissionsScroll.availableWidth
+                spacing: Kirigami.Units.smallSpacing
+                Repeater {
+                    objectName: "snapPermissionsRepeater"
+                    model: snapPermissionsDialog.permissions
+                    delegate: RowLayout {
+                        id: permissionRow
+                        required property var modelData
+                        Layout.fillWidth: true
+                        spacing: Kirigami.Units.smallSpacing
+                        Kirigami.Icon {
+                            source: BreezeIcons.source(
+                                permissionRow.modelData.warning ? "dialog-warning"
+                                                                : "dialog-information",
+                                Kirigami.Theme.backgroundColor)
+                            Accessible.ignored: true
+                            Layout.preferredWidth: Kirigami.Units.iconSizes.small
+                            Layout.preferredHeight: Kirigami.Units.iconSizes.small
+                            Layout.alignment: Qt.AlignTop
+                        }
+                        Controls.Label {
+                            text: permissionRow.modelData.text
+                            textFormat: Text.PlainText
+                            wrapMode: Text.Wrap
+                            color: permissionRow.modelData.warning ? Kirigami.Theme.negativeTextColor
+                                                     : palette.windowText
+                            Layout.fillWidth: true
+                        }
+                    }
+                }
             }
+        }
+        Controls.Label {
+            text: qsTr("If you decline, the current version stays installed and nothing changes.")
+            textFormat: Text.PlainText
+            wrapMode: Text.Wrap
+            opacity: 0.8
+            Layout.fillWidth: true
         }
         footer: Controls.ToolBar {
             padding: Kirigami.Units.largeSpacing * 2
             contentItem: RowLayout {
                 Item { Layout.fillWidth: true }
                 Controls.Button {
-                    id: cancelSnapPermissionsButton
-                    text: qsTr("Cancel")
+                    id: declineSnapPermissionsButton
+                    objectName: "declineSnapPermissionsButton"
+                    text: qsTr("Decline")
                     onClicked: snapPermissionsDialog.close()
                 }
                 Controls.Button {
-                    text: qsTr("Update")
+                    objectName: "approveSnapPermissionsButton"
+                    text: qsTr("Approve")
                     highlighted: true
                     onClicked: {
                         snapPermissionsDialog.proceeding = true;

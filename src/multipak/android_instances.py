@@ -12,7 +12,7 @@ from . import host
 from .android import Waydroid
 from .android_progress import AndroidProgress, AndroidStartupOutput
 from .localization import tr
-from .process import Cancelled
+from .process import Cancelled, CommandError
 
 CLI = "/usr/local/bin/multipak-waydroid"
 BASE = Path("/var/lib/multipak-waydroid/instances")
@@ -53,6 +53,195 @@ def discover(runner):
     return sorted(result, key=lambda e: (e["release"], e["label"].casefold()), reverse=True)
 
 
+def keep_ready_path(instance_id):
+    home = Path(os.environ.get("HOME") or Path.home())
+    return home / ".config/autostart" / f"multipak-android-{instance_id}-ready.desktop"
+
+
+def send_files(runner, instance_id, paths, progress=lambda done, total, name: None):
+    """Send files to one environment's Download folder; progress(done, total, name) follows
+    each file. Errors come as codes from the command and are translated here."""
+    if not paths:
+        raise ValueError(tr("Choose the files to send."))
+    state = {"buffer": "", "name": "", "error": None}
+
+    def output(text):
+        state["buffer"] += text
+        *lines, state["buffer"] = state["buffer"].split("\n")
+        for line in lines:
+            kind, _, rest = line.strip().partition(" ")
+            if kind == "START":
+                total, _, state["name"] = rest.partition(" ")
+                progress(0, int(total), state["name"])
+            elif kind == "PROGRESS":
+                done, _, total = rest.partition(" ")
+                progress(int(done), int(total), state["name"])
+            elif kind == "ERROR" and state["error"] is None:
+                state["error"] = rest.partition(" ")
+
+    argv = InstanceWaydroid(runner, instance_id).argv("send", "--progress", "--", *paths)
+    try:
+        runner.run(argv, timeout=7 * 24 * 3600, on_output=output)
+    except CommandError as error:
+        code, _, name = state["error"] or ("failed", "", state["name"])
+        if code == "off":
+            raise RuntimeError(tr("Android is off. Start a session to send files.")) from error
+        if code == "folder":
+            message = tr("Only files can be sent: {0} is a folder.").format(name)
+            raise RuntimeError(message) from error
+        raise RuntimeError(tr("Could not send {0}.").format(name or tr("the files"))) from error
+
+
+def microphone(runner, instance_id, *choice):
+    """The Linux microphone one environment records from: the options and which one is
+    chosen. With a name ("" for the Linux default), choose it first."""
+    environment = InstanceWaydroid(runner, instance_id)
+    arguments = ("set", *filter(None, choice)) if choice else ("list",)
+    output = environment.command("microphone", *arguments, timeout=30)
+    try:
+        answer = json.loads(output.strip().splitlines()[-1])
+        chosen, listed = answer["microphone"], answer["sources"]
+        options = [{"name": "", "label": tr("Linux default")}]
+        options += [{"name": item["name"], "label": item["description"]} for item in listed]
+        if any(not isinstance(value, str) for row in options for value in row.values()):
+            raise ValueError
+        if not isinstance(chosen, str):
+            raise ValueError
+    except (ValueError, TypeError, KeyError, IndexError) as error:
+        raise RuntimeError(tr("Android did not confirm the microphone.")) from error
+    if chosen not in [row["name"] for row in options]:
+        # Kept: it may only be unplugged, and Linux uses its default meanwhile.
+        options.append({"name": chosen, "label": tr("{0} (disconnected)").format(chosen)})
+    return {
+        "options": options,
+        "index": [row["name"] for row in options].index(chosen),
+        "listed": answer.get("listed") is not False,
+    }
+
+
+def camera(runner, instance_id, *choice):
+    """The Linux webcam one environment sees from its next start: the options, which one
+    is chosen and a note on this Android's limits. With an id, choose it first."""
+    environment = InstanceWaydroid(runner, instance_id)
+    output = environment.command("camera", *(("set", *choice) if choice else ("list",)), timeout=30)
+    try:
+        answer = json.loads(output.strip().splitlines()[-1])
+        chosen, release = answer["camera"], answer["release"]
+        needed = {"20.0": "MJPEG", "18.1": "YUYV"}[release]
+        options = [
+            {
+                "name": "auto",
+                "label": tr("Automatic (the first webcam that works)"),
+                "enabled": True,
+            },
+            {"name": "none", "label": tr("No camera"), "enabled": True},
+        ]
+        for item in answer["cameras"]:
+            if not all(
+                isinstance(value, str) for value in (item["id"], item["name"], *item["formats"])
+            ):
+                raise ValueError
+            # Only the formats an Android reads; a test driver may offer dozens.
+            formats = ", ".join(
+                shown
+                for code, shown in (("MJPG", "MJPEG"), ("YUYV", "YUYV"))
+                if code in item["formats"]
+            )
+            label = (
+                f"{item['name']} — {formats}"
+                if item["compatible"] is True
+                else tr("{0} — does not work in this Android (it needs {1})").format(
+                    item["name"], needed
+                )
+            )
+            options.append(
+                {"name": item["id"], "label": label, "enabled": item["compatible"] is True}
+            )
+        if not isinstance(chosen, str) or any(
+            not isinstance(row["name"], str) or not isinstance(row["label"], str) for row in options
+        ):
+            raise ValueError
+    except (ValueError, TypeError, KeyError, IndexError, AttributeError) as error:
+        raise RuntimeError(tr("Android did not confirm the webcam.")) from error
+    if chosen not in [row["name"] for row in options]:
+        # Kept: it may only be unplugged; Android then starts without a camera.
+        shown = chosen.removeprefix("name:").rsplit("/", 1)[-1]
+        options.append(
+            {"name": chosen, "label": tr("{0} (disconnected)").format(shown), "enabled": True}
+        )
+    note = (
+        tr("Android 11: some camera apps, such as the Camera app, may not work.")
+        if release == "18.1"
+        else ""
+    )
+    return {
+        "options": options,
+        "index": [row["name"] for row in options].index(chosen),
+        "note": note,
+    }
+
+
+def keyboard_wanted(instance_id):
+    """The container's virtual keyboard choice, saved by the Android runtime; off by default."""
+    home = Path(os.environ.get("HOME") or Path.home())
+    path = home / ".local/share/multipak/android-instances" / instance_id / "input-preferences.json"
+    try:
+        return json.loads(path.read_text()).get("keyboard") is True
+    except (OSError, ValueError, AttributeError):
+        return False
+
+
+def set_keyboard(runner, instance_id, enabled):
+    """Show or hide the virtual keyboard in one container; applied at once when it runs."""
+    output = InstanceWaydroid(runner, instance_id).command("keyboard", "on" if enabled else "off")
+    try:
+        if json.loads(output.strip().splitlines()[-1])["keyboard"] is not bool(enabled):
+            raise ValueError
+    except (ValueError, TypeError, KeyError, IndexError) as error:
+        raise RuntimeError(tr("Android did not confirm the keyboard preference.")) from error
+
+
+def set_keep_ready(instance_id, enabled, label=""):
+    """Start the Android session in the background whenever the desktop starts.
+
+    The root service already starts with the computer; Android freezes itself while
+    idle, so opening an application only thaws it. Uses the Manager's session unit."""
+    if not valid_id(instance_id):
+        raise ValueError(tr("Invalid Android environment ID."))
+    path = keep_ready_path(instance_id)
+    if not enabled:
+        path.unlink(missing_ok=True)
+        return
+    from .desktop import quote_exec
+
+    command = [
+        "systemd-run",
+        "--user",
+        "--collect",
+        f"--unit=multipak-android-session-{instance_id}",
+        "--service-type=exec",
+        # No value: systemd-run copies the variable from the desktop's environment.
+        "--setenv=WAYLAND_DISPLAY",
+        "--",
+        CLI,
+        "--instance",
+        instance_id,
+        "session",
+        "start",
+    ]
+    name = re.sub(r"[\x00-\x1f\x7f]", "", label) or instance_id
+    text = (
+        "[Desktop Entry]\nType=Application\n"
+        f"Name=MultiPak Android: {name}\n"
+        f"Exec={' '.join(quote_exec(word) for word in command)}\n"
+        "NoDisplay=true\nX-GNOME-Autostart-enabled=true\n"
+    )
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name("." + path.name + ".tmp")
+    temporary.write_text(text, encoding="utf-8")
+    temporary.replace(path)
+
+
 def discover_with_status(runner):
     """Read each owned instance's state without preparing or starting Android."""
     labels = {
@@ -90,6 +279,8 @@ def discover_with_status(runner):
                 "state_label": labels[state],
                 "state_explanation": explanation,
                 "can_stop": state in ("running", "frozen"),
+                "keep_ready": keep_ready_path(entry["id"]).is_file(),
+                "keyboard": keyboard_wanted(entry["id"]),
             }
         )
     return result
@@ -204,6 +395,16 @@ def remove(runner, instance_id, *, delete_data=False, only_empty=False):
     data, _ = host.directories()
     for shortcut in (data / "applications").glob(f"multipak-waydroid.{instance_id}.*.desktop"):
         shortcut.unlink()
+    menu = data / "kio/servicemenus" / f"multipak-waydroid.{instance_id}.send.desktop"
+    menu.unlink(missing_ok=True)
+    marker = f"{CLI} --instance {instance_id} send "
+    for script in (data / "nautilus/scripts").glob("*/*"):
+        try:
+            if marker in script.read_text(errors="replace"):
+                script.unlink()
+        except OSError:
+            pass
+    keep_ready_path(instance_id).unlink(missing_ok=True)
 
 
 def upgrade(runner, instance_id, *, progress=lambda *_: None):

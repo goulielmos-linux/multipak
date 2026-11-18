@@ -400,6 +400,15 @@ def test_running_copies_are_found_and_asked_to_close(store, tmp_path):
     appdir = store.appimage_directory(tx.id) / "AppDir"
     listing = [f"  41 {appdir}/usr/bin/demo --flag\n 52 /usr/bin/other\n"]
     assert appimage_updates.running(store, tx, lambda: listing[0]) == [41]
+    # Started through an interpreter or the loader: the AppImage's. An editor showing one
+    # of its files: not.
+    others = (
+        f"60 /usr/bin/python3 -u {appdir}/usr/bin/tool.py\n"
+        f"61 /lib64/ld-linux-x86-64.so.2 {appdir}/usr/bin/demo\n"
+        f"62 /usr/bin/kate {appdir}/usr/share/doc/README\n"
+        f"63 /usr/bin/python3 /home/me/script.py {appdir}/usr/bin/demo\n"
+    )
+    assert appimage_updates.running(store, tx, lambda: others) == [60, 61]
     signals = []
 
     def signal(pids):

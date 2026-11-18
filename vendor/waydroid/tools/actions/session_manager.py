@@ -82,6 +82,17 @@ def start(args, unlocked_cb=None, background=True):
 
     session["background_start"] = "true" if background else "false"
 
+    import multipak_microphone
+    try:
+        session["microphone"] = multipak_microphone.chosen()
+    except Exception as error:
+        logging.warning("Android will record from the default microphone: %s", error)
+    import multipak_camera
+    try:
+        session["camera"] = multipak_camera.chosen()
+    except Exception as error:
+        logging.warning("Android will use the first webcam it can: %s", error)
+
     mainloop = GLib.MainLoop()
 
     def sigint_handler(data):
@@ -108,9 +119,28 @@ def start(args, unlocked_cb=None, background=True):
     services.user_manager.start(args, session, unlocked_cb)
     services.clipboard_manager.start(args)
     services.notification_manager.start(args, session)
+    import multipak_links
+    import multipak_media
+    try:
+        media = multipak_media.listen(session)
+    except Exception as error:
+        media = None
+        logging.warning("Android media will stay out of the desktop controls: %s", error)
+    try:
+        multipak_links.listen(media)
+    except Exception as error:
+        logging.warning("Android links will stay unopened: %s", error)
+    import multipak_volume
+    try:
+        args.app_volumes = multipak_volume.listen(session)
+    except Exception as error:
+        logging.warning("Android apps will share one volume in the desktop's mixer: %s", error)
     service(args, mainloop)
 
 def do_stop(args, looper):
+    if "app_volumes" in args:
+        args.app_volumes()  # Removes the apps from the desktop's mixer.
+        del args.app_volumes
     services.user_manager.stop(args)
     services.clipboard_manager.stop(args)
     services.notification_manager.stop(args)

@@ -1,9 +1,9 @@
 """Qt controller for the owned Android environment list."""
 
-from PySide6.QtCore import Property, QLocale, QObject, Signal, Slot
+from PySide6.QtCore import Property, QLocale, QObject, QUrl, Signal, Slot
 
 from multipak import android_instances as environments
-from multipak import android_stats
+from multipak import android_link_choice, android_stats
 from multipak.localization import tr
 from multipak.worker import Worker
 
@@ -11,6 +11,9 @@ from multipak.worker import Worker
 class AndroidEnvironments(QObject):
     changed = Signal()
     statsChanged = Signal()
+    sendChanged = Signal()
+    microphoneChanged = Signal()
+    cameraChanged = Signal()
 
     def __init__(self, store, parent=None, *, worker_factory=Worker, preview=False):
         super().__init__(parent)
@@ -32,6 +35,18 @@ class AndroidEnvironments(QObject):
         self._stats = {}
         self._stats_generation = 0
         self._sampling_generation = 0
+        self._send = {"text": "", "progress": -1.0, "error": "", "done": False}
+        self._send_worker = None
+        self._send_outcome = None
+        self._ask_links = None
+        self._microphone = {}
+        self._microphone_error = ""
+        self._microphone_worker = None
+        self._microphone_outcome = None
+        self._camera = {}
+        self._camera_error = ""
+        self._camera_worker = None
+        self._camera_outcome = None
 
     @Property("QVariantMap", notify=statsChanged)
     def stats(self):
@@ -65,6 +80,7 @@ class AndroidEnvironments(QObject):
         if self.busy or self._sampling_generation != self._stats_generation:
             return
         locale = QLocale()
+        decimal = QLocale.DataSizeFormat.DataSizeSIFormat  # GB, like Kontainer.
         stats = {}
         for row in self._rows:
             identifier = row["id"]
@@ -74,7 +90,10 @@ class AndroidEnvironments(QObject):
             cpu = android_stats.cpu_percent(self._stats_samples.get(identifier), current)
             stats[identifier] = {
                 "cpu": "—" if cpu is None else locale.toString(cpu, "f", 1) + "%",
-                "memory": locale.formattedDataSize(current["memory"]),
+                # As Kontainer shows it: what the container uses of the computer's memory.
+                "memory": locale.formattedDataSize(current["memory"], 2, decimal)
+                + " / "
+                + locale.formattedDataSize(android_stats.total_memory(), 2, decimal),
             }
         self._stats_samples = self._stats_result
         self._stats = stats
@@ -175,6 +194,244 @@ class AndroidEnvironments(QObject):
 
         self._run(operation, "upgrade")
 
+    @Slot(str, bool)
+    def setKeepReady(self, identifier, enabled):
+        if not self.selectInstance(identifier):
+            return
+        label = self._rows[self._selected]["label"]
+
+        def operation(engine):
+            environments.set_keep_ready(identifier, enabled, label)
+            if enabled:
+                environments.InstanceWaydroid(engine.runner, identifier).ready(engine.progress)
+            return environments.discover_with_status(engine.runner)
+
+        self._run(operation, "ready" if enabled else "refresh")
+
+    @Slot(str, bool)
+    def setKeyboard(self, identifier, enabled):
+        if not self.selectInstance(identifier):
+            return
+
+        def operation(engine):
+            environments.set_keyboard(engine.runner, identifier, enabled)
+            return environments.discover_with_status(engine.runner)
+
+        self._run(operation, "refresh")
+
+    @Property(bool, notify=changed)
+    def askLinks(self):
+        if self._ask_links is None:
+            try:
+                self._ask_links = not self.preview and android_link_choice.asking()
+            except Exception:
+                self._ask_links = False
+        return self._ask_links
+
+    @Slot(bool)
+    def setAskLinks(self, enabled):
+        if self.preview or self.busy:
+            self.changed.emit()  # Puts the box back.
+            return
+
+        def operation(engine):
+            try:
+                android_link_choice.refresh(bool(enabled))
+            except Exception:
+                self._ask_links = None  # Read the saved choice again.
+                raise
+            return environments.discover_with_status(engine.runner)
+
+        self._ask_links = bool(enabled)
+        self._run(operation, "refresh")
+
+    @Property("QVariantMap", notify=sendChanged)
+    def sending(self):
+        """text, progress (0 to 1, or -1 while unknown), error and done, for the send window."""
+        return {**self._send, "busy": self._send_worker is not None}
+
+    @Slot(str, "QVariantList")
+    def sendFiles(self, identifier, urls):
+        if self.preview or self._send_worker is not None:
+            return
+        urls = [url if isinstance(url, QUrl) else QUrl(str(url)) for url in urls]
+        paths = [url.toLocalFile() or url.toString() for url in urls]
+        self._send = {"text": tr("Sending…"), "progress": -1.0, "error": "", "done": False}
+        self._send_outcome = None
+
+        def operation(engine):
+            def progress(done, total, name):
+                engine.progress(1000 * done // total if total else 1000, name)
+
+            environments.send_files(engine.runner, identifier, paths, progress)
+
+        worker = self.worker_factory(self.store, operation, self)
+        self._send_worker = worker
+        worker.progress.connect(self._send_progress)
+        worker.succeeded.connect(self._send_ready)
+        worker.failed.connect(self._send_failed)
+        worker.finished.connect(self._send_finished)
+        self.sendChanged.emit()
+        worker.start()
+
+    @Slot()
+    def cancelSend(self):
+        if self._send_worker is not None:
+            self._send_worker.cancel_requested.set()
+
+    @Slot(int, str)
+    def _send_progress(self, permille, name):
+        self._send["text"] = tr("Sending {0}.").format(name)
+        self._send["progress"] = permille / 1000
+        self.sendChanged.emit()
+
+    @Slot(object)
+    def _send_ready(self, _result):
+        self._send_outcome = (True, "")
+
+    @Slot(str, object)
+    def _send_failed(self, message, _tx):
+        self._send_outcome = (False, message)
+
+    @Slot()
+    def _send_finished(self):
+        worker, self._send_worker = self._send_worker, None
+        worker.deleteLater()
+        # Cancelled: neither succeeded nor failed, and the window just closes.
+        ok, message = self._send_outcome or (True, "")
+        self._send["done"] = ok and self._send_outcome is not None
+        self._send["text"] = tr("Done") if self._send["done"] else self._send["text"]
+        self._send["error"] = "" if ok else str(message)
+        self.sendChanged.emit()
+
+    @Property("QVariantList", notify=microphoneChanged)
+    def microphones(self):
+        return self._microphone.get("options", [])
+
+    @Property(int, notify=microphoneChanged)
+    def microphoneIndex(self):
+        return self._microphone.get("index", -1)
+
+    @Property(bool, notify=microphoneChanged)
+    def microphoneBusy(self):
+        return self._microphone_worker is not None
+
+    @Property(str, notify=microphoneChanged)
+    def microphoneError(self):
+        return self._microphone_error
+
+    @Slot(str)
+    def loadMicrophone(self, identifier):
+        self._microphone = {}
+        self._choose_microphone(identifier)
+
+    @Slot(str, str)
+    def setMicrophone(self, identifier, name):
+        self._choose_microphone(identifier, name)
+
+    def _choose_microphone(self, identifier, *choice):
+        if self.preview or self._microphone_worker is not None:
+            return
+        self._microphone_error = ""
+        self._microphone_outcome = None
+        worker = self.worker_factory(
+            self.store,
+            lambda engine: environments.microphone(engine.runner, identifier, *choice),
+            self,
+        )
+        self._microphone_worker = worker
+        worker.succeeded.connect(self._microphone_ready)
+        worker.failed.connect(self._microphone_failed)
+        worker.finished.connect(self._microphone_finished)
+        self.microphoneChanged.emit()
+        worker.start()
+
+    @Slot(object)
+    def _microphone_ready(self, value):
+        self._microphone_outcome = (True, value)
+
+    @Slot(str, object)
+    def _microphone_failed(self, message, _tx):
+        self._microphone_outcome = (False, message)
+
+    @Slot()
+    def _microphone_finished(self):
+        worker, self._microphone_worker = self._microphone_worker, None
+        worker.deleteLater()
+        ok, value = self._microphone_outcome or (False, tr("The operation was not completed."))
+        if ok:
+            self._microphone = value
+            if not value["listed"]:
+                self._microphone_error = tr("The microphones could not be listed.")
+        else:
+            self._microphone_error = str(value)
+        self.microphoneChanged.emit()
+
+    @Property("QVariantList", notify=cameraChanged)
+    def cameras(self):
+        return self._camera.get("options", [])
+
+    @Property(int, notify=cameraChanged)
+    def cameraIndex(self):
+        return self._camera.get("index", -1)
+
+    @Property(str, notify=cameraChanged)
+    def cameraNote(self):
+        return self._camera.get("note", "")
+
+    @Property(bool, notify=cameraChanged)
+    def cameraBusy(self):
+        return self._camera_worker is not None
+
+    @Property(str, notify=cameraChanged)
+    def cameraError(self):
+        return self._camera_error
+
+    @Slot(str)
+    def loadCamera(self, identifier):
+        self._camera = {}
+        self._choose_camera(identifier)
+
+    @Slot(str, str)
+    def setCamera(self, identifier, name):
+        self._choose_camera(identifier, name)
+
+    def _choose_camera(self, identifier, *choice):
+        if self.preview or self._camera_worker is not None:
+            return
+        self._camera_error = ""
+        self._camera_outcome = None
+        worker = self.worker_factory(
+            self.store,
+            lambda engine: environments.camera(engine.runner, identifier, *choice),
+            self,
+        )
+        self._camera_worker = worker
+        worker.succeeded.connect(self._camera_ready)
+        worker.failed.connect(self._camera_failed)
+        worker.finished.connect(self._camera_finished)
+        self.cameraChanged.emit()
+        worker.start()
+
+    @Slot(object)
+    def _camera_ready(self, value):
+        self._camera_outcome = (True, value)
+
+    @Slot(str, object)
+    def _camera_failed(self, message, _tx):
+        self._camera_outcome = (False, message)
+
+    @Slot()
+    def _camera_finished(self):
+        worker, self._camera_worker = self._camera_worker, None
+        worker.deleteLater()
+        ok, value = self._camera_outcome or (False, tr("The operation was not completed."))
+        if ok:
+            self._camera = value
+        else:
+            self._camera_error = str(value)
+        self.cameraChanged.emit()
+
     @Slot()
     def refresh(self):
         self._run(lambda e: environments.discover_with_status(e.runner), "refresh")
@@ -189,15 +446,15 @@ class AndroidEnvironments(QObject):
 
     @Slot(str)
     def act(self, action):
-        if not self.canAct or action not in ("open", "start", "stop"):
+        if not self.canAct or action not in ("open", "start", "stop", "restart"):
             return
         identifier = self._rows[self._selected]["id"]
 
         def operation(engine):
             android = environments.InstanceWaydroid(engine.runner, identifier)
-            if action == "stop":
+            if action in ("stop", "restart"):
                 android.stop()
-            else:
+            if action != "stop":
                 android.ready(engine.progress)
                 if action == "open":
                     android.command("show-full-ui")
@@ -250,9 +507,11 @@ class AndroidEnvironments(QObject):
             "create": tr("Creating the Android container…"),
             "start": tr("Starting the Android container…"),
             "stop": tr("Stopping the Android container…"),
+            "restart": tr("Restarting Android…"),
             "open": tr("Opening Android…"),
             "remove": tr("Removing the Android container…"),
             "upgrade": tr("Updating the Android container…"),
+            "ready": tr("Starting the Android container…"),
         }.get(mode, tr("Preparing the Android environment…"))
         self._outcome = (False, tr("The operation was not completed."))
         self.worker = self.worker_factory(self.store, operation, self)

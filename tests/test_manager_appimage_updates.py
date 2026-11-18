@@ -59,6 +59,7 @@ def manager(tmp_path, application, monkeypatch):
         package_checker=lambda runner, name, kind, packages, refresh=False: {
             package: PackageCheck("available", "1.0", "2.0") for package in packages
         },
+        container_lister=lambda runner: None,
     )
     signals = []
     for name in (
@@ -84,6 +85,17 @@ def row(manager, title):
 
 def index(manager, title):
     return next(position for position, item in enumerate(manager.rows) if item["title"] == title)
+
+
+def bases(manager):
+    """The bases and content behind the list: "Update all" updates them, without rows."""
+    from multipak import snap_updates
+
+    return {
+        item.name: manager._snap_update_row(item)
+        for item in manager._items
+        if isinstance(item, snap_updates.Runtime)
+    }
 
 
 def prepared(packages=(), link=""):
@@ -259,6 +271,28 @@ def test_the_list_is_grouped(mixed):
     assert mixed.updateCount == 2
 
 
+def test_a_new_container_with_an_old_name_does_not_take_its_applications(mixed):
+    # Gimp's container was deleted and another one was created with the same name.
+    gimp = next(tx for tx in mixed.store.transactions() if tx.package_name == "Gimp")
+    from dataclasses import replace
+
+    mixed.store.save(replace(gimp, container_id="9" * 64))
+    checked = []
+    mixed.package_checker = lambda runner, name, kind, packages, refresh=False: (
+        checked.append(name) or {}
+    )
+    mixed.container_lister = lambda runner: {"f" * 64: {"MultiPak-Fedora-42"}}
+    mixed.refresh()
+    assert "Gimp" not in [item["title"] for item in mixed.rows]
+    # Nor is it checked inside the new container.
+    assert checked == []
+    # Its own container (same ID) shows it again.
+    mixed.store.save(replace(gimp, container_id="f" * 64))
+    mixed.refresh()
+    assert "Gimp" in [item["title"] for item in mixed.rows]
+    assert checked == ["MultiPak-Fedora-42"]
+
+
 def test_an_application_alone_updates_its_container_at_once(mixed):
     mixed.select(index(mixed, "Gimp"))
     assert mixed.canAct
@@ -375,13 +409,13 @@ def test_snap_updates_are_only_checked_on_request(manager, monkeypatch):
     ] == [
         ("local", "No update source", "Installed from a local file. Updates are unavailable."),
         ("browser", "", "Updates not checked yet."),
-        ("core22", "Bases and content", "Updates not checked yet."),
-    ]
+    ]  # Bases and content are not applications: no row, only "Update all".
     manager.refresh()
     assert calls == [("browser", "latest/beta"), ("core22", "")]
     assert row(manager, "browser")["detail"] == "Channel: latest/beta"
     assert row(manager, "browser")["note"] == "Update available: v8 (revision 8)"
-    assert row(manager, "core22")["note"] == "Update available: v8 (revision 8)"
+    assert manager._snap_checks["runtime:core22"].status == "available"
+    assert all(item["title"] != "core22" for item in manager.rows)
     manager.openList("update")
     assert len(calls) == 2
     assert row(manager, "browser")["note"] == "Update available: v8 (revision 8)"
@@ -425,20 +459,32 @@ def test_a_snap_update_asks_for_permissions_and_updates_only_the_selected_item(
     operation = []
 
     def refresh(engine, tx, revision, confirm):
-        operation.append((tx.snap_name, revision, confirm(tx.package_name, ("Classic",))))
+        permissions = (
+            {"text": "Start a background service: worker", "warning": False},
+            {"text": "Accept connections from other computers", "warning": True},
+        )
+        operation.append((tx.snap_name, revision, confirm(tx.package_name, permissions)))
         tx.snap_revision = revision
         tx.package_version = "v8"
         return tx
 
     monkeypatch.setattr(snap_refresh, "refresh", refresh)
     messages = []
-    manager.snapPermissionsRequested.connect(messages.append)
-    manager.snapPermissionsRequested.connect(lambda _: manager.answerSnapPermissions(True))
+    manager.snapPermissionsRequested.connect(lambda *request: messages.append(request))
+    manager.snapPermissionsRequested.connect(lambda *_: manager.answerSnapPermissions(True))
     manager.refresh()
     manager.select(index(manager, "browser"))
     manager.updateSelected()
     assert operation == [("browser", "8", True)]
-    assert "Classic" in messages[0]
+    assert messages == [
+        (
+            "The new version of browser needs 2 new permissions:",
+            [
+                {"text": "Start a background service: worker", "warning": False},
+                {"text": "Accept connections from other computers", "warning": True},
+            ],
+        )
+    ]
     assert manager.status == "browser was updated."
     assert row(manager, "browser")["note"] == "Up to date"
 
@@ -470,7 +516,7 @@ def test_reverting_a_snap_does_not_check_the_store(manager, monkeypatch):
     manager.revertSelectedSnap()
     assert "revision 7" in manager.status
     assert manager.hasPreviousSnap
-    assert manager.rows[-1]["title"] == "core22"
+    assert manager._items[-1].name == "core22"  # hidden: bases are not applications
 
 
 @pytest.mark.parametrize("close", [False, True])
@@ -554,8 +600,8 @@ def test_bases_are_listed_again_after_a_snap_update(manager, monkeypatch):
         "browser",
         "editor",
         "Beta",
-        "core22",
     ]
+    assert list(bases(manager)) == ["core22"]
     manager.select(index(manager, "browser"))
     manager.updateSelected()
     assert manager.status == "browser was updated."
@@ -564,10 +610,12 @@ def test_bases_are_listed_again_after_a_snap_update(manager, monkeypatch):
         ("editor", "Update available: v8 (revision 8)"),
         ("Beta", "The application does not indicate its update address."),
         ("browser", "Up to date"),
-        ("core22", "Update available: v8 (revision 8)"),
-        ("core24", "Updates not checked yet."),
     ]
-    assert row(manager, "core22")["subtitle"] == "Installed revisions: 7"
+    assert {name: item["note"] for name, item in bases(manager).items()} == {
+        "core22": "Update available: v8 (revision 8)",
+        "core24": "Updates not checked yet.",
+    }
+    assert bases(manager)["core22"]["subtitle"] == "Installed revisions: 7"
     # The updated snap stays selected where it moved.
     assert manager.selectedIndex == index(manager, "browser")
     # Reopening the list without checking keeps what the update showed.
@@ -586,14 +634,17 @@ def test_a_downloaded_base_that_some_snaps_still_have_to_use(manager, monkeypatc
         snap_updates.snap_store, "release", lambda name, *, channel: release("8", channel)
     )
     manager.refresh()
-    assert manager.rows[-1]["note"] == "Update available: v8 (revision 8)"
+    assert bases(manager)["core22"]["note"] == "Update available: v8 (revision 8)"
     meta = manager.store.snap_runtime_directory() / "core22/8/meta"
     meta.mkdir(parents=True)
     (meta / "snap.yaml").write_text("name: core22\n")
     manager.openList("update")
-    assert manager.rows[-1]["note"] == "Revision 8 is already downloaded. Still to switch: editor"
-    manager.select(len(manager.rows) - 1)
-    assert manager.canAct
+    assert (
+        bases(manager)["core22"]["note"]
+        == "Revision 8 is already downloaded. Still to switch: editor"
+    )
+    assert all(item["title"] != "core22" for item in manager.rows)
+    assert manager.canUpdateAll
 
 
 def test_update_all_lists_the_bases_each_snap_uses_at_the_end(manager, monkeypatch):
@@ -626,4 +677,5 @@ def test_update_all_lists_the_bases_each_snap_uses_at_the_end(manager, monkeypat
     settle()
     assert not manager.working
     assert "Updated: browser" in manager.status
-    assert [row["title"] for row in manager.rows[2:]] == ["browser", "core24"]
+    assert [row["title"] for row in manager.rows[2:]] == ["browser"]
+    assert list(bases(manager)) == ["core24"]

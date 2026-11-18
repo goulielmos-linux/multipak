@@ -1,6 +1,6 @@
 # Como o MultiPak instala pacotes RPM (Fedora, Mageia, openSUSE e ALT Linux)
 
-*MultiPak 1.2.0.*
+*MultiPak 1.1.0.*
 
 ---
 

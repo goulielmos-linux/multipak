@@ -25,6 +25,7 @@ HOST_TOOLS = frozenset(
         "kontainer",
         "xdg-mime",
         "update-mime-database",
+        "update-desktop-database",
         "kbuildsycoca6",
         "setsid",
         "waydroid",

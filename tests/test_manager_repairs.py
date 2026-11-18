@@ -122,3 +122,47 @@ def test_the_uninstall_button_of_a_row_asks_about_that_application(manager):
     assert asked == [True]
     assert manager.selectedIndex == 0
     assert manager.confirmationName == "Flatpak-Builder2"
+
+
+def test_an_application_without_its_container_is_marked_and_forgotten_on_request(
+    manager, monkeypatch
+):
+    from multipak import containers
+
+    store = manager.store
+    app = Transaction(
+        "d" * 32,
+        "meu-fedora",
+        "image",
+        "gimp",
+        "3.0",
+        "rpm",
+        "",
+        status="installed",
+        container_id="e" * 64,
+        launchers=["multipak-" + "d" * 32 + "-gimp.desktop"],
+    )
+    store.save(app)
+    store.launcher(app, app.launchers[0]).write_text("[Desktop Entry]\n")
+    monkeypatch.setattr(
+        containers, "abandoned", lambda engine: [t for t in store.transactions() if t.id == app.id]
+    )
+    manager.openList("remove")
+    rows = {row["title"]: row for row in manager.rows}
+    # Listed and marked, not removed on its own.
+    assert "Container not found" in rows["gimp"]["note"]
+    assert rows["gimp"]["removable"]
+    assert store.launcher(app, app.launchers[0]).exists()
+    assert rows["Flatpak-Builder2"]["note"] != rows["gimp"]["note"]
+    forgotten = []
+    monkeypatch.setattr(
+        containers,
+        "forget",
+        lambda engine, tx: (forgotten.append(tx.id), store.remove_directory(tx))[1],
+    )
+    index = [row["title"] for row in manager.rows].index("gimp")
+    manager.removeRow(index)
+    assert "shortcut" in manager.removalExplanation
+    manager.confirmRemoval()
+    assert forgotten == [app.id]
+    assert app.id not in {tx.id for tx in store.transactions()}

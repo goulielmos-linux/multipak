@@ -176,6 +176,43 @@ def _resource_strings(data, wanted):
     return resolved
 
 
+# Schemes that belong to the system or to a browser; never register an Android app for them.
+GENERIC_SCHEMES = frozenset(
+    "about android-app blob content data file ftp geo http https intent javascript mailto "
+    "market mms mmsto sms smsto tel ws wss".split()
+)
+MAX_SCHEMES = 16
+
+
+def browsable_schemes(elements):
+    """Specific schemes an activity opens from links (VIEW with BROWSABLE)."""
+    filters, current = [], None
+    for parents, tag, attrs in elements:
+        if tag == "intent-filter" and parents[-1:] in (("activity",), ("activity-alias",)):
+            current = {"actions": set(), "categories": set(), "schemes": set()}
+            filters.append(current)
+        elif current is not None and parents[-2:] in (
+            ("activity", "intent-filter"),
+            ("activity-alias", "intent-filter"),
+        ):
+            value = attrs.get((ANDROID_NS, "scheme" if tag == "data" else "name"), (0, ""))[1]
+            key = {"action": "actions", "category": "categories", "data": "schemes"}.get(tag)
+            if key and isinstance(value, str):
+                current[key].add(value)
+    schemes = set()
+    for item in filters:
+        if (
+            "android.intent.action.VIEW" in item["actions"]
+            and "android.intent.category.BROWSABLE" in item["categories"]
+        ):
+            schemes |= {
+                s.lower()
+                for s in item["schemes"]
+                if re.fullmatch(r"[A-Za-z][A-Za-z0-9+.-]{0,31}", s)
+            }
+    return tuple(sorted(schemes - GENERIC_SCHEMES)[:MAX_SCHEMES])
+
+
 def _read(archive, name, limit):
     entries = [item for item in archive.infolist() if item.filename == name]
     if len(entries) != 1 or entries[0].file_size > limit or entries[0].flag_bits & 1:
@@ -320,6 +357,7 @@ def inspect_apk(path: Path, *, bundle_base=False) -> Package:
                 android_version_code=(major << 32) | code,
                 android_min_sdk=sdk,
                 android_target_sdk=target_sdk,
+                android_schemes=browsable_schemes(elements),
             )
     except (zipfile.BadZipFile, KeyError, OSError, ValueError, struct.error, UnicodeError) as error:
         raise ValueError(tr("Could not read the Android APK: {0}").format(error)) from error

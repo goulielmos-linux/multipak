@@ -97,6 +97,8 @@ def start(args, session, unlocked_cb=None):
         desktop_file.set_string("Desktop Entry", "Name", appInfo["name"] + " — " + instance().label)
         desktop_file.set_string("Desktop Entry", "Exec", instance().command("app", "launch", packageName))
         desktop_file.set_string("Desktop Entry", "Icon", str(waydroid_data_icons_dir / f"{packageName}.png"))
+        # The hwcomposer names each window "waydroid.<package>"; match it to this shortcut.
+        desktop_file.set_string("Desktop Entry", "StartupWMClass", "waydroid." + packageName)
         glib_key_file_prepend_string_list(desktop_file, "Desktop Entry", "Categories", ["X-WayDroid-App"])
         desktop_file.set_string_list("Desktop Entry", "X-Purism-FormFactor", ["Workstation", "Mobile"])
         glib_key_file_prepend_string_list(desktop_file, "Desktop Entry", "Actions", ["app-settings"])
@@ -121,13 +123,49 @@ def start(args, session, unlocked_cb=None):
 
         platformService = IPlatform.get_service(args)
         if platformService:
+            import multipak_desktop
+            try:
+                multipak_desktop.sync(platformService)
+            except Exception as error:
+                logging.warning("Could not follow the desktop language and time zone: %s", error)
+            import multipak_links
+            try:
+                multipak_links.ensure(platformService, tools.helpers.ipc.DBusContainerService())
+            except Exception as error:
+                logging.warning("Could not set up Android links: %s", error)
+            import multipak_media
+            try:
+                multipak_media.allow(tools.helpers.ipc.DBusContainerService())
+            except Exception as error:
+                logging.warning("Android media will stay out of the desktop controls: %s", error)
+            import multipak_volume
+            try:
+                multipak_volume.allow(tools.helpers.ipc.DBusContainerService())
+            except Exception as error:
+                logging.warning("Android apps will share one volume in the desktop's mixer: %s", error)
+            import multipak_input
+            try:
+                multipak_input.initialize_volume(tools.helpers.ipc.DBusContainerService())
+            except Exception as error:
+                logging.warning("Could not set the Android media volume: %s", error)
             installed = set(tools.helpers.ipc.DBusContainerService().ListPackages())
             appsList = [a for a in platformService.getAppsInfo() if a["packageName"] in installed]
             for app in appsList:
                 updateDesktopFile(app)
+            keep = {instance().desktop_name(app["packageName"]) for app in appsList}
+            keep.add(multipak_links.shortcut_name())
             for existing in apps_dir.glob(instance().desktop_glob):
-                if existing.name not in map(lambda appInfo: instance().desktop_name(appInfo['packageName']), appsList):
+                if existing.name not in keep:
                     existing.unlink()
+            try:
+                multipak_links.register(apps_dir)
+            except Exception as error:
+                logging.warning("Could not register Android web links: %s", error)
+            import multipak_files
+            try:
+                multipak_files.register(session["xdg_data_home"])
+            except Exception as error:
+                logging.warning("Could not add Send to Android to the file managers: %s", error)
         if unlocked_cb:
             unlocked_cb()
 
@@ -141,6 +179,13 @@ def start(args, session, unlocked_cb=None):
             else:
                 appInfo = platformService.getAppInfo(packageName)
                 updateDesktopFile(appInfo)
+        import multipak_volume
+        if packageName == multipak_volume.HELPER and mode != IUserMonitor.PACKAGE_REMOVED:
+            # Android ends an update of the helper app after its installer returned.
+            try:
+                multipak_volume.allow(tools.helpers.ipc.DBusContainerService())
+            except Exception as error:
+                logging.warning("Android apps will share one volume in the desktop's mixer: %s", error)
 
     def service_thread():
         while not stopping:

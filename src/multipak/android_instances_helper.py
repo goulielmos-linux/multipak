@@ -22,7 +22,7 @@ else:
     from android_data_helper import migrate, prepare_layout
     from privileged_files import CLEAN_ENV, cancellation_watch
 
-RUNTIME_SHA256 = "c66654bbe487fed6c0907230be7fd72c09685655a05d134cd064e7e5b4c2b2d1"
+RUNTIME_SHA256 = '7fe2a4aa1fd878f2d3b2e1acecdebebcb056eca88ae554297c1e392313feb808'
 BASE = Path("/var/lib/multipak-waydroid")
 CLI = Path("/usr/local/bin/multipak-waydroid")
 RELEASES = {"android-13": "20.0", "android-11": "18.1"}
@@ -341,7 +341,11 @@ def require_empty(identifier):
     for line in run([*attach, "list", "packages", "-3", "--user", "0"]).splitlines():
         if not line:
             continue
-        if line != "package:io.github.multipak.gestures":
+        # MultiPak's own app, under its current and its old ID.
+        if line not in (
+            "package:io.github.goulielmos_linux.multipak.controller",
+            "package:io.github.multipak.gestures",
+        ):
             raise RuntimeError(
                 "Android applications are still installed. The container was preserved."
             )

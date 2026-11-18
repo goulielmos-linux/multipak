@@ -22,7 +22,13 @@ try:
         sys.argv.remove("--manager")
         from multipak.kirigami.manager import main
     else:
-        from multipak.kirigami.main import main
+        from multipak.android_link_choice import scheme_of
+
+        if len(sys.argv) == 2 and scheme_of(sys.argv[1]):
+            # An Android app's address that another program also opens ("Ask every time").
+            from multipak.kirigami.link_choice import main
+        else:
+            from multipak.kirigami.main import main
 except ImportError as error:
     raise SystemExit(tr("MultiPak could not load its interface: {0}").format(error)) from error
 

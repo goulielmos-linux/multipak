@@ -177,6 +177,7 @@ def test_runtime_desktop_cleanup_is_scoped_and_original_paths_are_not_active():
     script = (VENDOR / "data/scripts/waydroid-net.sh").read_text()
     assert "table inet lxc" not in script and "192.168.240" not in script
     assert "${table}" in script and "10.203.${slot}" in script
+    assert "--zone=trusted --$1-interface=${LXC_BRIDGE}" in script
 
 
 def test_same_app_in_two_environments_and_removing_one_preserves_the_other(setup, monkeypatch):
@@ -381,3 +382,31 @@ def test_failed_status_query_keeps_container_visible_and_does_not_claim_stopped(
     row = instances.discover_with_status(SimpleNamespace(run=run))[0]
     assert row["id"] == "androida" and row["state"] == "unavailable"
     assert row["state_explanation"] == "status timeout"
+
+
+def test_the_container_keyboard_is_read_from_its_preferences_and_set_by_command(
+    monkeypatch, tmp_path
+):
+    monkeypatch.setenv("HOME", str(tmp_path))
+    assert instances.keyboard_wanted("androida") is False  # Off by default.
+    folder = tmp_path / ".local/share/multipak/android-instances/androida"
+    folder.mkdir(parents=True)
+    (folder / "input-preferences.json").write_text(json.dumps({"keyboard": True}))
+    assert instances.keyboard_wanted("androida") is True
+    (folder / "input-preferences.json").write_text("[]")
+    assert instances.keyboard_wanted("androida") is False
+
+    calls = []
+
+    class Runner:
+        def __init__(self, reply):
+            self.reply = reply
+
+        def run(self, argv, timeout=None):
+            calls.append(argv)
+            return "log\n" + self.reply
+
+    instances.set_keyboard(Runner('{"keyboard": true}'), "androida", True)
+    assert calls[-1] == [instances.CLI, "--instance", "androida", "keyboard", "on"]
+    with pytest.raises(RuntimeError, match="keyboard"):
+        instances.set_keyboard(Runner('{"keyboard": true}'), "androida", False)

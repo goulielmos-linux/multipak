@@ -3169,8 +3169,8 @@ msgstr "Conjuntos APKS com entrega de recursos adicionais ainda não são suport
 msgid "ARM translation layer"
 msgstr "Camada de tradução ARM"
 
-msgid "About the Waydroid adaptations"
-msgstr "Sobre as adaptações do Waydroid"
+msgid "About the Waydroid changes"
+msgstr "Sobre as mudanças no Waydroid"
 
 msgid "Adding the application to the launcher…"
 msgstr "Adicionando o aplicativo ao lançador…"
@@ -3406,8 +3406,8 @@ msgstr "Mais opções"
 msgid "MultiPak could not determine which RPM-based distribution this package was built for, so it will use the latest Fedora version as the default environment: {0}.\n\nIf the application does not work after installation, it may have been built for a different Fedora version or another distribution, such as Nobara, Rocky Linux, AlmaLinux or openSUSE. Uninstall it through Application Manager — MultiPak and look for a package built for your chosen distribution."
 msgstr "Como não foi possível determinar se o pacote foi preparado para Fedora ou para outra distribuição que utiliza RPM, o MultiPak utilizará a versão mais recente do Fedora como ambiente padrão: {0}.\n\nSe o aplicativo não funcionar após a instalação, ele pode ter sido preparado para outra versão do Fedora ou para outra distribuição, como Nobara, Rocky Linux, AlmaLinux ou openSUSE. Desinstale-o pelo Gerenciador de Aplicativos — MultiPak e procure uma versão do pacote mais apropriada."
 
-msgid "MultiPak uses an adapted version of Waydroid to create and manage separate Android containers.\n\nEach container has its own:\n• System images\n• Applications and data\n• Network\n• Desktop shortcuts\n\nThe original system Waydroid environment remains available as a separate option."
-msgstr "O MultiPak usa uma versão adaptada do Waydroid para criar e gerenciar contêineres Android separados.\n\nCada contêiner tem:\n• Imagens do sistema\n• Aplicativos e dados\n• Rede\n• Atalhos no lançador\n\nO ambiente original do Waydroid instalado no sistema continua disponível como uma opção separada."
+msgid "MultiPak uses a modified version of Waydroid 1.6.3. The changes allow several separate Android containers, each with its own images, applications and data, network and shortcuts. They also integrate Android with Linux: links, notifications, media controls, volume per app, sending files and the choice of microphone and webcam.\n\nThe Waydroid installed on the system stays separate and is still offered as an option when installing."
+msgstr "O MultiPak usa uma versão modificada do Waydroid 1.6.3. As mudanças permitem vários contêineres Android separados, cada um com suas imagens, aplicativos e dados, rede e atalhos. Também integram o Android ao Linux: links, notificações, controles de mídia, volume por app, envio de arquivos e escolha do microfone e da webcam.\n\nO Waydroid instalado no sistema continua separado e disponível como opção na instalação."
 
 msgid "No Android containers yet"
 msgstr "Nenhum contêiner Android criado"
@@ -3670,8 +3670,8 @@ msgstr "Verificando o sistema Android…"
 msgid "Waiting for Android to finish starting…"
 msgstr "Aguardando o Android terminar de iniciar…"
 
-msgid "Waydroid (adapted)"
-msgstr "Waydroid (adaptado)"
+msgid "Waydroid (modified)"
+msgstr "Waydroid (modificado)"
 
 msgid "Waydroid (existing environment)"
 msgstr "Waydroid (ambiente existente)"
@@ -3885,3 +3885,330 @@ msgstr "Este pacote é para {0}, mas o ambiente Void Linux instala pacotes {1}. 
 
 msgid "The package's metadata identifies {0}."
 msgstr "Os metadados do pacote identificam o {0}."
+
+msgid "Open this application's links in Android"
+msgstr "Abrir os links deste aplicativo no Android"
+
+msgid "Start at login"
+msgstr "Ligar ao entrar"
+
+msgid "Android did not confirm the keyboard preference."
+msgstr "O Android não confirmou a preferência do teclado."
+
+msgid "Send files…"
+msgstr "Enviar arquivos…"
+
+msgid "Send files to %1"
+msgstr "Enviar arquivos para %1"
+
+msgid "Sending to %1"
+msgstr "Enviando para %1"
+
+msgid "Sending…"
+msgstr "Enviando…"
+
+msgid "Sending {0}."
+msgstr "Enviando {0}."
+
+msgid "Done"
+msgstr "Concluído"
+
+msgid "Choose the files to send."
+msgstr "Escolha os arquivos para enviar."
+
+msgid "Android is off. Start a session to send files."
+msgstr "O Android está desligado. Inicie uma sessão para enviar arquivos."
+
+msgid "Only files can be sent: {0} is a folder."
+msgstr "Só arquivos podem ser enviados: {0} é uma pasta."
+
+msgid "Could not send {0}."
+msgstr "Não foi possível enviar {0}."
+
+msgid "the files"
+msgstr "os arquivos"
+
+msgid "Camera and microphone…"
+msgstr "Câmera e microfone…"
+
+msgid "Camera and microphone: %1"
+msgstr "Câmera e microfone: %1"
+
+msgid "Microphone"
+msgstr "Microfone"
+
+msgid "Android applications record from this microphone. A change applies to the next recording."
+msgstr "Os aplicativos Android gravam deste microfone. A troca vale a partir da próxima gravação."
+
+msgid "Linux default"
+msgstr "Padrão do Linux"
+
+msgid "{0} (disconnected)"
+msgstr "{0} (desligado)"
+
+msgid "Android did not confirm the microphone."
+msgstr "O Android não confirmou o microfone."
+
+msgid "The microphones could not be listed."
+msgstr "Não foi possível listar os microfones."
+
+msgid "Ask which app to use when a link can open in Android or on Linux"
+msgstr "Perguntar qual aplicativo usar quando um link puder abrir no Android ou no Linux"
+
+msgid "Only for addresses that another app or program also opens."
+msgstr "Só para endereços que outro aplicativo ou programa também abre."
+
+msgid "Open with — MultiPak"
+msgstr "Abrir com — MultiPak"
+
+msgid "Open this address with:"
+msgstr "Abrir este endereço com:"
+
+msgid "No program opens this address."
+msgstr "Nenhum programa abre este endereço."
+
+msgid "Could not open the address: {0}"
+msgstr "Não foi possível abrir o endereço: {0}"
+
+msgid "Could not load the window."
+msgstr "Não foi possível carregar a janela."
+
+msgid "This address cannot be opened."
+msgstr "Este endereço não pode ser aberto."
+
+msgid "Could not update the choice for Android app links: {0}"
+msgstr "Não foi possível atualizar a escolha dos links de aplicativos Android: {0}"
+
+msgid "Webcam"
+msgstr "Webcam"
+
+msgid "Android sees only this webcam. A change applies when Android restarts."
+msgstr "O Android vê só esta webcam. A troca vale quando o Android reiniciar."
+
+msgid "Restart Android"
+msgstr "Reiniciar o Android"
+
+msgid "Restarting Android…"
+msgstr "Reiniciando o Android…"
+
+msgid "Automatic (the first webcam that works)"
+msgstr "Automática (a primeira webcam que funciona)"
+
+msgid "No camera"
+msgstr "Nenhuma câmera"
+
+msgid "{0} — does not work in this Android (it needs {1})"
+msgstr "{0} — não funciona neste Android (ele precisa de {1})"
+
+msgid "Android did not confirm the webcam."
+msgstr "O Android não confirmou a webcam."
+
+msgid "Android 11: some camera apps, such as the Camera app, may not work."
+msgstr "Android 11: alguns apps de câmera, como o app Câmera, podem não funcionar."
+
+msgid "Send files"
+msgstr "Enviar arquivos"
+
+msgid "Camera and microphone"
+msgstr "Câmera e microfone"
+
+msgid "Remove container"
+msgstr "Remover contêiner"
+
+msgid "Restart container"
+msgstr "Reiniciar contêiner"
+
+msgid "Container not found: it was deleted or renamed. Uninstalling removes only the shortcut and MultiPak's record."
+msgstr "Contêiner não encontrado: ele foi apagado ou renomeado. Desinstalar remove só o atalho e o registro do MultiPak."
+
+msgid "Its container was not found. Only the shortcut and MultiPak's record will be removed; if the container comes back, the application will not be listed anymore."
+msgstr "O contêiner dele não foi encontrado. Só o atalho e o registro do MultiPak serão removidos; se o contêiner voltar, o aplicativo não aparecerá mais na lista."
+
+msgid "Shortcut and record removed."
+msgstr "Atalho e registro removidos."
+
+msgid "This application's container is available again."
+msgstr "O contêiner deste aplicativo está disponível de novo."
+
+msgid "Approve"
+msgstr "Aprovar"
+
+msgid "Decline"
+msgstr "Recusar"
+
+msgid "If you decline, the current version stays installed and nothing changes."
+msgstr "Se você recusar, a versão atual continua instalada e nada muda."
+
+msgid "New permissions"
+msgstr "Novas autorizações"
+
+msgid "{0} ({1})"
+msgstr "{0} ({1})"
+
+msgid "This application accepts connections from other computers on the network (port {0})."
+msgstr "Este aplicativo aceita conexões de outros computadores da rede (porta {0})."
+
+msgid "This application accepts connections from other computers on the network (address {0}, port {1})."
+msgstr "Este aplicativo aceita conexões de outros computadores da rede (endereço {0}, porta {1})."
+
+msgid "Play sound"
+msgstr "Reproduzir som"
+
+msgid "Record sound from the microphone"
+msgstr "Gravar som do microfone"
+
+msgid "Announce and find services on the local network"
+msgstr "Anunciar e encontrar serviços na rede local"
+
+msgid "Find services on the local network"
+msgstr "Encontrar serviços na rede local"
+
+msgid "Use Bluetooth devices"
+msgstr "Usar dispositivos Bluetooth"
+
+msgid "Run a web browser engine"
+msgstr "Rodar um motor de navegador web"
+
+msgid "Use the camera"
+msgstr "Usar a câmera"
+
+msgid "Use files shared by another snap"
+msgstr "Usar arquivos compartilhados por outro snap"
+
+msgid "Manage printers and print jobs"
+msgstr "Gerenciar impressoras e trabalhos de impressão"
+
+msgid "Use the desktop: fonts, themes and notifications"
+msgstr "Usar a área de trabalho: fontes, temas e notificações"
+
+msgid "Read your GnuPG keys"
+msgstr "Ler suas chaves GnuPG"
+
+msgid "Read information about the computer's hardware"
+msgstr "Ler informações sobre o hardware do computador"
+
+msgid "Read and change the files in your home folder"
+msgstr "Ler e alterar os arquivos da sua pasta pessoal"
+
+msgid "Use game controllers"
+msgstr "Usar controles de jogo"
+
+msgid "Change the system language settings"
+msgstr "Mudar as configurações de idioma do sistema"
+
+msgid "Control login sessions"
+msgstr "Controlar as sessões de login"
+
+msgid "See the mounted disks and folders"
+msgstr "Ver os discos e pastas montados"
+
+msgid "Access the internet and the network"
+msgstr "Acessar a internet e a rede"
+
+msgid "Accept network connections"
+msgstr "Aceitar conexões pela rede"
+
+msgid "Manage the network connections"
+msgstr "Gerenciar as conexões de rede"
+
+msgid "See the network settings and connections"
+msgstr "Ver as configurações e conexões de rede"
+
+msgid "Use the graphics card"
+msgstr "Usar a placa de vídeo"
+
+msgid "Read and store passwords in your keyring"
+msgstr "Ler e guardar senhas no seu chaveiro"
+
+msgid "Control other programs running on the computer"
+msgstr "Controlar outros programas em execução no computador"
+
+msgid "Play and record sound"
+msgstr "Reproduzir e gravar som"
+
+msgid "Access USB devices directly"
+msgstr "Acessar dispositivos USB diretamente"
+
+msgid "Read and change files on USB drives and other disks"
+msgstr "Ler e alterar arquivos em pendrives e outros discos"
+
+msgid "Keep the screen from turning off"
+msgstr "Impedir que a tela se desligue"
+
+msgid "Use serial ports"
+msgstr "Usar portas seriais"
+
+msgid "Shut down or restart the computer"
+msgstr "Desligar ou reiniciar o computador"
+
+msgid "Read your SSH keys"
+msgstr "Ler suas chaves SSH"
+
+msgid "Read your public SSH keys"
+msgstr "Ler suas chaves SSH públicas"
+
+msgid "See the programs running on the computer"
+msgstr "Ver os programas em execução no computador"
+
+msgid "Use security keys"
+msgstr "Usar chaves de segurança"
+
+msgid "Use the desktop of an X11 session"
+msgstr "Usar a área de trabalho de uma sessão X11"
+
+msgid "Show windows in a Wayland session"
+msgstr "Mostrar janelas numa sessão Wayland"
+
+msgid "Show windows and read the X11 session"
+msgstr "Mostrar janelas e ler a sessão X11"
+
+msgid "Create the local socket {0} for the service {1}"
+msgstr "Criar o socket local {0} para o serviço {1}"
+
+msgid "Accept connections only from this computer (port {0})"
+msgstr "Aceitar conexões só deste computador (porta {0})"
+
+msgid "Replace {0} with an empty temporary folder inside the app"
+msgstr "Trocar {0} por uma pasta temporária vazia dentro do aplicativo"
+
+msgid "Replace {0} with a link to {1} inside the app"
+msgstr "Trocar {0} por um link para {1} dentro do aplicativo"
+
+msgid "Replace {0} with {1} inside the app"
+msgstr "Trocar {0} por {1} dentro do aplicativo"
+
+msgid "Run without confinement (classic), with full access to the system"
+msgstr "Rodar sem isolamento (classic), com acesso total ao sistema"
+
+msgid "Start a background service: {0}"
+msgstr "Iniciar um serviço em segundo plano: {0}"
+
+msgid "Start the service {0} automatically on a schedule ({1})"
+msgstr "Iniciar o serviço {0} automaticamente em horários marcados ({1})"
+
+msgid "Use the D-Bus name {0} in your session"
+msgstr "Usar o nome D-Bus {0} na sua sessão"
+
+msgid "Create the system user {0}"
+msgstr "Criar o usuário de sistema {0}"
+
+msgid "Write to {0}"
+msgstr "Gravar em {0}"
+
+msgid "Read {0}"
+msgstr "Ler {0}"
+
+msgid "Use the {0} interface"
+msgstr "Usar a interface {0}"
+
+msgid "The new version of {0} needs 1 new permission:"
+msgstr "A nova versão de {0} exige 1 nova autorização:"
+
+msgid "The new version of {0} needs {1} new permissions:"
+msgstr "A nova versão de {0} exige {1} novas autorizações:"
+
+msgid "Accept connections from other computers on the network (port {0})"
+msgstr "Aceitar conexões de outros computadores da rede (porta {0})"
+
+msgid "Accept connections from other computers on the network (address {0}, port {1})"
+msgstr "Aceitar conexões de outros computadores da rede (endereço {0}, porta {1})"

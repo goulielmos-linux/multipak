@@ -2,6 +2,8 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
+
 from multipak.kirigami import about
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -30,3 +32,11 @@ def test_the_build_records_the_manifest_versions(monkeypatch):
 
     versions = install_flatpak.bundled_versions()
     assert versions["lua"] and versions["popt"] and versions["rpm"]
+
+
+def test_the_section_lists_nothing_outside_the_flatpak(monkeypatch):
+    # Outside the Flatpak, unsquashfs and rpm would be the computer's own, not the bundled ones.
+    pytest.importorskip("PySide6.QtCore")
+    monkeypatch.setattr(about.host, "is_flatpak", lambda: False)
+    info = about.AboutInfo.__new__(about.AboutInfo)
+    assert about.AboutInfo.tools.fget(info) == []

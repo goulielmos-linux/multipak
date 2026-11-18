@@ -134,6 +134,10 @@ def prepare(session, uid, pid):
     background = session.get("background_start", "true")
     if background not in ("true", "false"):
         raise ValueError("Invalid session mode")
+    import multipak_microphone
+    microphone = multipak_microphone.check(session.get("microphone", ""))
+    import multipak_camera
+    camera = multipak_camera.check(session.get("camera", ""))
     owner = pwd.getpwuid(uid)
     # No host mount source or identity comes from the caller's dictionary.
     runtime = Path("/run/user") / str(uid)
@@ -177,5 +181,7 @@ def prepare(session, uid, pid):
         "xdg_data_home": str(Path(owner.pw_dir).resolve() / ".local/share"),
         "lcd_density": density,
         "background_start": background,
+        "microphone": microphone,
+        "camera": camera,
         "state": "STOPPED",
     }

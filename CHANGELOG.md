@@ -1,32 +1,5 @@
 # Changelog
 
-## Unreleased
-
-### Android
-
-- Install Android applications through Waydroid: `.apk` files and `.apkm`, `.apks`
-  and `.xapk` bundles. MultiPak reads the package's Android version requirements and
-  architecture and recommends an Android version.
-- Create separate Android containers, each with its own system images, applications,
-  data, network and shortcuts, using a bundled adapted Waydroid runtime. The system
-  Waydroid installation remains available as a separate option.
-- Optionally set up ARM translation for applications built only for ARM (Android 13
-  on x86_64).
-- Add Android containers to the Application Manager: create, open, stop, update and
-  remove them. Uninstall Android applications while keeping their data, and offer to
-  remove a container after its last application.
-- Show the adapted Waydroid runtime and LXC versions in About, with an explanation of
-  the Waydroid adaptations.
-- Associate Android package files with MultiPak. The new file type starts selected
-  without changing existing choices.
-- Android `.apk` apps and Alpine Linux `.apk` packages share the extension: MultiPak
-  tells them apart by their contents (an Android app is a ZIP, an Alpine package a gzip
-  TAR), and the Android file type is a choice of its own in the file associations.
-
-### Application Manager
-
-- Waydroid integration in the side bar, with the Waydroid logo as its icon.
-
 ## 1.1.0
 
 ### New package formats
@@ -73,8 +46,30 @@
 - Update AppImages from the Application Manager, from the address they indicate, their
   project page or a link you enter.
 
+### Android
+
+- Install Android applications through Waydroid: `.apk` files and `.apkm`, `.apks`
+  and `.xapk` bundles. MultiPak reads the package's Android version requirements and
+  architecture and recommends an Android version.
+- Create separate Android containers, each with its own system images, applications,
+  data, network and shortcuts, using a bundled modified Waydroid runtime. The system
+  Waydroid installation remains available as a separate option.
+- Optionally set up ARM translation for applications built only for ARM (Android 13
+  on x86_64).
+- Add Android containers to the Application Manager: create, open, stop, update and
+  remove them. Uninstall Android applications while keeping their data, and offer to
+  remove a container after its last application.
+- Show the modified Waydroid runtime and LXC versions in About, with an explanation of
+  the Waydroid changes.
+- Associate Android package files with MultiPak. The new file type starts selected
+  without changing existing choices.
+- Android `.apk` apps and Alpine Linux `.apk` packages share the extension: MultiPak
+  tells them apart by their contents (an Android app is a ZIP, an Alpine package a gzip
+  TAR), and the Android file type is a choice of its own in the file associations.
+
 ### Application Manager
 
+- Waydroid integration in the side bar, with the Waydroid logo as its icon.
 - A new layout: a side bar with Install, Uninstall, Update, Snap services, File
   associations, Language and About, with its own icons.
 - Install from a file or from the Snap Store; snaps from the snapcraft.io site open
@@ -89,8 +84,9 @@
 ### Containers
 
 - Only containers that MultiPak created are treated as its own. When one is renamed or
-  deleted, its applications leave the lists, and a container that takes its name is
-  never updated by mistake.
+  deleted, its applications are marked "container not found" in the Application Manager
+  and removed only when you ask, and a container that takes its name is never updated by
+  mistake.
 - When the container of an AppImage was renamed or deleted, the Application Manager
   offers to repair or delete it.
 
@@ -98,6 +94,11 @@
 
 - Closing an update notice no longer postpones it; only Remind me later does.
 - When an operation fails, details that only repeat the message are no longer offered.
+
+## 1.0.3
+
+- Fix RPM inspection in the Flatpak by installing the bundled RPM libraries
+  in the runtime library search path.
 
 ## 1.0.2
 

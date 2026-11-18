@@ -20,3 +20,4 @@ keyctl errno 0
 request_key errno 0
 swapoff errno 0
 swapon errno 0
+ioctl errno 1 [1,4294967295,SCMP_CMP_MASKED_EQ,2147768445]

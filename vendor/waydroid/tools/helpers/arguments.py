@@ -1,3 +1,4 @@
+# Modified by MultiPak on 2026-11-18 for named Android environments and desktop integration.
 # Copyright 2021 Oliver Smith
 # SPDX-License-Identifier: GPL-3.0-or-later
 import argparse
@@ -171,9 +172,28 @@ def arguments():
     input_settings.add_argument("mode", choices=("get", "set"))
     input_settings.add_argument("PACKAGE")
     input_settings.add_argument("--touch", choices=("on", "off"), default="off")
-    input_settings.add_argument("--keyboard", choices=("on", "off"), default="off")
+    input_settings.add_argument("--keyboard", choices=("on", "off"))
     input_settings.add_argument("--navigation", choices=("on", "off"))
     input_settings.add_argument("--arrows", choices=("on", "off"))
+    input_settings.add_argument("--links-android", choices=("on", "off"))
+    sub.add_parser("diagnose", help="show which desktop integrations are active")
+    links = sub.add_parser("links", help="open Android links in the Linux browser")
+    links.add_argument("mode", choices=("on", "off"))
+    keyboard = sub.add_parser("keyboard", help="show the virtual keyboard in this container")
+    keyboard.add_argument("mode", choices=("get", "on", "off"))
+    send = sub.add_parser("send", help="send files to the Android Download folder")
+    send.add_argument("--progress", action="store_true",
+                      help="print the progress for the Manager instead of notifications")
+    send.add_argument("FILE", nargs="+")
+    microphone = sub.add_parser("microphone", help="choose the Linux microphone Android records from")
+    microphone.add_argument("mode", choices=("list", "set"))
+    microphone.add_argument("NAME", nargs="?", help="a source name from the list; none for the Linux default")
+    camera = sub.add_parser("camera", help="choose the Linux webcam Android sees (when Android starts)")
+    camera.add_argument("mode", choices=("list", "set"))
+    camera.add_argument("ID", nargs="?", help="auto (default), none, or a webcam id from the list")
+    open_uri = sub.add_parser("open-uri", help="open an address in an Android application")
+    open_uri.add_argument("PACKAGE")
+    open_uri.add_argument("URI", nargs="?")
     arguments_prop(sub)
     arguments_fullUI(sub)
     arguments_firstLaunch(sub)

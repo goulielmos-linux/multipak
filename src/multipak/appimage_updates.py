@@ -773,16 +773,43 @@ def _processes():
     return result.stdout
 
 
+# Programs that run another file given as their first argument: a script or a program
+# of the AppImage started through them is still the AppImage's.
+_INTERPRETERS = re.compile(
+    r"(?:ld-linux.*\.so.*|ld-musl.*|(?:ba|da|z)?sh|python[0-9.]*|perl[0-9.]*|ruby[0-9.]*"
+    r"|node|java|mono|wine[0-9]*|lua[0-9.]*|tclsh[0-9.]*|wish[0-9.]*)"
+)
+
+
 def running(store, tx, lister=_processes):
-    """IDs of processes started from this AppImage."""
+    """IDs of processes started from this AppImage: their program is one of its files.
+    A program that merely has one of its files open (an editor showing a file of the
+    AppDir) is not one of them, so it is not asked to close."""
     directory = store.appimage_directory(tx.id)
     markers = (str(directory / "AppDir") + "/", str(directory / "application.AppImage"))
     found = []
     for line in lister().splitlines():
         pid, _, arguments = line.strip().partition(" ")
-        if pid.isdigit() and int(pid) != os.getpid() and any(m in arguments for m in markers):
+        if not pid.isdigit() or int(pid) == os.getpid():
+            continue
+        arguments = arguments.strip()
+        program, _, rest = arguments.partition(" ")
+        started = arguments.startswith(markers) or (
+            _INTERPRETERS.fullmatch(os.path.basename(program)) is not None
+            and _first_file(rest).startswith(markers)
+        )
+        if started:
             found.append(int(pid))
     return found
+
+
+def _first_file(arguments):
+    """The arguments from the first one that is not an option (python3 -u FILE, sh -e
+    FILE), kept whole: the file's path may contain spaces."""
+    words = arguments.split(" ")
+    while words and (not words[0] or words[0].startswith("-")):
+        words.pop(0)
+    return " ".join(words)
 
 
 def close(store, tx, *, lister=_processes, signal=None, wait=10.0, sleep=time.sleep):

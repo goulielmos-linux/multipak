@@ -78,6 +78,37 @@ def release_identity(release: dict[str, str]) -> tuple[str, str]:
     return OS_RELEASE_FAMILIES.get(release_id, release_id), version
 
 
+def root_exec(container: str) -> list[str]:
+    """podman exec as uid 0. A numeric user needs no lookup in the container's passwd,
+    which podman can lose for a long-running container ("unable to find user root")."""
+    return ["podman", "exec", "--user", "0:0", container]
+
+
+def copy_into(runner: Runner, container: str, source, destination: str, timeout=60) -> None:
+    """podman cp into a container, or with cp from /run/host when podman cp fails on a
+    running container whose users podman can no longer look up."""
+    try:
+        runner.run(["podman", "cp", str(source), f"{container}:{destination}"], timeout=timeout)
+    except CommandError as error:
+        inside = f"/run/host{Path(source).resolve()}"
+        try:
+            runner.run([*root_exec(container), "cp", "--", inside, destination], timeout=timeout)
+        except CommandError:
+            raise error from None
+
+
+def _copy_out(runner: Runner, container: str, source: str, path: Path) -> None:
+    try:
+        runner.run(["podman", "cp", f"{container}:{source}", str(path)], timeout=30)
+    except CommandError as error:
+        # Same podman failure as in copy_into; a stopped container keeps the first error.
+        try:
+            text = runner.run([*root_exec(container), "cat", "--", source], timeout=30)
+        except CommandError:
+            raise error from None
+        path.write_text(text, encoding="utf-8")
+
+
 def read_os_release(runner: Runner, container: str) -> dict[str, str]:
     # Works for stopped containers too, without starting or modifying them.
     with TemporaryDirectory(
@@ -85,11 +116,11 @@ def read_os_release(runner: Runner, container: str) -> dict[str, str]:
     ) as directory:
         path = Path(directory) / "os-release"
         try:
-            runner.run(["podman", "cp", f"{container}:/usr/lib/os-release", str(path)], timeout=30)
+            _copy_out(runner, container, "/usr/lib/os-release", path)
         except CommandError:
             # Slackware, Pisi Linux and SliTaz keep the file only in /etc.
             path.unlink(missing_ok=True)
-            runner.run(["podman", "cp", f"{container}:/etc/os-release", str(path)], timeout=30)
+            _copy_out(runner, container, "/etc/os-release", path)
         if path.is_symlink() or not path.is_file() or path.stat().st_size > 65536:
             raise ValueError(
                 tr(

@@ -1,6 +1,6 @@
 # How MultiPak runs AppImages
 
-*MultiPak 1.2.0. Translated from the [Portuguese version](howappimagecompatibilityworks.pt-BR.md), which is the reference text.*
+*MultiPak 1.1.0. Translated from the [Portuguese version](howappimagecompatibilityworks.pt-BR.md), which is the reference text.*
 
 ---
 
@@ -452,8 +452,10 @@ it reruns the dependency analysis (`_with_dependencies`):
   Manager proposes **moving it to the container** (`needs_container`).
 
 **Application open:** `running` looks in the system's `ps -eo pid=,args=` for processes
-whose command mentions `appimages/<id>/AppDir/` or the copy. If there are any, the
-Manager asks you to close it; "Close" sends `SIGTERM` and waits up to 10 s. This is
+whose program is `appimages/<id>/AppDir/…` or the copy, or an interpreter or the loader
+(`python3`, `sh`, `ld-linux…`, `java`…) whose first file is one of them. A program that
+only has one of its files open, such as an editor showing a file of the AppDir, is not
+counted. If there are any, the Manager asks you to close it; "Close" sends `SIGTERM` and waits up to 10 s. This is
 checked before the download and again before the switch.
 
 **Switch** (`appimage.update`): moves the current copy to `previous.AppImage` and

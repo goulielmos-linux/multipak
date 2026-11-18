@@ -179,6 +179,8 @@ def test_os_release_falls_back_to_etc_for_slackware():
 
         def run(self, argv, **_kwargs):
             self.calls.append(argv)
+            if argv[1] == "exec":
+                raise CommandError(argv, 125, "container is not running")
             if argv[2].endswith(":/usr/lib/os-release"):
                 raise CommandError(argv, 125, "no such file")
             Path(argv[3]).write_text(RELEASE)

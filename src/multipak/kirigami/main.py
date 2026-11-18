@@ -603,6 +603,14 @@ class Welcome(QObject):
     def snapRefusal(self):
         return _message_html(self._snap_refusal)
 
+    @Property(str, notify=dataChanged)
+    def snapNetworkWarning(self):
+        """One sentence for each port other computers on the network can connect to."""
+        from multipak.snap_meta import network_ports
+
+        info = getattr(self.package, "snap", None)
+        return _message_html("\n".join(network_ports(info))) if info else ""
+
     @Property(bool, notify=dataChanged)
     def snapClassic(self):
         info = getattr(self.package, "snap", None)

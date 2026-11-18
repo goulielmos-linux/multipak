@@ -10,7 +10,7 @@ import tarfile
 import tempfile
 from pathlib import Path
 
-BUNDLE_SHA256 = "ae044c3b8b85960eacf47204d2b3b13865b1ce9da95af84447c47757f9064129"
+BUNDLE_SHA256 = "e9242aef29528c8401090ca754edeb242afd0f40521fbb08a94a3a60deb7b916"
 BASE = Path("/usr/local/libexec/multipak-system")
 
 

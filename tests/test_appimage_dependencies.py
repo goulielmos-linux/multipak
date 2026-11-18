@@ -10,6 +10,7 @@ import pytest
 
 from multipak import appimage, appimage_container, appimage_dependencies, containers
 from multipak.appimage_dependencies import (
+    GLIBC_COMPONENTS,
     Dependency,
     DependencyReport,
     analyze,
@@ -87,7 +88,8 @@ class FakeArchive:
 def test_analysis_reports_only_what_the_system_lacks(tmp_path):
     binary = Path(SYSTEM_BINARY).resolve().read_bytes()
     needed = elf_dependencies(binary).needed
-    external = [name for name in needed if name != "libc.so.6"]
+    # glibc's own parts (libc, libm, the loader…) are checked by version, never listed.
+    external = [name for name in needed if not GLIBC_COMPONENTS.match(name)]
     archive = FakeArchive(
         {
             "AppRun": b'#!/bin/bash\nexec /usr/bin/env python3 "$HERE/usr/bin/app.py"\n',
@@ -1013,19 +1015,41 @@ def forget_setup(store, rows):
     return engine, kept, renamed, deleted
 
 
-def test_applications_of_renamed_or_deleted_containers_are_forgotten(store):
+def test_applications_of_renamed_or_deleted_containers_are_only_reported(store):
     rows = [
         {"Id": "a" * 64, "Names": ["MultiPak-Fedora-45"]},
         {"Id": "b" * 64, "Names": ["Meu Ubuntu"]},  # Renamed; "c" was deleted.
     ]
     engine, kept, renamed, deleted = forget_setup(store, rows)
-    forgotten = containers.forget_abandoned(engine)
-    assert {tx.id for tx in forgotten} == {renamed.id, deleted.id}
-    assert [tx.id for tx in store.transactions()] == [kept.id]
+    found = containers.abandoned(engine)
+    assert {tx.id for tx in found} == {renamed.id, deleted.id}
+    # Nothing is removed until the user asks.
+    assert len(store.transactions()) == 3
+    assert store.launcher(renamed, renamed.launchers[0]).exists()
+    containers.forget(engine, renamed)
+    assert sorted(tx.id for tx in store.transactions()) == sorted([kept.id, deleted.id])
     assert store.launcher(kept, kept.launchers[0]).exists()
     assert not list(store.applications.glob(f"multipak-{renamed.id}-*"))
     # Nothing ran inside any container.
     assert all(argv[:2] == ["podman", "ps"] for argv in engine.runner.calls)
+
+
+def test_an_empty_answer_from_podman_removes_nothing(store):
+    # Podman answering with no containers at all (storage moved, a failed migration).
+    engine, *_ = forget_setup(store, [])
+    assert len(containers.abandoned(engine)) == 3
+    assert len(store.transactions()) == 3
+
+
+def test_an_application_whose_container_came_back_is_not_forgotten(store):
+    engine, kept, *_ = forget_setup(store, [{"Id": "b" * 64, "Names": ["Meu Ubuntu"]}])
+    # The list was loaded while "a" was missing; it is back before the user confirms.
+    engine.runner = Recorder(
+        lambda argv: json.dumps([{"Id": "a" * 64, "Names": ["MultiPak-Fedora-45"]}])
+    )
+    with pytest.raises(RuntimeError):
+        containers.forget(engine, kept)
+    assert store.launcher(kept, kept.launchers[0]).exists()
 
 
 def test_nothing_is_forgotten_when_podman_cannot_be_queried(store):
@@ -1036,7 +1060,7 @@ def test_nothing_is_forgotten_when_podman_cannot_be_queried(store):
 
     engine.runner.run = failing
     engine._log = lambda text: None
-    assert containers.forget_abandoned(engine) == []
+    assert containers.abandoned(engine) == []
     assert len(store.transactions()) == 3
 
 

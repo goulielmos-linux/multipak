@@ -111,6 +111,15 @@ Kirigami.ScrollablePage {
             Layout.fillWidth: true
         }
 
+        // Always shown, not folded into the alerts: other computers can connect to it.
+        Kirigami.InlineMessage {
+            objectName: "snapNetworkWarning"
+            visible: !page.refused && welcome.snapNetworkWarning.length > 0
+            text: welcome.snapNetworkWarning
+            type: Kirigami.MessageType.Warning
+            Layout.fillWidth: true
+        }
+
         Kirigami.AbstractCard {
             id: alertsCard
             objectName: "snapAlerts"

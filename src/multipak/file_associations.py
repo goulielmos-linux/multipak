@@ -142,6 +142,10 @@ def _atomic_write(path, content):
 
 
 def _atomic_write_bytes(path, content):
+    # A link (dotfiles kept with stow, chezmoi…) stays a link: the file it points to is
+    # replaced instead of the link itself.
+    if path.is_symlink():
+        path = Path(os.path.realpath(path))
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
     temporary.write_bytes(content)

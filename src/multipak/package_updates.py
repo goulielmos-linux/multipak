@@ -5,12 +5,14 @@ updates the whole container; this only tells which applications have something n
 """
 
 import json
+import secrets
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 from . import host
+from .environments import copy_into
 from .models import valid_environment_name
 from .package_check import MARK
 
@@ -18,7 +20,11 @@ from .package_check import MARK
 SUPPORTED = frozenset(
     {"deb", "rpm", "arch", "apk", "xbps", "eopkg", "pisi", "slackware", "slitaz", "gentoo"}
 )
-TARGET = "/tmp/multipak-package-check.py"
+# Distrobox shares /tmp with the host, so a fixed name there could be created or
+# replaced by another user of the computer before it runs. Each check uses a new
+# folder with a random name, created with mode 700 (mkdir fails if it already exists).
+FOLDER = "/tmp/multipak-check-"
+SCRIPT = "package-check.py"
 # Results older than this are shown as not checked.
 FRESH = 24 * 60 * 60
 
@@ -40,13 +46,20 @@ def check_container(runner, name, kind, packages, *, refresh=False, now=time.tim
     packages = list(dict.fromkeys(packages))
     if not packages:
         return {}
-    script = Path(__file__).with_name("package_check.py")
-    with host.accessible_file(script) as visible:
-        runner.run(["podman", "cp", str(visible), f"{name}:{TARGET}"], timeout=60)
-    command = ["distrobox", "enter", "--name", name, "--no-tty", "--no-workdir", "--"]
-    command += ["sudo", "-n", "python3", TARGET, kind]
-    command += ["--refresh"] if refresh else []
-    output = runner.run([*command, *packages], timeout=900 if refresh else 300)
+    enter = ["distrobox", "enter", "--name", name, "--no-tty", "--no-workdir", "--"]
+    folder = FOLDER + secrets.token_hex(8)
+    target = f"{folder}/{SCRIPT}"
+    runner.run([*enter, "mkdir", "-m", "700", "--", folder], timeout=120)
+    try:
+        script = Path(__file__).with_name("package_check.py")
+        with host.accessible_file(script) as visible:
+            copy_into(runner, name, visible, target)
+        command = [*enter, "sudo", "-n", "python3", target, kind]
+        command += ["--refresh"] if refresh else []
+        output = runner.run([*command, *packages], timeout=900 if refresh else 300)
+    finally:
+        # The copied script belongs to the container's root.
+        runner.run([*enter, "sudo", "-n", "rm", "-rf", "--", folder], check=False, timeout=60)
     return parse_output(output, packages, now())
 
 

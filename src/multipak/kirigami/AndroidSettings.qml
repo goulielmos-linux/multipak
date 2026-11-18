@@ -44,19 +44,19 @@ Controls.ApplicationWindow {
                 enabled: androidSettings.ready && !androidSettings.busy
             }
             Controls.CheckBox {
-                id: keyboard
-                objectName: "androidVirtualKeyboard"
-                text: qsTr("Show the virtual keyboard")
-                checked: androidSettings.keyboard
-                enabled: androidSettings.ready && !androidSettings.busy
-                Layout.fillWidth: true
-            }
-            Controls.CheckBox {
                 id: arrows
                 objectName: "androidArrowGestures"
                 text: qsTr("Use arrow keys as swipe gestures")
                 checked: androidSettings.arrows
                 enabled: androidSettings.ready && !androidSettings.busy
+            }
+            Controls.CheckBox {
+                id: linksAndroid
+                objectName: "androidLinksInAndroid"
+                text: qsTr("Open this application's links in Android")
+                checked: androidSettings.linksAndroid
+                enabled: androidSettings.ready && !androidSettings.busy
+                Layout.fillWidth: true
             }
             Controls.BusyIndicator {
                 visible: androidSettings.busy
@@ -91,7 +91,7 @@ Controls.ApplicationWindow {
             enabled: !androidSettings.busy
             highlighted: true
             onClicked: androidSettings.ready
-                ? androidSettings.save(touch.checked, keyboard.checked, arrows.checked) : androidSettings.refresh()
+                ? androidSettings.save(touch.checked, arrows.checked, linksAndroid.checked) : androidSettings.refresh()
             Controls.DialogButtonBox.buttonRole: Controls.DialogButtonBox.ApplyRole
         }
         Controls.Button {

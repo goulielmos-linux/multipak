@@ -1,6 +1,6 @@
 # Como o MultiPak instala pacotes do Pisi Linux
 
-*MultiPak 1.2.0.*
+*MultiPak 1.1.0.*
 
 ---
 

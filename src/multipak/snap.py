@@ -547,31 +547,59 @@ def _bus_marker(tx):
     return f"# MultiPak snap {tx.id}"
 
 
+_BUS_CALL = [
+    "busctl",
+    "--user",
+    "call",
+    "org.freedesktop.DBus",
+    "/org/freedesktop/DBus",
+    "org.freedesktop.DBus",
+]
+# Names of the desktop itself (portals, secrets, notifications…). Never a snap's, even
+# when the session bus does not know them yet.
+_RESERVED_BUS_PREFIXES = ("org.freedesktop.",)
+
+
 def _reload_bus(runner):
     try:
-        runner.run(
-            [
-                "busctl",
-                "--user",
-                "call",
-                "org.freedesktop.DBus",
-                "/org/freedesktop/DBus",
-                "org.freedesktop.DBus",
-                "ReloadConfig",
-            ],
-            timeout=30,
-        )
+        runner.run([*_BUS_CALL, "ReloadConfig"], timeout=30)
     except (CommandError, OSError):
         pass  # The bus reads new files on its own too.
+
+
+def _names_on_bus(runner):
+    """Names the session bus already has or can start: owned by a running program, or
+    in a service file of the system or of another program. The user's own folder takes
+    precedence over the system's, so writing one of these names there would take it
+    away from its program."""
+    names = set()
+    for method in ("ListNames", "ListActivatableNames"):
+        try:
+            output = runner.run([*_BUS_CALL, method], timeout=30)
+        except (CommandError, OSError):
+            continue
+        try:
+            # 'as 3 "org.freedesktop.DBus" ":1.2" "org.example.Name"'
+            words = shlex.split(output) if isinstance(output, str) else []
+        except ValueError:
+            continue
+        names.update(word for word in words[2:] if not word.startswith(":"))
+    return names
 
 
 def _write_bus_services(engine, tx, info):
     """As snapd does for activates-on and bus-name: asking the session bus for the
     name starts the service. A name another program already provides is left to it."""
     written = False
+    taken = None
     for path, name in _bus_files(tx, info):
         bus_name = path.name.removesuffix(".service")
-        if path.exists() and _bus_marker(tx) not in path.read_text(errors="replace"):
+        mine = path.exists() and _bus_marker(tx) in path.read_text(errors="replace")
+        if not mine and taken is None:
+            taken = _names_on_bus(engine.runner)
+        if not mine and (
+            path.exists() or bus_name in taken or bus_name.startswith(_RESERVED_BUS_PREFIXES)
+        ):
             engine._log(
                 tr("The D-Bus name {0} belongs to another program; it does not start {1}.").format(
                     bus_name, name

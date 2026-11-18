@@ -1,6 +1,8 @@
+import QtCore
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
+import QtQuick.Dialogs as Dialogs
 import org.kde.kirigami as Kirigami
 import "BreezeIcons.js" as BreezeIcons
 
@@ -20,6 +22,10 @@ Kirigami.ScrollablePage {
     property string removalName: ""
     property string updateId: ""
     property string updateName: ""
+    property string sendId: ""
+    property string sendName: ""
+    property string microphoneId: ""
+    property string microphoneName: ""
     property bool detailsExpanded: false
     padding: outerMargin
 
@@ -68,6 +74,19 @@ Kirigami.ScrollablePage {
                 enabled: !controller.busy
                 onClicked: createDialog.open()
             }
+        }
+        Controls.CheckBox {
+            objectName: "androidManagerAskLinks"
+            text: qsTr("Ask which app to use when a link can open in Android or on Linux")
+            checked: controller.askLinks
+            enabled: !controller.busy
+            onToggled: {
+                controller.setAskLinks(checked);
+                checked = Qt.binding(() => controller.askLinks);
+            }
+            Controls.ToolTip.visible: hovered
+            Controls.ToolTip.text: qsTr("Only for addresses that another app or program also opens.")
+            Layout.fillWidth: true
         }
         Kirigami.AbstractCard {
             visible: !controller.busy && controller.rows.length === 0
@@ -162,9 +181,6 @@ Kirigami.ScrollablePage {
                                 color: Kirigami.Theme.disabledTextColor
                                 wrapMode: Text.WordWrap
                                 Layout.fillWidth: true
-                                HoverHandler { id: statsHover }
-                                Controls.ToolTip.visible: statsHover.hovered
-                                Controls.ToolTip.text: qsTr("Resource usage for the entire Android container. CPU at 100% means one fully occupied core.")
                             }
                         }
                         Controls.ToolButton {
@@ -197,7 +213,7 @@ Kirigami.ScrollablePage {
                                 objectName: "androidManagerMenu" + containerCard.index
                                 Controls.MenuItem {
                                     objectName: "androidManagerUpdate" + containerCard.index
-                                    text: qsTr("Update container…")
+                                    text: qsTr("Update container")
                                     icon.source: BreezeIcons.source("system-software-update", Kirigami.Theme.backgroundColor)
                                     enabled: !controller.busy && containerCard.modelData.initialized === true
                                     onTriggered: {
@@ -207,8 +223,57 @@ Kirigami.ScrollablePage {
                                     }
                                 }
                                 Controls.MenuItem {
+                                    objectName: "androidManagerRestart" + containerCard.index
+                                    text: qsTr("Restart container")
+                                    icon.source: BreezeIcons.source("view-refresh", Kirigami.Theme.backgroundColor)
+                                    enabled: !controller.busy && containerCard.active
+                                    onTriggered: controller.actOn(containerCard.modelData.id, "restart")
+                                }
+                                Controls.MenuItem {
+                                    objectName: "androidManagerKeepReady" + containerCard.index
+                                    text: qsTr("Start at login")
+                                    icon.source: BreezeIcons.source("user-online", Kirigami.Theme.backgroundColor)
+                                    checkable: true
+                                    checked: containerCard.modelData.keep_ready === true
+                                    enabled: !controller.busy && containerCard.modelData.initialized === true
+                                    onTriggered: controller.setKeepReady(containerCard.modelData.id, checked)
+                                }
+                                Controls.MenuItem {
+                                    objectName: "androidManagerKeyboard" + containerCard.index
+                                    text: qsTr("Show the virtual keyboard")
+                                    icon.source: BreezeIcons.source("input-keyboard-symbolic", Kirigami.Theme.backgroundColor)
+                                    checkable: true
+                                    checked: containerCard.modelData.keyboard === true
+                                    enabled: !controller.busy && containerCard.modelData.initialized === true
+                                    onTriggered: controller.setKeyboard(containerCard.modelData.id, checked)
+                                }
+                                Controls.MenuItem {
+                                    objectName: "androidManagerSend" + containerCard.index
+                                    text: qsTr("Send files")
+                                    icon.source: BreezeIcons.source("document-send", Kirigami.Theme.backgroundColor)
+                                    enabled: !controller.busy && !controller.sending.busy && containerCard.modelData.initialized === true
+                                    onTriggered: {
+                                        page.sendId = containerCard.modelData.id;
+                                        page.sendName = containerCard.modelData.label;
+                                        filePicker.open();
+                                    }
+                                }
+                                Controls.MenuItem {
+                                    objectName: "androidManagerMicrophone" + containerCard.index
+                                    text: qsTr("Camera and microphone")
+                                    icon.source: BreezeIcons.source("camera-web", Kirigami.Theme.backgroundColor)
+                                    enabled: !controller.busy && containerCard.modelData.initialized === true
+                                    onTriggered: {
+                                        page.microphoneId = containerCard.modelData.id;
+                                        page.microphoneName = containerCard.modelData.label;
+                                        controller.loadCamera(page.microphoneId);
+                                        controller.loadMicrophone(page.microphoneId);
+                                        microphoneDialog.open();
+                                    }
+                                }
+                                Controls.MenuItem {
                                     objectName: "androidManagerRemove" + containerCard.index
-                                    text: qsTr("Remove…")
+                                    text: qsTr("Remove container")
                                     icon.source: BreezeIcons.source("edit-delete", Kirigami.Theme.backgroundColor)
                                     enabled: !controller.busy
                                     onTriggered: {
@@ -379,6 +444,173 @@ Kirigami.ScrollablePage {
         }
         onOpened: deleteData.checked = false
         onAccepted: controller.removeInstance(page.removalId, deleteData.checked)
+    }
+    Controls.Dialog {
+        id: sendDialog
+        objectName: "androidSendDialog"
+        parent: Controls.Overlay.overlay
+        anchors.centerIn: parent
+        width: Math.min(page.width - page.outerMargin * 2, Kirigami.Units.gridUnit * 24)
+        title: qsTr("Sending to %1").arg(page.sendName)
+        modal: true
+        closePolicy: Controls.Popup.NoAutoClose
+        contentItem: ColumnLayout {
+            spacing: Kirigami.Units.largeSpacing
+            Controls.Label {
+                text: controller.sending.error || controller.sending.text
+                color: controller.sending.error ? Kirigami.Theme.negativeTextColor : Kirigami.Theme.textColor
+                textFormat: Text.PlainText
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+            Controls.ProgressBar {
+                visible: !controller.sending.error
+                from: 0
+                to: 1
+                value: Math.max(controller.sending.progress, 0)
+                indeterminate: controller.sending.busy && controller.sending.progress < 0
+                Layout.fillWidth: true
+            }
+        }
+        footer: Controls.DialogButtonBox {
+            Controls.Button {
+                objectName: "androidSendButton"
+                text: controller.sending.busy ? qsTr("Cancel") : qsTr("Close")
+                onClicked: controller.sending.busy ? controller.cancelSend() : sendDialog.close()
+            }
+        }
+        Connections {
+            target: controller
+            function onSendChanged() {
+                if (controller.sending.busy)
+                    return;
+                if (controller.sending.done)
+                    sendClose.restart();  // "Done" stays a moment, then the window closes.
+                else if (!controller.sending.error)
+                    sendDialog.close();  // Cancelled.
+            }
+        }
+        Timer {
+            id: sendClose
+            interval: 1500
+            onTriggered: sendDialog.close()
+        }
+    }
+    Controls.Dialog {
+        id: microphoneDialog
+        objectName: "androidMicrophoneDialog"
+        parent: Controls.Overlay.overlay
+        anchors.centerIn: parent
+        width: Math.min(page.width - page.outerMargin * 2, Kirigami.Units.gridUnit * 29)
+        title: qsTr("Camera and microphone: %1").arg(page.microphoneName)
+        modal: true
+        standardButtons: Controls.Dialog.Close
+        contentItem: ColumnLayout {
+            spacing: Kirigami.Units.largeSpacing
+            Kirigami.Heading {
+                level: 4
+                text: qsTr("Webcam")
+            }
+            Controls.Label {
+                text: qsTr("Android sees only this webcam. A change applies when Android restarts.")
+                textFormat: Text.PlainText
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+            RowLayout {
+                Controls.ComboBox {
+                    id: cameraChoice
+                    objectName: "androidCameraChoice"
+                    model: controller.cameras
+                    textRole: "label"; valueRole: "name"
+                    currentIndex: controller.cameraIndex
+                    enabled: !controller.cameraBusy && count > 0
+                    Layout.fillWidth: true
+                    Accessible.name: qsTr("Webcam")
+                    delegate: Controls.ItemDelegate {
+                        required property var modelData
+                        required property int index
+                        width: ListView.view ? ListView.view.width : implicitWidth
+                        text: modelData.label
+                        enabled: modelData.enabled
+                        highlighted: cameraChoice.highlightedIndex === index
+                    }
+                    onActivated: controller.setCamera(page.microphoneId, currentValue)
+                }
+                Controls.BusyIndicator {
+                    running: controller.cameraBusy
+                    visible: running
+                    Layout.preferredHeight: Kirigami.Units.iconSizes.medium
+                }
+            }
+            Controls.Label {
+                visible: text !== ""
+                text: controller.cameraNote
+                textFormat: Text.PlainText
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+            Controls.Label {
+                visible: text !== ""
+                text: controller.cameraError
+                textFormat: Text.PlainText
+                color: Kirigami.Theme.negativeTextColor
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+            Controls.Button {
+                objectName: "androidCameraRestart"
+                text: qsTr("Restart Android")
+                icon.source: BreezeIcons.source("view-refresh", Kirigami.Theme.backgroundColor)
+                enabled: !controller.busy
+                onClicked: controller.actOn(page.microphoneId, "restart")
+            }
+            Kirigami.Heading {
+                level: 4
+                text: qsTr("Microphone")
+            }
+            Controls.Label {
+                text: qsTr("Android applications record from this microphone. A change applies to the next recording.")
+                textFormat: Text.PlainText
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+            RowLayout {
+                Controls.ComboBox {
+                    objectName: "androidMicrophoneChoice"
+                    model: controller.microphones
+                    textRole: "label"; valueRole: "name"
+                    currentIndex: controller.microphoneIndex
+                    enabled: !controller.microphoneBusy && count > 0
+                    Layout.fillWidth: true
+                    Accessible.name: qsTr("Microphone")
+                    onActivated: controller.setMicrophone(page.microphoneId, currentValue)
+                }
+                Controls.BusyIndicator {
+                    running: controller.microphoneBusy
+                    visible: running
+                    Layout.preferredHeight: Kirigami.Units.iconSizes.medium
+                }
+            }
+            Controls.Label {
+                visible: text !== ""
+                text: controller.microphoneError
+                textFormat: Text.PlainText
+                color: Kirigami.Theme.negativeTextColor
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+        }
+    }
+    Dialogs.FileDialog {
+        id: filePicker
+        title: qsTr("Send files to %1").arg(page.sendName)
+        fileMode: Dialogs.FileDialog.OpenFiles
+        currentFolder: StandardPaths.writableLocation(StandardPaths.HomeLocation)
+        onAccepted: {
+            sendDialog.open();
+            controller.sendFiles(page.sendId, selectedFiles);
+        }
     }
     footer: Controls.ToolBar {
         id: footerBar

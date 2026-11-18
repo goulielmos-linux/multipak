@@ -32,6 +32,7 @@ from .environments import (
     CUSTOM_LABEL,
     OWNER_LABEL,
     SHARED_LABEL,
+    copy_into,
     discover,
     parse_os_release,
     read_os_release,
@@ -1341,4 +1342,4 @@ class Engine:
     def _copy_with_runner(self, runner: Runner, source: Path, destination: str) -> None:
         self._require_tx()
         with host.accessible_file(source) as visible:
-            runner.run(["podman", "cp", str(visible), f"{self.tx.container_id}:{destination}"])
+            copy_into(runner, self.tx.container_id, visible, destination, timeout=1800)

@@ -15,8 +15,10 @@ from multipak.models import Transaction
     [
         ("", True),
         ("package:io.github.multipak.gestures", True),
+        ("package:io.github.goulielmos_linux.multipak.controller", True),
+        ("package:io.github.goulielmos_linux.multipak.controller\npackage:io.github.multipak.gestures", True),
         ("package:org.example.external", False),
-        ("package:io.github.multipak.gestures\npackage:org.example.external", False),
+        ("package:io.github.goulielmos_linux.multipak.controller\npackage:org.example.external", False),
         ("Error: package manager unavailable", False),
         ("package:../bad", False),
     ],
@@ -46,6 +48,7 @@ def test_missing_or_invalid_confirmation_never_offers_removal(output):
     [
         ("", True),
         ("package:io.github.multipak.gestures", True),
+        ("package:io.github.goulielmos_linux.multipak.controller", True),
         ("package:org.example.external", False),
         ("Error: unavailable", False),
     ],
@@ -188,6 +191,8 @@ def test_privileged_recheck_blocks_removal_before_stopping_service(monkeypatch, 
 
 
 def test_privileged_recheck_accepts_only_helper_and_empty_lists(monkeypatch):
-    outputs = iter(["RUNNING", "package:android", "package:io.github.multipak.gestures"])
+    outputs = iter(
+        ["RUNNING", "package:android", "package:io.github.goulielmos_linux.multipak.controller\npackage:io.github.multipak.gestures"]
+    )
     monkeypatch.setattr(helper, "run", lambda _: next(outputs))
     helper.require_empty("androida")

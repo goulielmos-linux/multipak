@@ -192,11 +192,11 @@ Kirigami.Page {
                     anchors.margins: Kirigami.Units.smallSpacing
                     spacing: 0
 
-                    NavItem { key: "install"; iconName: "material-add-circle"; text: qsTr("Install") }
-                    NavItem { key: "remove"; iconName: "material-delete"; text: qsTr("Uninstall") }
+                    NavItem { key: "install"; iconName: "list-add"; text: qsTr("Install") }
+                    NavItem { key: "remove"; iconName: "trash-empty"; text: qsTr("Uninstall") }
                     NavItem {
                         key: "update"
-                        iconName: "material-update"
+                        iconName: "system-software-update"
                         text: qsTr("Update")
                         count: manager.updateCount
                     }
@@ -208,7 +208,7 @@ Kirigami.Page {
                     NavItem { key: "waydroid"; iconName: "waydroid"; text: qsTr("Waydroid integration") }
                     NavItem {
                         key: "snaps"
-                        iconName: "material-raven"
+                        iconName: "folder-snap-symbolic"
                         text: qsTr("Snap services")
                     }
                     Kirigami.Separator {
@@ -216,14 +216,14 @@ Kirigami.Page {
                         Layout.topMargin: Kirigami.Units.smallSpacing
                         Layout.bottomMargin: Kirigami.Units.smallSpacing
                     }
-                    NavItem { key: "associations"; iconName: "material-file-open"; text: qsTr("File associations") }
-                    NavItem { key: "language"; iconName: "material-translate"; text: qsTr("Language") }
+                    NavItem { key: "associations"; iconName: "document-open"; text: qsTr("File associations") }
+                    NavItem { key: "language"; iconName: "languages"; text: qsTr("Language") }
                     Kirigami.Separator {
                         Layout.fillWidth: true
                         Layout.topMargin: Kirigami.Units.smallSpacing
                         Layout.bottomMargin: Kirigami.Units.smallSpacing
                     }
-                    NavItem { key: "about"; iconName: "material-info"; text: qsTr("About") }
+                    NavItem { key: "about"; iconName: "help-about"; text: qsTr("About") }
                     Item { Layout.fillHeight: true }
                 }
             }

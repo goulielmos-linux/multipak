@@ -6,6 +6,11 @@ from . import android, android_instances
 from .localization import tr
 
 
+# MultiPak's own Android app, under its current and its old ID; it does not make a
+# container "in use".
+OWN_APPS = ("io.github.goulielmos_linux.multipak.controller", "io.github.multipak.gestures")
+
+
 @dataclass(frozen=True)
 class ManagedAndroidContainer:
     name: str
@@ -25,7 +30,7 @@ def no_user_apps(output):
             continue
         if not line.startswith("package:") or not android.valid_package_id(line[8:]):
             return False
-        if line[8:] != "io.github.multipak.gestures":
+        if line[8:] not in OWN_APPS:
             return False
     return True
 

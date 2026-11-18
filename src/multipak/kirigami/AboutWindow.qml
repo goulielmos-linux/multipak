@@ -230,24 +230,29 @@ InformationWindow {
                 spacing: 0
                 Layout.fillWidth: true
                 FormCard.FormDelegateSeparator { visible: backend.index > 0 }
-                FormCard.FormTextDelegate {
+                FormCard.FormButtonDelegate {
+                    objectName: "aboutBackendLicenseButton_" + backend.modelData.id
                     text: backend.modelData.name
                     description: backend.modelData.path
+                    onClicked: Qt.openUrlExternally(backend.modelData.licenseUrl)
                     contentItem: RowLayout {
                         spacing: Kirigami.Units.largeSpacing
                         ColumnLayout {
                             Layout.fillWidth: true
                             spacing: Kirigami.Units.smallSpacing
                             RowLayout {
-                                Controls.Label { text: backend.modelData.name }
+                                Controls.Label { id: backendName; text: backend.modelData.name }
                                 Controls.ToolButton {
                                     objectName: "aboutBackendInfoButton_" + backend.modelData.id
+                                    // As tall as the name, so this row keeps the same spacing as the others.
+                                    Layout.preferredHeight: backendName.implicitHeight
+                                    Layout.preferredWidth: backendName.implicitHeight
                                     visible: backend.modelData.id === "Waydroid"
-                                    text: qsTr("About the Waydroid adaptations")
+                                    text: qsTr("About the Waydroid changes")
                                     icon.source: BreezeIcons.source("help-about", Kirigami.Theme.backgroundColor)
                                     icon.width: Kirigami.Units.iconSizes.small
                                     icon.height: Kirigami.Units.iconSizes.small
-                                    padding: Kirigami.Units.smallSpacing
+                                    padding: 0
                                     display: Controls.AbstractButton.IconOnly
                                     Accessible.name: text
                                     Controls.ToolTip.visible: hovered
@@ -264,6 +269,12 @@ InformationWindow {
                             }
                         }
                         Controls.Label { text: backend.modelData.version }
+                        Kirigami.Icon {
+                            source: BreezeIcons.source("go-next-symbolic", Kirigami.Theme.backgroundColor)
+                            implicitWidth: Kirigami.Units.iconSizes.small
+                            implicitHeight: implicitWidth
+                            Accessible.ignored: true
+                        }
                     }
                 }
             }
@@ -274,10 +285,10 @@ InformationWindow {
         id: waydroidDialog
         objectName: "aboutWaydroidDialog"
         transientParent: about
-        title: qsTr("About the Waydroid adaptations")
+        title: qsTr("About the Waydroid changes")
         Controls.Label {
             objectName: "aboutWaydroidExplanation"
-            text: qsTr("MultiPak uses an adapted version of Waydroid to create and manage separate Android containers.\n\nEach container has its own:\n• System images\n• Applications and data\n• Network\n• Desktop shortcuts\n\nThe original system Waydroid environment remains available as a separate option.")
+            text: qsTr("MultiPak uses a modified version of Waydroid 1.6.3. The changes allow several separate Android containers, each with its own images, applications and data, network and shortcuts. They also integrate Android with Linux: links, notifications, media controls, volume per app, sending files and the choice of microphone and webcam.\n\nThe Waydroid installed on the system stays separate and is still offered as an option when installing.")
             textFormat: Text.PlainText
             wrapMode: Text.WordWrap
             Layout.fillWidth: true

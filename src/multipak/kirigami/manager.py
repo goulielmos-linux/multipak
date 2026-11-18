@@ -62,6 +62,16 @@ def package_format(tx) -> str:
     return "PET" if getattr(tx, "converted_from", "") == "puppy" else tx.package_kind.upper()
 
 
+def same_container(recorded, current):
+    """Whether the container MultiPak recorded for an application is this one. Records
+    without an ID (older versions) are matched by name only."""
+    recorded = (recorded or "").removeprefix("sha256:")
+    current = (current or "").removeprefix("sha256:")
+    if not recorded or not current:
+        return True
+    return recorded.startswith(current) or current.startswith(recorded)
+
+
 @dataclass(frozen=True)
 class ContainerApp:
     """An application in the update list. Updating it updates its whole container:
@@ -87,7 +97,8 @@ class Manager(QObject):
     updateClosingRequested = Signal()
     updateDependenciesRequested = Signal()
     groupUpdateRequested = Signal()
-    snapPermissionsRequested = Signal(str)
+    # The dialog's sentence and one {text, warning} dict per new permission.
+    snapPermissionsRequested = Signal(str, list)
     _repairsFound = Signal(object)
     _packageChecksFound = Signal(object)
 
@@ -102,9 +113,13 @@ class Manager(QObject):
         package_checker=check_container,
         preview=False,
         association_settings=None,
+        container_lister=None,
     ):
         super().__init__(parent)
         self.store = store
+        if container_lister is None:
+            from multipak.containers import present_containers as container_lister
+        self.container_lister = container_lister
         self.worker_factory = worker_factory
         self.discoverer = discoverer
         self.updater = updater
@@ -359,6 +374,12 @@ class Manager(QObject):
                 "rpm-ostree will remove the package and recalculate the required "
                 "dependencies. A restart will be needed to finish. Your personal data "
                 "will be preserved."
+            )
+        if self._pending and self._system_states.get(self._pending.id) == "missing":
+            return tr(
+                "Its container was not found. Only the shortcut and MultiPak's record "
+                "will be removed; if the container comes back, the application will not "
+                "be listed anymore."
             )
         if self._pending and self._pending.method == "appimage":
             return tr(
@@ -677,6 +698,11 @@ class Manager(QObject):
                             "unavailable": tr("Could not query the system status."),
                         }.get(self._system_states.get(tx.id), "")
                         if tx.method == "system"
+                        else tr(
+                            "Container not found: it was deleted or renamed. Uninstalling "
+                            "removes only the shortcut and MultiPak's record."
+                        )
+                        if self._system_states.get(tx.id) == "missing"
                         else tr("Removal pending")
                         if tx.status == "cleanup_failed"
                         else tr("This application's container was replaced.")
@@ -700,12 +726,14 @@ class Manager(QObject):
         transactions = self.store.transactions()
         rows, previous = [], None
         for item in self._items:
+            if isinstance(item, snap_updates.Runtime):
+                # Bases and content are not applications: "Update all" updates them, and
+                # their group sorts last, so the rows keep the indexes of the items.
+                continue
             if isinstance(item, ContainerApp):
                 kind, row = "container-app", self._container_app_row(item)
             elif isinstance(item, ExistingEnvironment):
                 kind, row = "container", self._container_row(item, appimages, transactions)
-            elif isinstance(item, snap_updates.Runtime):
-                kind, row = "snap-runtime", self._snap_update_row(item)
             elif item.method == "snap":
                 kind, row = "snap", self._snap_update_row(item)
             else:
@@ -1130,6 +1158,18 @@ class Manager(QObject):
 
     def _check_packages(self, runner, transactions, refresh, progress=None):
         results, now = {}, time.time()
+        # An application whose container is gone (or replaced by another of the same
+        # name) is not checked: there is nothing of it to check.
+        present = self.container_lister(runner) if self._package_targets(transactions) else None
+        if present is not None:
+            transactions = [
+                tx
+                for tx in transactions
+                if any(
+                    tx.container in names and same_container(tx.container_id, identifier)
+                    for identifier, names in present.items()
+                )
+            ]
         for (container, kind), txs in self._package_targets(transactions).items():
             if progress is not None:
                 progress(tr("Checking for updates in {0}…").format(container))
@@ -1172,8 +1212,10 @@ class Manager(QObject):
                 )
                 others += sum(
                     1
-                    for check in snap_updates.cached(store).values()
-                    if check.status == "available" and not check.stale
+                    for identifier, check in snap_updates.cached(store).items()
+                    if check.status == "available"
+                    and not check.stale
+                    and not identifier.startswith("runtime:")
                 )
             except Exception:  # noqa: BLE001
                 others = None
@@ -1240,6 +1282,7 @@ class Manager(QObject):
                     for tx in transactions
                     if tx.method == "distrobox"
                     and tx.container == item.name
+                    and same_container(tx.container_id, item.container_id)
                     and tx.status == "installed"
                 ]
                 if isinstance(item, ExistingEnvironment)
@@ -1471,10 +1514,11 @@ class Manager(QObject):
         )
 
     def _load_removals(self, engine):
-        from multipak.containers import forget_abandoned
+        from multipak.containers import abandoned
 
-        # Applications of a renamed or deleted container are no longer offered.
-        forget_abandoned(engine)
+        # Applications of a renamed or deleted container stay listed, marked, until the
+        # user removes them: Podman can answer wrongly for a moment.
+        missing = {tx.id for tx in abandoned(engine)}
         transactions = self.store.transactions()
         system = [
             tx
@@ -1490,6 +1534,7 @@ class Manager(QObject):
             except (OSError, RuntimeError, ValueError, TimeoutError) as exc:
                 states = {tx.id: "unavailable" for tx in system}
                 error = tr("Could not query direct installations: ") + str(exc)
+        states.update(dict.fromkeys(missing, "missing"))
         items = self._removable() + [tx for tx in system if states.get(tx.id) != "absent"]
         items.sort(key=lambda tx: (tx.package_name.casefold(), tx.container, tx.id))
         return items, states, error
@@ -1697,7 +1742,8 @@ class Manager(QObject):
             except OSError:
                 pass
         self._resort()
-        self._status = "" if self._items else tr("Nothing installed by MultiPak can be updated.")
+        listed = any(not isinstance(item, snap_updates.Runtime) for item in self._items)
+        self._status = "" if listed else tr("Nothing installed by MultiPak can be updated.")
 
     def _replace_check(self, transaction_id, check):
         self._checks = dict(self._checks) | {transaction_id: check}
@@ -1984,14 +2030,18 @@ class Manager(QObject):
             return
         self._status = tr("Uninstalling {0}… Please wait.").format(transaction.package_name)
         self._logs, self._error = "", False
-        self._run(
-            (lambda engine: uninstall_system(engine, transaction))
-            if transaction.method == "system"
-            else (lambda engine: uninstall_android_application(engine, transaction))
-            if transaction.method == "waydroid"
-            else (lambda engine: uninstall_application(engine, transaction)),
-            self._removed,
-        )
+        if transaction.method == "system":
+            operation = lambda engine: uninstall_system(engine, transaction)  # noqa: E731
+        elif transaction.method == "waydroid":
+            operation = lambda engine: uninstall_android_application(engine, transaction)  # noqa: E731
+        elif self._system_states.get(transaction.id) == "missing":
+            from multipak.containers import forget
+
+            self._removal_method = "forget"
+            operation = lambda engine: forget(engine, transaction)  # noqa: E731
+        else:
+            operation = lambda engine: uninstall_application(engine, transaction)  # noqa: E731
+        self._run(operation, self._removed)
 
     def _removed(self, result):
         if self._removal_method == "system":
@@ -2019,7 +2069,9 @@ class Manager(QObject):
                 item for item in self._items if item.method == "system" or item.id in remaining
             ]
             self._status = (
-                tr("AppImage uninstalled. Personal data was preserved.")
+                tr("Shortcut and record removed.")
+                if self._removal_method == "forget"
+                else tr("AppImage uninstalled. Personal data was preserved.")
                 if self._removal_method == "appimage"
                 else tr(
                     "Android application uninstalled. Its data and the Android environment "
@@ -2065,7 +2117,7 @@ class Manager(QObject):
         self._run(run, finished, lambda error: self._snap_update_failed(item, error))
 
     def _start_snap_refresh(self, tx):
-        from multipak.snap_refresh import refresh
+        from multipak.snap_refresh import permissions_title, refresh
 
         revision = self._snap_checks[tx.id].revision
         reply = self._snap_permission_reply = Event()
@@ -2074,9 +2126,8 @@ class Manager(QObject):
         def operation(engine):
             def confirm(name, permissions):
                 self.snapPermissionsRequested.emit(
-                    tr("{0} requests new permissions:").format(name)
-                    + "\n\n"
-                    + "\n".join(f"• {permission}" for permission in permissions)
+                    permissions_title(name, permissions),
+                    [dict(permission) for permission in permissions],
                 )
                 while not reply.wait(0.2):
                     if engine.cancelled.is_set():

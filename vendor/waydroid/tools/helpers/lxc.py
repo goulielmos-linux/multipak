@@ -12,6 +12,7 @@ import stat
 import sys
 import time
 import platform
+import re
 import gbinder
 import tools.config
 import tools.helpers.run
@@ -55,6 +56,10 @@ def generate_nodes_lxc_config(args):
     make_entry("/dev/tty")
     make_entry("/dev/char", options="bind,create=dir,optional 0 0")
 
+    # MultiPak: an empty file over perfetto.rc keeps the tracing daemons from starting.
+    make_entry(tools.config.tools_src + "/data/configs/empty.rc",
+               "system/etc/init/perfetto.rc", options="bind,optional,ro 0 0")
+
     # Graphic dev nodes
     make_entry("/dev/kgsl-3d0")
     make_entry("/dev/mali0")
@@ -68,8 +73,7 @@ def generate_nodes_lxc_config(args):
         make_entry(n)
     for n in glob.glob("/dev/graphics/fb*"):
         make_entry(n)
-    for n in glob.glob("/dev/video*"):
-        make_entry(n)
+    # MultiPak: no /dev/video* here; the chosen webcam is added at each start (multipak_camera).
     for n in glob.glob("/dev/dma_heap/*"):
         make_entry(n)
 
@@ -207,7 +211,7 @@ def set_lxc_config(args):
     # Create empty file
     Path(os.path.join(lxc_path, "config_session")).touch()
 
-def generate_session_lxc_config(args, session):
+def generate_session_lxc_config(args, session, camera=None):
     inst = instance()
     if (str(session.get("user_id")) != str(inst.owner) or inst.data_layout != 2
             or session.get("waydroid_data") != str(inst.data)):
@@ -234,6 +238,11 @@ def generate_session_lxc_config(args, session):
     add(inst.data, "data", options="rbind 0 0")
     add(inst.exchange / "apks", "data/waydroid_tmp", options="rbind,create=dir 0 0")
     add(inst.exchange / "icons", "data/icons", options="rbind,create=dir 0 0")
+    if camera is not None:
+        # The webcam multipak_camera.prepare checked; Android sees only it, as its first camera.
+        if not re.fullmatch(r"/dev/video[0-9]+", camera) or Path(camera).is_symlink():
+            raise PermissionError("Not a webcam node")
+        add_node_entry(nodes, camera, "dev/video0", "none", "bind,create=file,optional 0 0", False)
     destination = Path(tools.config.defaults["lxc"]) / inst.id / "config_session"
     destination.write_text("".join(node + "\n" for node in nodes))
 
@@ -357,6 +366,12 @@ def make_base_props(args):
     prop_fp = tools.helpers.props.host_get(args, "ro.vendor.build.fingerprint")
     if prop_fp != "":
         props.append("ro.build.fingerprint=" + prop_fp)
+
+    # MultiPak: a shorter boot and fewer idle services. The desktop keeps the clock
+    # and nothing updates the system image, so time sync and OTA dexopt only use memory.
+    props.append("debug.sf.nobootanimation=1")
+    props.append("config.disable_networktime=true")
+    props.append("config.disable_otadexopt=true")
 
     # now append/override with values in [properties] section of waydroid.cfg
     cfg = tools.config.load(args)

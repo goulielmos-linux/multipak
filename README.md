@@ -1,4 +1,4 @@
-# MultiPak 1.2.0
+# MultiPak 1.1.0
 
 **English** | [Português (Brasil)](README.pt-BR.md)
 
@@ -19,7 +19,8 @@ open the **Application Manager** from your launcher.
   services included.
 - **Runs AppImages**, even those that need libraries your system lacks.
 - **Installs Android apps** in Android containers based on Waydroid, managed from the
-  Waydroid integration.
+  Waydroid integration, whose look was inspired by
+  [Kontainer](https://github.com/DenysMb/Kontainer).
 - **Always up to date:** new distribution releases show up on their own, without a
   MultiPak update (except Slackware and Pisi Linux).
 - **Shows everything before installing**: the application, the container and how sure
@@ -52,22 +53,22 @@ by their contents.
 ## Screenshots
 
 ### Application Manager
-![Application Manager](docs/screenshots/1.2.0/application-manager.png)
+![Application Manager](docs/screenshots/1.1.0/application-manager.png)
 
 ### Installation Wizard
-![Installation Wizard](docs/screenshots/1.2.0/installation-welcome.png)
+![Installation Wizard](docs/screenshots/1.1.0/installation-welcome.png)
 
 ### Installation settings
-![Installation settings](docs/screenshots/1.2.0/installation-settings.png)
+![Installation settings](docs/screenshots/1.1.0/installation-settings.png)
 
 ### Installation summary
-![Installation summary](docs/screenshots/1.2.0/installation-summary.png)
+![Installation summary](docs/screenshots/1.1.0/installation-summary.png)
 
 ### Installation progress
-![Installation progress](docs/screenshots/1.2.0/installation-progress.png)
+![Installation progress](docs/screenshots/1.1.0/installation-progress.png)
 
 ### Installation completed
-![Installation completed](docs/screenshots/1.2.0/installation-completed.png)
+![Installation completed](docs/screenshots/1.1.0/installation-completed.png)
 
 ## Installation
 
@@ -78,7 +79,7 @@ Manager.
 2. Open it with a Flatpak installer, such as Bazaar, Discover, GNOME Software or
    Warehouse, and click **Install**.
 
-Or, in a terminal: `flatpak install --user multipak-1.2.0-x86_64.flatpak`
+Or, in a terminal: `flatpak install --user multipak-1.1.0-x86_64.flatpak`
 
 ## Updates
 

@@ -1,6 +1,6 @@
 # Como o MultiPak roda AppImages
 
-*MultiPak 1.2.0.*
+*MultiPak 1.1.0.*
 
 ---
 
@@ -452,8 +452,10 @@ Depois refaz a análise de dependências (`_with_dependencies`):
   Gerenciador propõe **passar para o contêiner** (`needs_container`).
 
 **Aplicativo aberto:** `running` procura no `ps -eo pid=,args=` do sistema processos
-cujo comando cita `appimages/<id>/AppDir/` ou a cópia. Se houver, o Gerenciador pede
-para fechar; "Fechar" manda `SIGTERM` e espera até 10 s. Isso é checado antes do
+cujo programa é `appimages/<id>/AppDir/…` ou a cópia, ou um interpretador ou o loader
+(`python3`, `sh`, `ld-linux…`, `java`…) cujo primeiro arquivo é um deles. Um programa
+que só tem um dos arquivos aberto, como um editor mostrando um arquivo do AppDir, não
+conta. Se houver, o Gerenciador pede para fechar; "Fechar" manda `SIGTERM` e espera até 10 s. Isso é checado antes do
 download e de novo antes da troca.
 
 **Troca** (`appimage.update`): move a cópia atual para `previous.AppImage` e a

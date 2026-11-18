@@ -1,5 +1,6 @@
 """Read and check meta/snap.yaml, following snapd's own rules where they matter."""
 
+import ipaddress
 import posixpath
 import re
 from dataclasses import dataclass, field
@@ -203,6 +204,54 @@ def socket_address(listen, scope):
     return ("tcp", match[1] or match[2] or "", int(match[3]))
 
 
+def reaches_network(address):
+    """Whether other computers can connect to a socket_address: a port alone listens
+    on every address (IPv4 too), and so does any address that is not loopback."""
+    if address[0] != "tcp":
+        return False
+    try:
+        return not ipaddress.ip_address(address[1]).is_loopback
+    except ValueError:
+        return True  # A port alone, or an address that is no loopback.
+
+
+def service_sockets(info):
+    """(service, listen-stream, socket_address) of each socket a service MultiPak runs
+    listens on."""
+    result = []
+    for name in runnable_services(info):
+        app = info.app(name)
+        for _socket, listen, _mode in app.sockets:
+            try:
+                result.append((name, listen, socket_address(listen, app.scope)))
+            except ValueError:
+                continue
+    return result
+
+
+def network_warning(address):
+    """The sentence for a tcp socket_address that other computers on the network reach."""
+    if not address[1]:
+        return tr(
+            "This application accepts connections from other computers on the network (port {0})."
+        ).format(address[2])
+    return tr(
+        "This application accepts connections from other computers on the network "
+        "(address {0}, port {1})."
+    ).format(address[1], address[2])
+
+
+def network_ports(info):
+    """One sentence for each port other computers on the network can connect to."""
+    return list(
+        dict.fromkeys(
+            network_warning(address)
+            for _name, _listen, address in service_sockets(info)
+            if reaches_network(address)
+        )
+    )
+
+
 @dataclass(frozen=True)
 class Hook:
     """Settings snap.yaml gives a hook; the script itself is meta/hooks/<name>."""
@@ -250,6 +299,8 @@ class SnapInfo:
     component_details: tuple[Component, ...] = ()
     # System accounts the snap's services switch to, such as snap_daemon.
     system_usernames: tuple[str, ...] = ()
+    # Names the snap's dbus slots own on the session bus.
+    session_bus_names: tuple[str, ...] = ()
     hooks: tuple[Hook, ...] = ()
     raw_plugs: dict = field(default_factory=dict, compare=False, repr=False)
 
@@ -576,6 +627,7 @@ def parse(text):
                 str(key)[:80] for key in _mapping(data.get("system-usernames"), "system-usernames")
             )
         ),
+        session_bus_names=tuple(sorted(set(session_names.values()))),
         hooks=tuple(hooks),
         raw_plugs=raw_plugs,
     )
@@ -780,6 +832,7 @@ def limitations(info, installed=(), services=()):
                 "administrator: {0}. They cannot use network ports below 1024."
             ).format(", ".join(runnable_services(info)))
         )
+    result.extend(network_ports(info))
     if idle_services(info):
         result.append(
             tr(

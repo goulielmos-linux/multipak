@@ -70,6 +70,12 @@ _netmask2cidr ()
     echo $(( $2 + (${#x}/4) ))
 }
 
+# firewalld drops DHCP/DNS on interfaces without a zone; trust the bridge at runtime only.
+_firewalld() {
+    command -v firewall-cmd >/dev/null 2>&1 && firewall-cmd --state >/dev/null 2>&1 || return 0
+    firewall-cmd --zone=trusted --$1-interface=${LXC_BRIDGE} >/dev/null 2>&1 || true
+}
+
 _ifdown() {
     ip addr flush dev ${LXC_BRIDGE}
     ip link set dev ${LXC_BRIDGE} down
@@ -180,6 +186,7 @@ start() {
     else
         start_iptables
     fi
+    _firewalld change
 
     LXC_DOMAIN_ARG=""
     if [ -n "$LXC_DOMAIN" ]; then
@@ -261,6 +268,7 @@ stop() {
         else
             stop_iptables
         fi
+        _firewalld remove
 
         pid=`cat "${varrun}"/dnsmasq.pid 2>/dev/null` && kill -9 $pid
         rm -f "${varrun}"/dnsmasq.pid

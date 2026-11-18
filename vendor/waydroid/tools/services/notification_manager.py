@@ -1,3 +1,5 @@
+# Modified by MultiPak on 2026-11-17 for named Android environments.
+from multipak_instance import current as instance
 # Copyright 2025 Alessandro Astone
 # SPDX-License-Identifier: GPL-3.0-or-later
 import logging
@@ -28,12 +30,15 @@ def start(args, session):
         app_icon = ""
         actions_flat = [s for action in actions for s in (action.id, action.label)]
         hints = {
-            "desktop-entry": f"waydroid.{package_name}",
             "resident": dbus.types.Boolean(resident),
             "transient": dbus.types.Boolean(transient),
             "urgency": dbus.types.Byte(urgency),
             "suppress-sound": dbus.types.Boolean(suppress_sound),
         }
+        try:
+            hints["desktop-entry"] = instance().desktop_name(str(package_name)).removesuffix(".desktop")
+        except ValueError:
+            pass
         if category:
             hints["category"] = category
         if image_data:

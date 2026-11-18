@@ -79,9 +79,9 @@ def launch(args):
         if platformService:
             import multipak_input
             try:
-                multipak_input.initialize_keyboard(platformService)
+                multipak_input.apply_keyboard(platformService)
             except Exception as error:
-                logging.warning("Could not initialize input preferences: %s", error)
+                logging.warning("Could not apply the keyboard preference: %s", error)
             platformService.setprop("waydroid.active_apps", args.PACKAGE)
             platformService.launchApp(args.PACKAGE)
             multiwin = platformService.getprop(

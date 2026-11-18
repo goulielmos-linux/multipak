@@ -36,6 +36,15 @@ BACKEND_PROBES = {
 }
 
 
+BACKEND_LICENSES = {
+    "Distrobox": "https://github.com/89luca89/distrobox/blob/main/COPYING.md",
+    "Podman": "https://github.com/containers/podman/blob/main/LICENSE",
+    "Waydroid": "https://github.com/waydroid/waydroid/blob/main/LICENSE",
+    "LXC": "https://github.com/lxc/lxc/blob/main/LICENSE.LGPL2.1",
+    "Bubblewrap": "https://github.com/containers/bubblewrap/blob/main/COPYING",
+}
+
+
 BUNDLED_VERSIONS = "/app/share/multipak/bundled-versions.json"
 
 
@@ -230,7 +239,8 @@ class AboutInfo(QObject):
     @Property("QVariantList", constant=True)
     def tools(self):
         if not hasattr(self, "_tools"):
-            self._tools = bundled_tools()
+            # Outside the Flatpak these would be the computer's own tools, not bundled ones.
+            self._tools = bundled_tools() if host.is_flatpak() else []
         return self._tools
 
     @Slot(str)
@@ -257,9 +267,10 @@ class AboutInfo(QObject):
         return [
             {
                 "id": name,
-                "name": tr("Waydroid (adapted)") if name == "Waydroid" else name,
+                "name": tr("Waydroid (modified)") if name == "Waydroid" else name,
                 "version": data["version"] or states.get(data["state"], ""),
                 "path": data["path"] or tr("Not found"),
+                "licenseUrl": BACKEND_LICENSES[name],
             }
             for name, data in self._backends.items()
         ]

@@ -282,13 +282,14 @@ def remove_container(engine, container, *, remove_home=False):
         record_path(engine.store, container.name).unlink()
 
 
-def forget_abandoned(engine):
-    """Forget applications whose container was renamed or deleted.
+def abandoned(engine):
+    """Applications whose container was renamed or deleted.
 
     A renamed container is no longer MultiPak's, and a deleted one took its applications
-    with it. Their shortcuts, which call the old name, and MultiPak's records are removed.
-    Nothing inside any container is touched, and nothing is forgotten when Podman cannot
-    be queried. Returns the forgotten transactions.
+    with it. Nothing is removed here: the Manager shows them as "container not found",
+    and the user removes them (forget) or brings the container back. Podman can answer
+    wrongly for a moment (storage moved, a failed migration), so forgetting on its word
+    alone could lose good records. Nothing is reported when Podman cannot be queried.
     """
     candidates = [
         tx
@@ -299,32 +300,41 @@ def forget_abandoned(engine):
     ]
     if not candidates:
         return []
+    names = present_containers(engine.runner, engine._log)
+    if names is None:
+        return []
+    return [tx for tx in candidates if tx.container not in names.get(tx.container_id, set())]
+
+
+def present_containers(runner, log=None):
+    """{container ID: its names} of every Podman container, or None when Podman cannot
+    be queried."""
     try:
-        rows = json.loads(
-            engine.runner.run(["podman", "ps", "--all", "--format", "json"], timeout=30)
-        )
+        rows = json.loads(runner.run(["podman", "ps", "--all", "--format", "json"], timeout=30))
     except (CommandError, OSError, TimeoutError, ValueError) as error:
-        engine._log(tr("Could not check the containers: {0}").format(error))
-        return []
+        if log is not None:
+            log(tr("Could not check the containers: {0}").format(error))
+        return None
     if not isinstance(rows, list):
-        return []
-    names = {
+        return None
+    return {
         str(row.get("Id", "")).removeprefix("sha256:"): set(row.get("Names") or [])
         for row in rows
         if isinstance(row, dict)
     }
-    forgotten = []
+
+
+def forget(engine, tx):
+    """Remove the shortcuts and MultiPak's record of an application whose container is
+    gone, after the user asked. Nothing inside any container is touched."""
     with engine.store.lock():
-        for tx in candidates:
-            current = names.get(tx.container_id)
-            if current is not None and tx.container in current:
+        if tx.id not in {item.id for item in abandoned(engine)}:
+            raise RuntimeError(tr("This application's container is available again."))
+        for name in tx.launchers:
+            try:
+                path = engine.store.launcher(tx, name)
+            except ValueError:
                 continue
-            for name in tx.launchers:
-                try:
-                    path = engine.store.launcher(tx, name)
-                except ValueError:
-                    continue
-                path.unlink(missing_ok=True)
-            engine.store.remove_directory(tx)
-            forgotten.append(tx)
-    return forgotten
+            path.unlink(missing_ok=True)
+        engine.store.remove_directory(tx)
+    return tx

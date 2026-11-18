@@ -6,7 +6,7 @@ from multipak.localization import tr
 
 from . import host
 from .container_progress import PackageProgress
-from .environments import read_os_release
+from .environments import copy_into, read_os_release
 from .models import valid_environment_name
 from .process import CommandError
 
@@ -54,7 +54,7 @@ def _update(engine, name, command):
         asset, target = SCRIPTS[family]
         script = Path(__file__).with_name("assets") / asset
         with host.accessible_file(script) as visible:
-            engine.runner.run(["podman", "cp", str(visible), f"{name}:{target}"], timeout=60)
+            copy_into(engine.runner, name, visible, target)
         command = [
             "distrobox",
             "enter",

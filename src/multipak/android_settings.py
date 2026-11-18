@@ -17,31 +17,35 @@ def owned(runner, identifier, package):
 
 
 def configure(
-    runner, identifier, package, *, touch=None, keyboard=None, navigation=None, arrows=None
+    runner,
+    identifier,
+    package,
+    *,
+    touch=None,
+    keyboard=None,
+    navigation=None,
+    arrows=None,
+    links_android=None,
 ):
     entry = owned(runner, identifier, package)
     ensure_runtime(runner)
     arguments = ["app-config", "get", package]
-    if touch is not None and keyboard is not None:
-        arguments = [
-            "app-config",
-            "set",
-            package,
-            "--touch",
-            "on" if touch else "off",
-            "--keyboard",
-            "on" if keyboard else "off",
-        ]
+    if touch is not None:
+        arguments = ["app-config", "set", package, "--touch", "on" if touch else "off"]
+        if keyboard is not None:
+            arguments.extend(["--keyboard", "on" if keyboard else "off"])
         if navigation is not None:
             arguments.extend(["--navigation", "on" if navigation else "off"])
         if arrows is not None:
             arguments.extend(["--arrows", "on" if arrows else "off"])
+        if links_android is not None:
+            arguments.extend(["--links-android", "on" if links_android else "off"])
     output = InstanceWaydroid(runner, identifier).command(*arguments, timeout=90 if arrows else 20)
     try:
         result = json.loads(output)
         if not isinstance(result, dict) or any(
             type(result.get(key)) is not bool
-            for key in ("touch", "keyboard", "navigation", "arrows")
+            for key in ("touch", "keyboard", "navigation", "arrows", "links_android")
         ):
             raise ValueError
     except (ValueError, TypeError) as error:

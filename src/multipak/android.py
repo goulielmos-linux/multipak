@@ -5,6 +5,7 @@ import hashlib
 import os
 import re
 import shlex
+import subprocess
 import threading
 import time
 import uuid
@@ -451,6 +452,67 @@ def _launcher(engine, tx, package):
     register_shortcut(engine.store.applications, name)
 
 
+def _link_handler(engine, tx, package):
+    """Hidden shortcut that lets Linux open the app's own addresses, such as myapp://.
+
+    It only registers the app; the desktop keeps its current defaults."""
+    name = f"multipak-{tx.id}-links.desktop"
+    path = engine.store.launcher(tx, name)
+    schemes = [
+        s for s in package.android_schemes if re.fullmatch(r"[a-z][a-z0-9+.-]{0,31}", s)
+    ]
+    if not tx.android_instance_id or not schemes:
+        if name in tx.launchers or path.exists():
+            path.unlink(missing_ok=True)
+            tx.launchers = [n for n in tx.launchers if n != name]
+            engine.store.save(tx)
+            _refresh_link_handlers(engine)
+        return
+    from .android_instances import CLI
+
+    def text_value(value):
+        # Desktop string values cannot contain control characters or bare backslashes.
+        return re.sub(r"[\x00-\x1f\x7f]", " ", value).replace("\\", "\\\\")
+
+    icon = engine.store.directory(tx.id) / "icon.png"
+    command = " ".join(
+        quote_exec(arg) for arg in (CLI, "--instance", tx.android_instance_id, "open-uri")
+    )
+    text = (
+        "[Desktop Entry]\nType=Application\n"
+        f"Name={text_value(package.name + ' — ' + tx.android_environment_label)}\n"
+        f"Exec={command} {quote_exec(tx.android_package_id)} %u\n"
+        f"Icon={text_value(str(icon)) if icon.is_file() else 'waydroid'}\n"
+        "Terminal=false\nNoDisplay=true\n"
+        f"MimeType={''.join(f'x-scheme-handler/{s};' for s in schemes)}\n"
+        f"X-MultiPak-Android-Package={tx.android_package_id}\n"
+    )
+    temporary = path.with_suffix(".tmp")
+    temporary.write_text(text)
+    temporary.replace(path)
+    tx.launchers = sorted({*tx.launchers, name})
+    engine.store.save(tx)
+    _refresh_link_handlers(engine)
+
+
+def _refresh_link_handlers(engine):
+    """GLib apps read mimeinfo.cache and KDE reads its own cache; both are best effort.
+
+    With "Always ask" on, the addresses in conflict are worked out again."""
+    for argv in (["update-desktop-database", str(engine.store.applications)], ["kbuildsycoca6"]):
+        if tool := host.which(argv[0]):
+            try:
+                host.run([tool, *argv[1:]], capture_output=True, text=True, timeout=60)
+            except (OSError, subprocess.SubprocessError):
+                pass
+    from . import android_link_choice
+
+    try:
+        android_link_choice.refresh()
+    except Exception as error:
+        engine._log(tr("Could not update the choice for Android app links: {0}").format(error))
+
+
 def install(
     engine,
     package,
@@ -580,6 +642,7 @@ def _finish(engine, tx, package, staged):
             engine.runner.defer_cancellation = False
     engine._stage(90, tr("Adding the application to the launcher…"))
     _launcher(engine, tx, package)
+    _link_handler(engine, tx, package)
     tx.status, tx.stage, tx.error = "installed", tr("Installation completed"), ""
     engine.store.save(tx)
     engine.progress(100, tx.stage)
@@ -636,6 +699,8 @@ def cleanup(engine, transaction, *, check_empty=False):
                         waydroid.remove_package(tx.android_package_id)
             for name in tx.launchers:
                 engine.store.launcher(tx, name).unlink(missing_ok=True)
+            if f"multipak-{tx.id}-links.desktop" in tx.launchers:
+                _refresh_link_handlers(engine)
             engine.store.remove_directory(tx)
         except Exception as error:
             tx.status, tx.error = "cleanup_failed", str(error)

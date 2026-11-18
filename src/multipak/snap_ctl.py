@@ -7,6 +7,7 @@ import errno
 import fcntl
 import json
 import os
+import queue
 import re
 import select
 import stat
@@ -437,6 +438,8 @@ class Server:
         # once, and one dialog at a time, so that it cannot flood the desktop.
         self._slots = threading.BoundedSemaphore(MAX_REQUESTS)
         self._dialog = threading.Lock()
+        # Requests over the limit, refused one after another by a single thread.
+        self._refusals = queue.Queue()
 
     def __enter__(self):
         self.directory.mkdir(parents=True, mode=0o700)
@@ -444,6 +447,7 @@ class Server:
         self._fd = os.open(self.directory / "requests", os.O_RDWR | os.O_CLOEXEC)
         self._thread = threading.Thread(target=self._serve, daemon=True)
         self._thread.start()
+        threading.Thread(target=self._refuse_all, daemon=True).start()
         return self
 
     def __exit__(self, *_exc):
@@ -451,6 +455,7 @@ class Server:
             os.write(self._fd, (STOP + "\n").encode())
             self._thread.join(timeout=5)
         finally:
+            self._refusals.put(None)
             os.close(self._fd)
             # The app may have left folders it made unreadable.
             remove_tree(self.directory, ignore_errors=True)
@@ -467,9 +472,13 @@ class Server:
                     return
                 if CALL.fullmatch(name):
                     if not self._slots.acquire(blocking=False):
-                        self._refuse(name)
+                        self._refusals.put(name)
                         continue
                     threading.Thread(target=self._handle, args=(name,), daemon=True).start()
+
+    def _refuse_all(self):
+        for name in iter(self._refusals.get, None):
+            self._refuse(name)
 
     def _refuse(self, name):
         try:
@@ -479,8 +488,9 @@ class Server:
         except OSError:
             return
         try:
-            # Never waits: the client may not be reading yet, and the loop must go on.
-            _reply(directory_fd, 1, "error: too many requests at once\n", deadline=0)
+            # Waits for the client to open its reply pipe, as for any answer: it may
+            # not be reading yet, and a refusal it never gets would hold it forever.
+            _reply(directory_fd, 1, "error: too many requests at once\n")
         except OSError:
             pass
         finally:

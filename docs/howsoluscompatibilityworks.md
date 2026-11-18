@@ -1,6 +1,6 @@
 # How MultiPak installs Solus packages
 
-*MultiPak 1.2.0. Translated from the [Portuguese version](howsoluscompatibilityworks.pt-BR.md), which is the reference text.*
+*MultiPak 1.1.0. Translated from the [Portuguese version](howsoluscompatibilityworks.pt-BR.md), which is the reference text.*
 
 ---
 

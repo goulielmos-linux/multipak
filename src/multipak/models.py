@@ -114,6 +114,8 @@ class Package:
     android_expansions: tuple[AndroidPart, ...] = ()
     android_variants: tuple[dict, ...] = ()
     android_min_sdk: int = 1
+    # URI schemes the app opens from links, such as "myapp" (VIEW + BROWSABLE).
+    android_schemes: tuple[str, ...] = ()
     android_parts: tuple[AndroidPart, ...] = ()
     # snap_meta.SnapInfo for snaps; None otherwise.
     snap: object = None

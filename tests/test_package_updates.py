@@ -110,9 +110,9 @@ def test_the_script_runs_in_the_container_without_downloading_unless_asked(tmp_p
     calls = []
 
     class Runner:
-        def run(self, command, timeout):
+        def run(self, command, timeout, check=True):
             calls.append(command)
-            if command[0] == "distrobox":
+            if "python3" in command:
                 return (
                     package_check.MARK
                     + " "
@@ -122,10 +122,18 @@ def test_the_script_runs_in_the_container_without_downloading_unless_asked(tmp_p
 
     result = package_updates.check_container(Runner(), "MultiPak-Fedora-43", "rpm", ["gimp"])
     assert result["gimp"].status == "current"
-    assert calls[0][:2] == ["podman", "cp"]
-    assert calls[1][-3:] == [package_updates.TARGET, "rpm", "gimp"]
+    # A new private folder with a random name, never a fixed path in the shared /tmp.
+    mkdir = calls[0]
+    assert mkdir[-5:-1] == ["mkdir", "-m", "700", "--"]
+    folder = mkdir[-1]
+    assert folder.startswith(package_updates.FOLDER) and len(folder) > len(package_updates.FOLDER)
+    target = f"{folder}/{package_updates.SCRIPT}"
+    assert calls[1][:2] == ["podman", "cp"] and calls[1][-1].endswith(":" + target)
+    assert calls[2][-3:] == [target, "rpm", "gimp"]
+    assert calls[3][-2:] == ["--", folder] and "rm" in calls[3]
     package_updates.check_container(Runner(), "MultiPak-Fedora-43", "rpm", ["gimp"], refresh=True)
-    assert calls[-1][-3:] == ["rpm", "--refresh", "gimp"]
+    assert calls[-2][-3:] == ["rpm", "--refresh", "gimp"]
+    assert calls[-2][-4] != target  # another random folder each time
     with pytest.raises(ValueError):
         package_updates.check_container(Runner(), "bad name;", "rpm", ["gimp"])
 

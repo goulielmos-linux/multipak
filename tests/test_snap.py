@@ -2940,6 +2940,54 @@ def test_session_bus_names_are_written_and_removed_with_the_snap(tmp_path, monke
     assert sorted(p.name for p in services.iterdir()) == ["org.example.Taken.service"]
 
 
+def test_a_snap_cannot_take_a_bus_name_of_the_system_or_of_a_running_program(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+
+    from multipak.models import Transaction
+
+    monkeypatch.setattr(snap, "_home", lambda: tmp_path)
+    monkeypatch.setattr(snap, "launcher_invocation", lambda: ["multipak-snap", "--"])
+    apps = "".join(
+        f"  a{index}:\n    command: a\n    daemon: dbus\n    daemon-scope: user\n"
+        f"    bus-name: {name}\n"
+        for index, name in enumerate(
+            (
+                "org.example.Free",
+                "org.example.Activatable",
+                "org.example.Running",
+                "org.freedesktop.secrets",
+            )
+        )
+    )
+    info = snap_meta.parse("name: s\napps:\n" + apps)
+    tx = Transaction("b" * 32, "", "", "s", "1", "snap", "", method="snap")
+    calls, logs = [], []
+
+    def run(argv, **_kwargs):
+        calls.append(argv)
+        if argv[-1] == "ListNames":
+            return 'as 3 "org.freedesktop.DBus" ":1.7" "org.example.Running"\n'
+        if argv[-1] == "ListActivatableNames":
+            free = tmp_path / ".local/share/dbus-1/services/org.example.Free.service"
+            extra = ' "org.example.Free"' if free.exists() else ""
+            return 'as 2 "org.freedesktop.DBus" "org.example.Activatable"' + extra + "\n"
+        return ""
+
+    engine = SimpleNamespace(runner=SimpleNamespace(run=run))
+    engine._log = logs.append
+    snap._write_bus_services(engine, tx, info)
+    services = tmp_path / ".local/share/dbus-1/services"
+    assert sorted(p.name for p in services.iterdir()) == ["org.example.Free.service"]
+    for name in ("org.example.Activatable", "org.example.Running", "org.freedesktop.secrets"):
+        assert any(name in line for line in logs)
+    # Its own file, written before (an update), is kept although the bus now knows it.
+    logs.clear()
+    snap._write_bus_services(engine, tx, info)
+    assert (services / "org.example.Free.service").exists() and not any(
+        "org.example.Free" in line for line in logs
+    )
+
+
 @needs_squashfs
 def test_a_snap_is_installed_only_once(store, local_store, monkeypatch):
     from multipak.engine import Engine
@@ -3116,10 +3164,17 @@ def test_the_channel_answers_a_limited_number_of_requests_at_once(tmp_path, monk
     with snap_ctl.Server(channel, info, state, dialogs=dialogs):
         first = subprocess.Popen([str(zenity), "--file-selection"], stdout=subprocess.PIPE)
         assert waiting.wait(10)
-        second = subprocess.run([str(zenity), "--info"], capture_output=True, text=True)
-        assert second.returncode == 1 and "too many requests" in second.stderr
-        release.set()
-        assert first.communicate(timeout=10)[0] == b"/home/u/x\n"
+        try:
+            second = subprocess.run(
+                [str(zenity), "--info"], capture_output=True, text=True, timeout=20
+            )
+            assert second.returncode == 1 and "too many requests" in second.stderr
+            release.set()
+            assert first.communicate(timeout=10)[0] == b"/home/u/x\n"
+        finally:
+            release.set()
+            first.kill()
+            first.wait(timeout=10)
         # The app's leftovers, even unreadable, do not outlive the run.
         (channel / "junk/deep").mkdir(parents=True)
         (channel / "junk").chmod(0)

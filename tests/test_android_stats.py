@@ -1,8 +1,9 @@
+import os
 from types import SimpleNamespace
 
 import pytest
 
-from multipak.android_stats import cpu_percent, sample
+from multipak.android_stats import cpu_percent, sample, total_memory
 
 
 def test_stats_reads_only_active_valid_container_cgroups():
@@ -49,3 +50,8 @@ def test_cpu_uses_counter_delta_and_handles_restart_and_freezing():
     assert cpu_percent(second, first) is None
     assert cpu_percent(second, second) is None
     assert cpu_percent(None, dict(second, frozen=True)) == 0.0
+
+
+def test_total_memory_is_the_computers():
+    total = total_memory()
+    assert total == os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES") and total > 0

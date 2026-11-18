@@ -7,6 +7,7 @@ import importlib.util
 import json
 import os
 import pwd
+import re
 import socket
 import stat
 import sys
@@ -237,8 +238,20 @@ def session_module(monkeypatch, tmp_path):
         user_state=tmp_path / "prefs",
     )
     monkeypatch.setitem(sys.modules, "multipak_instance", SimpleNamespace(current=lambda: current))
-    source = Path(__file__).resolve().parents[1] / "vendor/waydroid/multipak_session.py"
-    spec = importlib.util.spec_from_file_location("multipak_session_test", source)
+    vendor = Path(__file__).resolve().parents[1] / "vendor/waydroid"
+    spec = importlib.util.spec_from_file_location(
+        "multipak_microphone", vendor / "multipak_microphone.py"
+    )
+    microphone = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(microphone)
+    monkeypatch.setitem(sys.modules, "multipak_microphone", microphone)
+    spec = importlib.util.spec_from_file_location("multipak_camera", vendor / "multipak_camera.py")
+    camera = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(camera)
+    monkeypatch.setitem(sys.modules, "multipak_camera", camera)
+    spec = importlib.util.spec_from_file_location(
+        "multipak_session_test", vendor / "multipak_session.py"
+    )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module, current
@@ -424,7 +437,14 @@ def test_session_ignores_caller_mount_paths_and_derives_them_from_identity(
         group_id="0",
         user_name="root",
     )
+    first = module.prepare(request, current.owner, 42)
+    assert first["microphone"] == "" and first["camera"] == "auto"
+    request["microphone"] = "alsa_input.usb-C920-02.analog-stereo"
+    request["camera"] = "/dev/v4l/by-id/usb-C920-video-index0"
+    pins.clear()
     trusted = module.prepare(request, current.owner, 42)
+    assert trusted["microphone"] == "alsa_input.usb-C920-02.analog-stereo"
+    assert trusted["camera"] == "/dev/v4l/by-id/usb-C920-video-index0"
     assert trusted["waydroid_data"] == str(current.data)
     assert trusted["xdg_runtime_dir"] == f"/run/user/{current.owner}"
     assert trusted["user_name"] == pwd.getpwuid(current.owner).pw_name
@@ -432,6 +452,24 @@ def test_session_ignores_caller_mount_paths_and_derives_them_from_identity(
     assert pins[0][0] == Path(f"/run/user/{current.owner}")
     assert pins[0][1] == ("wayland-1",)
     assert all("/etc" not in str(args) and "/root" not in str(args) for args in pins)
+
+
+def test_session_refuses_a_camera_name_that_could_add_lines(session_module):
+    module, current = session_module
+    request = {"user_id": str(current.owner), "pid": "42", "wayland_display": "wayland-0"}
+    request["camera"] = "auto\nlxc.mount.entry = / host none rbind 0 0"
+    with pytest.raises(ValueError, match="camera"):
+        module.prepare(request, current.owner, 42)
+    assert not current.sockets.exists()
+
+
+def test_session_refuses_a_microphone_name_that_could_add_settings(session_module):
+    module, current = session_module
+    request = {"user_id": str(current.owner), "pid": "42", "wayland_display": "wayland-0"}
+    request["microphone"] = "mic\ndefault-server = unix:/tmp/evil"
+    with pytest.raises(ValueError, match="microphone"):
+        module.prepare(request, current.owner, 42)
+    assert not current.sockets.exists()
 
 
 @pytest.mark.parametrize("already_labeled", [True, False])
@@ -551,6 +589,7 @@ def test_lxc_mount_configuration_contains_only_fixed_sources_and_real_tmpfs(tmp_
     )
     namespace = {
         "os": os,
+        "re": re,
         "Path": Path,
         "instance": lambda: current,
         "tools": SimpleNamespace(
@@ -579,6 +618,19 @@ def test_lxc_mount_configuration_contains_only_fixed_sources_and_real_tmpfs(tmp_
             SimpleNamespace(), {**request, "waydroid_data": "/etc"}
         )
     assert (destination / "config_session").read_text() == rendered
+    # Only a webcam node that multipak_camera checked becomes Android's /dev/video0.
+    namespace["generate_session_lxc_config"](SimpleNamespace(), request, "/dev/video3")
+    assert (destination / "config_session").read_text() == rendered + (
+        "lxc.mount.entry = /dev/video3 dev/video0 none bind,create=file,optional 0 0\n"
+    )
+    for camera in (
+        "/etc/shadow",
+        "/dev/video3\nlxc.mount.entry = / host",
+        "/dev/video3 x",
+        "/dev/sda",
+    ):
+        with pytest.raises(PermissionError):
+            namespace["generate_session_lxc_config"](SimpleNamespace(), request, camera)
 
 
 def test_migration_space_is_checked_before_any_service_is_stopped(tmp_path, monkeypatch):

@@ -30,7 +30,7 @@ class AndroidSettings(QObject):
         self.worker_factory = worker_factory
         self.worker = None
         self._ready = False
-        self._touch = self._keyboard = self._arrows = False
+        self._touch = self._keyboard = self._arrows = self._links_android = False
         self._label = identifier
         self._status = ""
         self._error = False
@@ -74,6 +74,10 @@ class AndroidSettings(QObject):
     def arrows(self):
         return self._arrows
 
+    @Property(bool, notify=changed)
+    def linksAndroid(self):
+        return self._links_android
+
     @Property(str, notify=changed)
     def status(self):
         return self._status
@@ -104,7 +108,7 @@ class AndroidSettings(QObject):
         )
 
     @Slot(bool, bool, bool)
-    def save(self, touch, keyboard, arrows):
+    def save(self, touch, arrows, links_android):
         if not self.ready:
             return
         self._start(
@@ -114,8 +118,8 @@ class AndroidSettings(QObject):
                 self.identifier,
                 self.package,
                 touch=touch,
-                keyboard=keyboard,
                 arrows=arrows,
+                links_android=links_android,
             ),
         )
 
@@ -133,7 +137,7 @@ class AndroidSettings(QObject):
     @Slot(object)
     def _succeeded(self, result):
         self._touch, self._keyboard = result["touch"], result["keyboard"]
-        self._arrows = result["arrows"]
+        self._arrows, self._links_android = result["arrows"], result["links_android"]
         self._label = result["label"]
         self._ready = True
         self._status = ""
