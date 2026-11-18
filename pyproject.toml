@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "multipak"
 dynamic = ["version"]
-description = "A graphical RPM, DEB, Arch, AppImage and Android APK installer for Linux desktops"
+description = "A graphical tool for atomic Linux systems that installs packages in multiple formats without modifying the base system"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "GPL-3.0-only"
@@ -47,7 +47,7 @@ testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 100
-# Adapted Waydroid source, kept close to upstream.
+# Modified Waydroid source, written in Waydroid's style.
 extend-exclude = ["vendor"]
 
 [tool.ruff.lint]

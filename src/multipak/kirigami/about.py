@@ -332,7 +332,7 @@ class AboutInfo(QObject):
         output = bytes(probe["output"][:4096]).decode("utf-8", errors="replace")
         version_pattern = r"(\d+(?:\.\d+){1,3}(?:[-+~][\w.-]+)?)"
         if name == "Waydroid":
-            # Show the adapted runtime's upstream version, rather than the
+            # Show the modified runtime's upstream version, rather than the
             # unrelated system Waydroid version or the MultiPak release number.
             pattern = r"(?im)^\s*\S+-waydroid-" + version_pattern + r"\s*$"
         elif name == "LXC":

@@ -6,7 +6,7 @@
 
 ## 1. Em poucas palavras
 
-Os apps Android rodam num **Waydroid adaptado** pelo MultiPak (base 1.6.3), instalado como
+Os apps Android rodam num **Waydroid modificado** pelo MultiPak (base 1.6.3), instalado como
 `/usr/local/bin/multipak-waydroid`. Cada contêiner Android tem o seu nome, as suas imagens, os seus apps e
 dados, a sua rede e os seus atalhos. O Waydroid do sistema, se estiver instalado, continua separado e não é
 alterado.

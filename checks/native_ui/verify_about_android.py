@@ -75,7 +75,7 @@ def main():
         assert not engine._about_info.loading
         rows = {row["id"]: row for row in engine._about_info.backends}
         assert list(rows) == ["Distrobox", "Podman", "Waydroid", "LXC"]
-        assert rows["Waydroid"]["name"] == "Waydroid (adaptado)"
+        assert rows["Waydroid"]["name"] == "Waydroid (modificado)"
         assert rows["Waydroid"]["version"] == "1.6.3", rows
         assert rows["Waydroid"]["path"] == str(root / "multipak-waydroid")
         assert rows["LXC"]["version"] == "6.0.5", rows
@@ -107,7 +107,7 @@ def main():
         copy_button = find(dialog, "aboutCopyInformationButton")
         QMetaObject.invokeMethod(copy_button, "clicked")
         copied = app.clipboard().text()
-        assert "Python " in copied and "Waydroid (adaptado) 1.6.3" in copied
+        assert "Python " in copied and "Waydroid (modificado) 1.6.3" in copied
         assert engine._about_info.environment[0]["name"].endswith("(offscreen)")
         with patch("multipak.kirigami.about.host.is_flatpak", return_value=False):
             assert not engine._about_info.flatpak
