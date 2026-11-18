@@ -10,11 +10,14 @@ from PySide6.QtWidgets import QApplication
 from multipak.android_translation import preview_plan
 from multipak.catalog import load_catalog, package_environment
 from multipak.distrobox_setup import (
+    LABELS,
     DistroboxMissing,
     DistroboxRequirement,
+    WaydroidMissing,
     distrobox_requirement,
-    install_distrobox,
-    reboot_after_distrobox,
+    host_requirement,
+    install_host_package,
+    reboot_after_host_package,
 )
 from multipak.environments import container_names, discover
 from multipak.file_associations import FileAssociations
@@ -340,7 +343,9 @@ class LiveInstaller(Welcome):
             "install": tr("Preparing installation…"),
             "system": tr("Preparing to install directly on your system…"),
             "cleanup": tr("Removing the components created by this installation…"),
-            "distrobox": tr("Installing Distrobox using rpm-ostree…"),
+            "distrobox": tr("Installing {0} using rpm-ostree…").format(
+                LABELS[getattr(self, "_distrobox_package", "distrobox")]
+            ),
             "reboot": tr("Requesting a system restart…"),
         }[mode]
         worker = self.worker_factory(self.store, operation, self)
@@ -503,13 +508,16 @@ class LiveInstaller(Welcome):
 
                     engine.runner.run(["test", "-s", CONFIG])
                     engine.runner.run(["test", "-d", ROOTFS])
-                return engine.install_android(
-                    package,
-                    allow_translation=True,
-                    instance_id=instance_id,
-                    android_profile=android_profile,
-                    android_label=android_label,
-                )
+                try:
+                    return engine.install_android(
+                        package,
+                        allow_translation=True,
+                        instance_id=instance_id,
+                        android_profile=android_profile,
+                        android_label=android_label,
+                    )
+                except WaydroidMissing:
+                    return host_requirement(engine, "waydroid")
             if package.kind == "snap":
                 return engine.install_snap(package, snap_components)
             if package.kind == "appimage":
@@ -534,6 +542,8 @@ class LiveInstaller(Welcome):
         self._distrobox_restart_required = requirement.restart_required
         self._distrobox_message = requirement.message
         self._distrobox_update_required = requirement.update_required
+        self._distrobox_package = requirement.package
+        self._distrobox_help_url = requirement.help_url
         self._set_state("ready")
         if self._close_pending:
             self.closeRequested.emit()
@@ -552,20 +562,29 @@ class LiveInstaller(Welcome):
         self._distrobox_can_install = False
         self._logs = ""
         self.logsChanged.emit()
-        self._run(install_distrobox, self._distrobox_installed, "distrobox")
+        package = getattr(self, "_distrobox_package", "distrobox")
+        self._run(
+            lambda engine: install_host_package(engine, package),
+            self._distrobox_installed,
+            "distrobox",
+        )
 
     def _distrobox_installed(self, restart_required):
+        package = getattr(self, "_distrobox_package", "distrobox")
+        label = LABELS[package]
         if type(restart_required) is not bool:
-            raise RuntimeError(tr("Distrobox installation could not be confirmed."))
+            raise RuntimeError(tr("{0} installation could not be confirmed.").format(label))
         message = (
             tr(
-                "Distrobox was installed using rpm-ostree. Restart your computer, then "
-                "reopen the package to install your application."
-            )
+                "{0} was installed using rpm-ostree. Restart your computer, then reopen the "
+                "package to install your application."
+            ).format(label)
             if restart_required
-            else tr("Distrobox is available. You can continue installing the application.")
+            else tr("{0} is available. You can continue.").format(label)
         )
-        self._show_distrobox_requirement(DistroboxRequirement(False, restart_required, message))
+        self._show_distrobox_requirement(
+            DistroboxRequirement(False, restart_required, message, package=package)
+        )
 
     @Slot()
     def requestDistroboxRestart(self):
@@ -575,7 +594,12 @@ class LiveInstaller(Welcome):
             or self.transaction is not None
         ):
             return
-        self._run(reboot_after_distrobox, self._distrobox_restart_requested, "reboot")
+        package = getattr(self, "_distrobox_package", "distrobox")
+        self._run(
+            lambda engine: reboot_after_host_package(engine, package),
+            self._distrobox_restart_requested,
+            "reboot",
+        )
 
     def _distrobox_restart_requested(self, _result):
         self._set_state("ready")

@@ -31,6 +31,7 @@ HOST_TOOLS = frozenset(
         "waydroid",
         "multipak-waydroid",
         "lxc-start",
+        "lxc-info",
         "test",
         "bwrap",
         "pkexec",

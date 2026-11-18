@@ -31,6 +31,10 @@ def source_messages():
 
 
 def read_catalog(path):
+    return parse_catalog(path.read_text(encoding="utf-8"), path)
+
+
+def parse_catalog(text, path):
     entries = {}
     source = translation = None
     field = None
@@ -42,7 +46,7 @@ def read_catalog(path):
                 raise ValueError(f"Duplicate message in {path}: {source}")
             entries[source] = translation
 
-    for raw in path.read_text(encoding="utf-8").splitlines() + [""]:
+    for raw in text.splitlines() + [""]:
         line = raw.strip()
         if not line:
             flush()
@@ -66,6 +70,22 @@ def read_catalog(path):
         else:
             raise ValueError(f"Unsupported catalog entry in {path}: {line}")
     return entries
+
+
+def prune_catalog(path, messages):
+    """Drop translations whose English text is no longer in the code, so none pile up."""
+    blocks = path.read_text(encoding="utf-8").strip("\n").split("\n\n")
+    kept, removed = [], 0
+    for block in blocks:
+        entries = parse_catalog(block, path)
+        source = next(iter(entries), None)
+        if source is None or source == "" or source in messages:
+            kept.append(block)
+        else:
+            removed += 1
+    if removed:
+        path.write_text("\n\n".join(kept) + "\n", encoding="utf-8")
+    return removed
 
 
 def placeholders(text):
@@ -115,6 +135,8 @@ def main():
             lines += ["msgid " + json.dumps(source, ensure_ascii=False), 'msgstr ""', ""]
         (ROOT / "locales/multipak.pot").write_text("\n".join(lines), encoding="utf-8")
     for path in sorted((ROOT / "locales").glob("*/LC_MESSAGES/multipak.po")):
+        if removed := prune_catalog(path, messages):
+            print(f"Removed {removed} unused translations from {path.relative_to(ROOT)}")
         compile_catalog(path, messages)
         print(f"Compiled {path.relative_to(ROOT)} ({len(messages)} source messages)")
 

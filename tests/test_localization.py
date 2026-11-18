@@ -122,6 +122,31 @@ def test_all_source_messages_and_placeholders_are_in_shipped_catalog():
         assert catalog.gettext(source) == entries[source]
 
 
+def test_shipped_catalog_has_no_unused_translations():
+    compiler_path = Path(__file__).parents[1] / "scripts/translations.py"
+    spec = importlib.util.spec_from_file_location("catalog_compiler", compiler_path)
+    compiler = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(compiler)
+    entries = compiler.read_catalog(CATALOG_DIRECTORY / "pt_BR/LC_MESSAGES/multipak.po")
+    assert set(entries) - {""} <= compiler.source_messages()
+
+
+def test_compiler_prunes_translations_the_code_no_longer_uses(tmp_path):
+    spec = importlib.util.spec_from_file_location(
+        "catalog_compiler", Path(__file__).parents[1] / "scripts/translations.py"
+    )
+    compiler = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(compiler)
+    path = tmp_path / "catalog.po"
+    path.write_text(
+        'msgid ""\nmsgstr "Language: pt_BR\\n"\n\n'
+        'msgid "Save"\nmsgstr "Salvar"\n\n'
+        'msgid "Old text"\nmsgstr "Texto antigo"\n'
+    )
+    assert compiler.prune_catalog(path, {"Save"}) == 1
+    assert compiler.read_catalog(path) == {"": "Language: pt_BR\n", "Save": "Salvar"}
+
+
 def test_compiler_rejects_changed_placeholders(tmp_path):
     spec = importlib.util.spec_from_file_location(
         "catalog_compiler", Path(__file__).parents[1] / "scripts/translations.py"

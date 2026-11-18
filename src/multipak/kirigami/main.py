@@ -230,6 +230,16 @@ class Welcome(QObject):
     def distroboxMessage(self):
         return getattr(self, "_distrobox_message", "")
 
+    @Property(str, notify=dataChanged)
+    def distroboxPackageName(self):
+        from multipak.distrobox_setup import LABELS
+
+        return LABELS[getattr(self, "_distrobox_package", "distrobox")]
+
+    @Property(str, notify=dataChanged)
+    def distroboxHelpUrl(self):
+        return getattr(self, "_distrobox_help_url", "")
+
     @Property(bool, notify=dataChanged)
     def distroboxSetupActive(self):
         return getattr(self, "_mode", "") in ("distrobox", "reboot")

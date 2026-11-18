@@ -8,7 +8,8 @@ InformationWindow {
     objectName: "distroboxSetupDialog"
     title: welcome.distroboxRestartRequired ? qsTr("Restart required")
         : welcome.distroboxUpdateRequired ? qsTr("Update required")
-        : welcome.distroboxCanInstall ? qsTr("Install Distrobox") : "Distrobox"
+        : welcome.distroboxCanInstall ? qsTr("Install %1").arg(welcome.distroboxPackageName)
+        : welcome.distroboxPackageName
     preferredWidth: Kirigami.Units.gridUnit * 30
 
     Controls.Label {
@@ -22,6 +23,14 @@ InformationWindow {
     footer: Controls.ToolBar {
         padding: dialog.contentPadding
         contentItem: RowLayout {
+            Controls.Button {
+                objectName: "distroboxSetupHelpButton"
+                // How to install or update it by hand, when MultiPak cannot do it here.
+                text: qsTr("See how")
+                icon.name: "help-contents"
+                visible: welcome.distroboxHelpUrl !== ""
+                onClicked: Qt.openUrlExternally(welcome.distroboxHelpUrl)
+            }
             Item { Layout.fillWidth: true }
             Controls.Button {
                 objectName: "distroboxSetupCloseButton"
@@ -31,7 +40,7 @@ InformationWindow {
             }
             Controls.Button {
                 objectName: "distroboxSetupInstallButton"
-                text: qsTr("Install Distrobox")
+                text: qsTr("Install %1").arg(welcome.distroboxPackageName)
                 visible: welcome.distroboxCanInstall
                 onClicked: {
                     dialog.close();

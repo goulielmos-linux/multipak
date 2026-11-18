@@ -4,6 +4,13 @@ from PySide6.QtCore import Property, QLocale, QObject, QUrl, Signal, Slot
 
 from multipak import android_instances as environments
 from multipak import android_link_choice, android_stats
+from multipak.distrobox_setup import (
+    DistroboxRequirement,
+    WaydroidMissing,
+    host_requirement,
+    install_host_package,
+    reboot_after_host_package,
+)
 from multipak.localization import tr
 from multipak.worker import Worker
 
@@ -47,6 +54,8 @@ class AndroidEnvironments(QObject):
         self._camera_error = ""
         self._camera_worker = None
         self._camera_outcome = None
+        # What MultiPak can do when the system's Waydroid is missing or too old.
+        self._waydroid_setup = {}
 
     @Property("QVariantMap", notify=statsChanged)
     def stats(self):
@@ -439,10 +448,54 @@ class AndroidEnvironments(QObject):
     @Slot(str, str)
     def create(self, profile, label):
         def operation(engine):
-            environments.create(engine.runner, profile, label, progress=engine.progress)
+            try:
+                environments.create(engine.runner, profile, label, progress=engine.progress)
+            except WaydroidMissing:
+                return host_requirement(engine, "waydroid", self._waydroid_purpose())
             return environments.discover_with_status(engine.runner)
 
         self._run(operation, "create")
+
+    @staticmethod
+    def _waydroid_purpose():
+        return tr("MultiPak needs Waydroid to create Android containers.")
+
+    @Property("QVariantMap", notify=changed)
+    def waydroidSetup(self):
+        return self._waydroid_setup
+
+    @Slot()
+    def dismissWaydroidSetup(self):
+        self._waydroid_setup = {}
+        self.changed.emit()
+
+    @Slot()
+    def installWaydroid(self):
+        if not self._waydroid_setup.get("canInstall"):
+            return
+        purpose = self._waydroid_purpose()
+
+        def operation(engine):
+            restart = install_host_package(engine, "waydroid", purpose)
+            message = (
+                tr(
+                    "Waydroid was installed using rpm-ostree. Restart your computer, then "
+                    "create the Android container again."
+                )
+                if restart
+                else tr("{0} is available. You can continue.").format("Waydroid")
+            )
+            return DistroboxRequirement(False, restart, message, package="waydroid")
+
+        self._waydroid_setup = {}
+        self._run(operation, "waydroid")
+
+    @Slot()
+    def restartForWaydroid(self):
+        if not self._waydroid_setup.get("restartRequired"):
+            return
+        self._waydroid_setup = {}
+        self._run(lambda engine: reboot_after_host_package(engine, "waydroid"), "reboot")
 
     @Slot(str)
     def act(self, action):
@@ -512,6 +565,8 @@ class AndroidEnvironments(QObject):
             "remove": tr("Removing the Android container…"),
             "upgrade": tr("Updating the Android container…"),
             "ready": tr("Starting the Android container…"),
+            "waydroid": tr("Installing {0} using rpm-ostree…").format("Waydroid"),
+            "reboot": tr("Requesting a system restart…"),
         }.get(mode, tr("Preparing the Android environment…"))
         self._outcome = (False, tr("The operation was not completed."))
         self.worker = self.worker_factory(self.store, operation, self)
@@ -553,7 +608,19 @@ class AndroidEnvironments(QObject):
         worker.deleteLater()
         ok, value = self._outcome
         self._error = not ok
-        if ok:
+        if ok and isinstance(value, DistroboxRequirement):
+            # Waydroid is missing or old: offer what can be done instead of an error.
+            self._waydroid_setup = {
+                "message": value.message,
+                "canInstall": value.can_install,
+                "restartRequired": value.restart_required,
+                "updateRequired": value.update_required,
+                "helpUrl": value.help_url,
+            }
+            self._status = ""
+        elif ok and self._operation == "reboot":
+            self._status = ""
+        elif ok:
             self._rows = value["rows"] if self._operation == "upgrade" else value
             self._selected = -1
             self._status = (

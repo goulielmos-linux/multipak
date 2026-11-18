@@ -78,12 +78,6 @@ msgstr ""
 msgid "A snap data directory is unavailable or is a symbolic link."
 msgstr ""
 
-msgid "A system change is pending. Restart your computer before installing Distrobox."
-msgstr ""
-
-msgid "A system operation is in progress. Wait for it to finish before installing Distrobox."
-msgstr ""
-
 msgid "A system operation is in progress. Wait for it to finish before restarting."
 msgstr ""
 
@@ -969,22 +963,10 @@ msgstr ""
 msgid "Distribution format."
 msgstr ""
 
-msgid "Distrobox installation could not be confirmed."
-msgstr ""
-
-msgid "Distrobox installation could not be confirmed. Check the rpm-ostree status before trying again."
-msgstr ""
-
-msgid "Distrobox is available. You can continue installing the application."
-msgstr ""
-
-msgid "Distrobox is scheduled for installation. Restart your computer, then reopen the package to continue."
-msgstr ""
-
-msgid "Distrobox was installed using rpm-ostree. Restart your computer, then reopen the package to install your application."
-msgstr ""
-
 msgid "Distrobox was not found."
+msgstr ""
+
+msgid "Do you want to install it now with rpm-ostree? You will need to restart your computer to finish."
 msgstr ""
 
 msgid "Done"
@@ -1119,7 +1101,7 @@ msgstr ""
 msgid "Finish"
 msgstr ""
 
-msgid "Finish the current application operation before installing Distrobox."
+msgid "Finish the current application operation before installing {0}."
 msgstr ""
 
 msgid "Flatpak runtime"
@@ -1185,7 +1167,7 @@ msgstr ""
 msgid "Install"
 msgstr ""
 
-msgid "Install Distrobox"
+msgid "Install %1"
 msgstr ""
 
 msgid "Install Distrobox on the system to continue."
@@ -1210,6 +1192,9 @@ msgid "Install directly on the system"
 msgstr ""
 
 msgid "Install directly on your system"
+msgstr ""
+
+msgid "Install it on your system, then try again."
 msgstr ""
 
 msgid "Install only the application"
@@ -1266,9 +1251,6 @@ msgstr ""
 msgid "Installer"
 msgstr ""
 
-msgid "Installing Distrobox using rpm-ostree…"
-msgstr ""
-
 msgid "Installing package updates…"
 msgstr ""
 
@@ -1297,6 +1279,9 @@ msgid "Installing the dependencies…"
 msgstr ""
 
 msgid "Installing {0} from PyPI…"
+msgstr ""
+
+msgid "Installing {0} using rpm-ostree…"
 msgstr ""
 
 msgid "Installs the application safely and automatically."
@@ -1605,10 +1590,13 @@ msgstr ""
 msgid "MultiPak needs Distrobox 1.8 and Podman 5 or newer. This system has Distrobox {0} and Podman {1}. Update them on your system to continue."
 msgstr ""
 
-msgid "MultiPak needs Distrobox 1.8 or newer to install applications in containers. Do you want to install it now with rpm-ostree? System authorization may be required, and you will need to restart your computer to finish."
+msgid "MultiPak needs Distrobox 1.8 or newer to install applications in containers."
 msgstr ""
 
-msgid "MultiPak needs Distrobox 1.8 or newer to install applications in containers. Install it on your system and open the package again."
+msgid "MultiPak needs Waydroid to create Android containers."
+msgstr ""
+
+msgid "MultiPak needs Waydroid to install Android apps."
 msgstr ""
 
 msgid "MultiPak settings"
@@ -1665,7 +1653,7 @@ msgstr ""
 msgid "No installed snap has commands that MultiPak can run as administrator."
 msgstr ""
 
-msgid "No pending Distrobox installation was found. Check the system status before restarting."
+msgid "No pending {0} installation was found. Check the system status before restarting."
 msgstr ""
 
 msgid "No program opens this address."
@@ -2101,6 +2089,9 @@ msgid "Search the app store"
 msgstr ""
 
 msgid "Security update required"
+msgstr ""
+
+msgid "See how"
 msgstr ""
 
 msgid "See the mounted disks and folders"
@@ -3603,13 +3594,13 @@ msgstr ""
 msgid "Validating the Android system…"
 msgstr ""
 
-msgid "Verifying the Distrobox installation…"
-msgstr ""
-
 msgid "Verifying the installation…"
 msgstr ""
 
 msgid "Verifying the pending deployment…"
+msgstr ""
+
+msgid "Verifying the {0} installation…"
 msgstr ""
 
 msgid "Verifying uninstallation…"
@@ -3684,7 +3675,13 @@ msgstr ""
 msgid "Waydroid is not installed on this system."
 msgstr ""
 
+msgid "Waydroid on this system is incomplete or too old: MultiPak needs LXC 3 or newer and the Python gbinder module, which come with Waydroid. Update Waydroid on your system to continue."
+msgstr ""
+
 msgid "Waydroid returned an invalid application identifier."
+msgstr ""
+
+msgid "Waydroid was installed using rpm-ostree. Restart your computer, then create the Android container again."
 msgstr ""
 
 msgid "Webcam"
@@ -3712,6 +3709,12 @@ msgid "You chose to search the app store."
 msgstr ""
 
 msgid "You confirmed the installation."
+msgstr ""
+
+msgid "Your system has an update or change waiting for a restart. Restart your computer, then try again."
+msgstr ""
+
+msgid "Your system is installing an update right now. Wait for it to finish, then try again."
 msgstr ""
 
 msgid "an empty base"
@@ -3843,7 +3846,19 @@ msgstr ""
 msgid "{0} exited with code {1}.\n{2}"
 msgstr ""
 
+msgid "{0} installation could not be confirmed."
+msgstr ""
+
+msgid "{0} installation could not be confirmed. Check the rpm-ostree status before trying again."
+msgstr ""
+
+msgid "{0} is available. You can continue."
+msgstr ""
+
 msgid "{0} is not a snap base."
+msgstr ""
+
+msgid "{0} is scheduled for installation. Restart your computer to finish."
 msgstr ""
 
 msgid "{0} is up to date."
@@ -3865,6 +3880,9 @@ msgid "{0} returned to version {1} (revision {2})."
 msgstr ""
 
 msgid "{0} was deleted."
+msgstr ""
+
+msgid "{0} was installed using rpm-ostree. Restart your computer, then reopen the package to install your application."
 msgstr ""
 
 msgid "{0} was repaired."

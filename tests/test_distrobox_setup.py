@@ -3,9 +3,13 @@ import json
 import pytest
 
 from multipak.distrobox_setup import (
+    HELP_URLS,
     DistroboxMissing,
     distrobox_requirement,
+    host_requirement,
     install_distrobox,
+    install_host_package,
+    outdated_waydroid,
     reboot_after_distrobox,
 )
 from multipak.process import CommandError
@@ -121,7 +125,7 @@ def test_installation_targets_only_distrobox_and_verifies_the_pending_deployment
 def test_confirmation_does_not_bypass_a_new_pending_operation(setup_engine):
     assert distrobox_requirement(setup_engine).can_install
     setup_engine.runner.before = status(deployment(), transaction=["Upgrade"])
-    with pytest.raises(RuntimeError, match="in progress"):
+    with pytest.raises(RuntimeError, match="installing an update"):
         install_distrobox(setup_engine)
     assert ["rpm-ostree", "install", "distrobox"] not in setup_engine.runner.calls
 
@@ -190,3 +194,69 @@ def test_old_distrobox_and_podman_enter_the_distrobox_flow(setup_engine, monkeyp
     assert not result.can_install and not result.restart_required
     assert result.update_required
     assert "Podman 4.9.3" in result.message
+
+
+def test_non_ostree_host_points_to_the_installation_guide(setup_engine, monkeypatch):
+    monkeypatch.setattr("multipak.system.system_install_available", lambda: False)
+    assert distrobox_requirement(setup_engine).help_url == HELP_URLS["distrobox"]
+    waydroid = host_requirement(setup_engine, "waydroid")
+    assert waydroid.package == "waydroid"
+    assert waydroid.help_url == HELP_URLS["waydroid"]
+    assert "Waydroid" in waydroid.message and "Android apps" in waydroid.message
+
+
+def test_missing_waydroid_is_offered_with_the_purpose_of_each_place(setup_engine):
+    installer = host_requirement(setup_engine, "waydroid")
+    manager = host_requirement(
+        setup_engine, "waydroid", "MultiPak needs Waydroid to create Android containers."
+    )
+    assert installer.can_install and manager.can_install
+    assert "install Android apps" in installer.message
+    assert "create Android containers" in manager.message
+    assert "rpm-ostree" in manager.message
+
+
+def test_waydroid_installation_requests_only_waydroid(setup_engine):
+    setup_engine.runner = HostRunner(
+        status(deployment()), status(deployment("waydroid", booted=False), deployment())
+    )
+    original = setup_engine.runner.run
+
+    def run(argv, **kwargs):
+        if argv == ["rpm-ostree", "install", "waydroid"]:
+            setup_engine.runner.started = True
+            setup_engine.runner.calls.append(argv)
+            return ""
+        return original(argv, **kwargs)
+
+    setup_engine.runner.run = run
+    assert install_host_package(setup_engine, "waydroid") is True
+    assert ["rpm-ostree", "install", "waydroid"] in setup_engine.runner.calls
+    assert ["rpm-ostree", "install", "distrobox"] not in setup_engine.runner.calls
+
+
+def test_pending_waydroid_asks_for_a_restart(setup_engine):
+    setup_engine.runner = HostRunner(status(deployment("waydroid", booted=False), deployment()))
+    result = host_requirement(setup_engine, "waydroid")
+    assert result.restart_required and not result.can_install
+
+
+@pytest.mark.parametrize(
+    ("lxc", "gbinder", "ok"),
+    [("7.0.0", "ok", True), ("2.1.1", "ok", False), ("7.0.0", "", False), ("", "ok", False)],
+)
+def test_waydroid_needs_lxc_3_and_gbinder(lxc, gbinder, ok):
+    class Runner:
+        def run(self, argv, **_kwargs):
+            return lxc if argv[0] == "lxc-info" else gbinder
+
+    message = outdated_waydroid(Runner())
+    assert (message == "") is ok
+
+
+def test_old_waydroid_parts_offer_the_guide_instead_of_an_install(setup_engine, monkeypatch):
+    monkeypatch.setattr("multipak.distrobox_setup.host.which", lambda name: f"/usr/bin/{name}")
+    setup_engine.runner.run = lambda argv, **_kwargs: "2.0.0" if argv[0] == "lxc-info" else ""
+    result = host_requirement(setup_engine, "waydroid")
+    assert result.update_required and not result.can_install
+    assert result.help_url == HELP_URLS["waydroid"]

@@ -414,6 +414,72 @@ Kirigami.ScrollablePage {
         onAccepted: controller.create(profile.currentValue, environmentName.text.trim())
     }
     Controls.Dialog {
+        // Waydroid is missing or too old: what MultiPak can do, as in the Installation Wizard.
+        id: waydroidSetupDialog
+        objectName: "androidWaydroidSetupDialog"
+        readonly property var setup: controller.waydroidSetup
+        parent: Controls.Overlay.overlay
+        anchors.centerIn: parent
+        width: Math.min(page.width - page.outerMargin * 2, Kirigami.Units.gridUnit * 29)
+        modal: true
+        title: setup.restartRequired ? qsTr("Restart required")
+            : setup.updateRequired ? qsTr("Update required")
+            : setup.canInstall ? qsTr("Install %1").arg("Waydroid") : "Waydroid"
+        contentItem: Controls.Label {
+            text: waydroidSetupDialog.setup.message || ""
+            textFormat: Text.PlainText
+            wrapMode: Text.WordWrap
+        }
+        footer: Controls.DialogButtonBox {
+            Controls.Button {
+                objectName: "androidWaydroidSetupHelp"
+                text: qsTr("See how")
+                icon.name: "help-contents"
+                visible: !!waydroidSetupDialog.setup.helpUrl
+                Controls.DialogButtonBox.buttonRole: Controls.DialogButtonBox.HelpRole
+                onClicked: Qt.openUrlExternally(waydroidSetupDialog.setup.helpUrl)
+            }
+            Controls.Button {
+                text: waydroidSetupDialog.setup.restartRequired ? qsTr("Restart later")
+                    : waydroidSetupDialog.setup.canInstall ? qsTr("Cancel") : qsTr("Close")
+                Controls.DialogButtonBox.buttonRole: Controls.DialogButtonBox.RejectRole
+            }
+            Controls.Button {
+                objectName: "androidWaydroidSetupInstall"
+                text: qsTr("Install %1").arg("Waydroid")
+                highlighted: true
+                visible: !!waydroidSetupDialog.setup.canInstall
+                Controls.DialogButtonBox.buttonRole: Controls.DialogButtonBox.AcceptRole
+            }
+            Controls.Button {
+                objectName: "androidWaydroidSetupRestart"
+                text: qsTr("Restart now")
+                highlighted: true
+                visible: !!waydroidSetupDialog.setup.restartRequired
+                Controls.DialogButtonBox.buttonRole: Controls.DialogButtonBox.AcceptRole
+            }
+        }
+        onAccepted: {
+            if (setup.canInstall)
+                controller.installWaydroid();
+            else if (setup.restartRequired)
+                controller.restartForWaydroid();
+        }
+        onRejected: controller.dismissWaydroidSetup()
+    }
+    Connections {
+        // Open the Waydroid setup whenever the controller has one, and close it when it is done.
+        target: controller
+        function onChanged() {
+            if (controller.waydroidSetup.message !== undefined) {
+                if (!waydroidSetupDialog.opened)
+                    waydroidSetupDialog.open();
+            } else if (waydroidSetupDialog.opened) {
+                waydroidSetupDialog.close();
+            }
+        }
+    }
+    Controls.Dialog {
         id: removeDialog
         objectName: "androidRemoveDialog"
         parent: Controls.Overlay.overlay

@@ -321,10 +321,14 @@ def identifier():
 
 
 def ensure_runtime(runner):
+    from .distrobox_setup import WaydroidMissing, outdated_waydroid
+
     if not host.which("waydroid"):
-        raise RuntimeError(
+        raise WaydroidMissing(
             tr("Install Waydroid on your system before preparing an Android environment.")
         )
+    if message := outdated_waydroid(runner):
+        raise WaydroidMissing(message)
     if host.which("multipak-waydroid"):
         version = runner.run([CLI, "--runtime-version"], timeout=10).strip()
         from .android_instances_helper import RUNTIME_SHA256
